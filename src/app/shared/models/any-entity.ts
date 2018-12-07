@@ -5,3 +5,14 @@ export interface anyEntityOptions<T>{
     selectId:   (i:T) => any            // entity to id value func    
     selBack:    (any) => string         // id value to http sublocation suffix
 } 
+
+export class AnyEntity
+{
+     [key: string]: any 
+}  
+
+export class AnyEntityId
+{
+     id:any   
+     [key: string]: any 
+}  

@@ -1,6 +1,6 @@
 import { EntityState, createEntityAdapter, EntityAdapter } from "@ngrx/entity";
-import { FieldDescribe } from "@appModels/metadata";
 import { anyEntityActions, AnyEntityActionTypes } from "@appStore/actions/any-entity.actions";
+import { FieldDescribes } from "@appModels/metadata";
 
 //import { anyEntityLazyActions, AnyEntityLazyActionTypes } from "@appStore/actions/any-entity-lazy.actions";
 
@@ -10,7 +10,7 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     loading: boolean;
     metaLoaded: boolean;
     metaLoading: boolean;
-    metadata:{[key: string]:FieldDescribe}
+    metadata:any             ///rrrrr!!!
     error: any;
 }
 
@@ -64,9 +64,16 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                 var s =
                     adapt.addMany( 
                         action.payload,
-                        { ...state , loaded: false, loading: true }
+                        { ...state , loaded: false, loading: true  }
                     );  
                 return s;        
+            }
+
+            case AnyEntityActionTypes.GET_ITEMS_META:
+                return { ...state, metaLoading: true, metaLoaded: false  };    
+
+            case AnyEntityActionTypes.GET_ITEMS_META_SUCCESS:{
+                return { ...state,  metaLoading:false, metaLoaded: true , metadata:action.payload };
             }
                 
             case AnyEntityActionTypes.EROR_ANY_ENTITY:

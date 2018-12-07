@@ -11,6 +11,9 @@ import * as fromStore from '@appStore/index';
 
 import * as fromSelectors from '@appStore/selectors/index';
 import { tap } from 'rxjs/operators';
+import { Exec, AddItem } from '@appStore/actions/any-entity-set.actions';
+import { anyEntityOptions, AnyEntityId } from '@appModels/any-entity';
+import { GetItemsMeta } from '@appStore/actions/any-entity.actions';
 
 
 
@@ -37,31 +40,15 @@ export class JnRootComponent implements OnInit , OnDestroy {
     private store: Store<fromStore.State>
   ){
 
-    //console.log(route) ; 
-    //store.select( fromSelectors.getRouterInfo ).pipe(tap(x=>console.log(x)));
+    const NvaSdEventTypeOption:anyEntityOptions<AnyEntityId> = {
+      name: "JgMockTable", 
+      location:"/NvaSd2/JgMockTable", 
+      selectId: (x) => x.id,
+      selBack: (x:string) => ("?ID=" + x )
+    };
     
-    // route.data
-    //   .map(x => x.data[SUB_SOURCE_PARAM_DATA_KEY] );
-
-    // this.subscr  =  
-    //   route.data
-    //     .map(x => x.data[SUB_SOURCE_PARAM_DATA_KEY] )
-    //     .subscribe( x => store.dispatch(  new JnChangeSource(x) ));
-
-    // this.store.pipe( select(fromSelectors.getLocation) ).subscribe( x=> console.log(x));    
-    
-
-    // this.db = dbEng.db( 
-    //   this.store
-    //     .pipe( select(fromSelectors.getLocation) )
-    //     .filter( x => x!='') 
-    // );
-
-    // посконный релиз    
-    // this.db = dbEng.db( 
-    //     route.data.map(x => x.data[SUB_SOURCE_PARAM_DATA_KEY] ) 
-    // );
-    
+    store.dispatch( new AddItem( NvaSdEventTypeOption) )
+    store.dispatch( new Exec( {name:"JgMockTable" , itemAction: new GetItemsMeta() }) )
   }
 
   onClickMe() {
@@ -69,7 +56,7 @@ export class JnRootComponent implements OnInit , OnDestroy {
   }  
 
   ngOnInit() {
-
+      this.store.subscribe(x=>console.log(x));
   }
 
   ngOnDestroy(){

@@ -24,6 +24,10 @@ export interface FieldDescribe {
     order?:number
   }
 
+export type FieldDescribes = ({
+    [key: string]:FieldDescribe
+  })
+
  /**
  * @stable
  */

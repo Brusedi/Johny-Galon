@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http'; 
-import { map, mergeMap } from 'rxjs/operators';
+import { map, mergeMap, tap } from 'rxjs/operators';
 
 import { AppSettingsService } from './app-setting.service';
 import { AppSettings } from '../app-setting';
@@ -87,6 +87,7 @@ export class DataProvService {
   private get = ( loc:string , subloc:string = undefined , type:RequestType = RequestType.Ordinary  ) =>
     this.buildDataUri_v2(loc, subloc,type )
         .pipe(
+            tap(x=>console.log(x)), 
             mergeMap( x => this.getDataFromUri( x )),
             map(x  => x.trim()===""? {}: JSON.parse(x) )
         ) ;           

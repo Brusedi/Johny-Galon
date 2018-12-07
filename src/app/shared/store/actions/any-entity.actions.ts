@@ -1,4 +1,7 @@
 import { Action } from "@ngrx/store";
+import { FieldDescribes } from "@appModels/metadata";
+
+
 
 export enum AnyEntityActionTypes {
     GET_ITEMS               = '[Entity] Load item',
@@ -33,11 +36,11 @@ export class AddItemSuccess<T> implements Action {
 
 export class GetItemsMeta implements Action {
     readonly type = AnyEntityActionTypes.GET_ITEMS_META;
-    constructor(public payload: any ) {}
+    constructor() {}
 }
-export class GetItemsMetaSuccess<T> implements Action {
+export class GetItemsMetaSuccess implements Action {
     readonly type = AnyEntityActionTypes.GET_ITEMS_META_SUCCESS;
-    constructor(public payload: T[] ) {}
+    constructor(public payload: any  ) {}  //FieldDescribes
 }
 
 export class ErrorAnyEntity implements Action {
@@ -49,7 +52,7 @@ export type anyEntityActions =
   | GetItems
   | GetItemsSuccess<any>
   | GetItemsMeta
-  | GetItemsMetaSuccess<any>
+  | GetItemsMetaSuccess
   | AddItem<any>
   | AddItemSuccess<any>
   | ErrorAnyEntity

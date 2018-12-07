@@ -30,6 +30,7 @@ import { DataProvService } from './shared/services/data-prov.service';
 import { HttpModule } from '@angular/http';
 import { StoreRouterConnectingModule, RouterStateSerializer  } from '@ngrx/router-store';
 import { CustomRouterStateSerializer } from '@appStore/router';
+import { JnNewItemComponent } from './jn-galon/jn-entity/jn-new-item/jn-new-item.component';
 
 
 const appRoutes: Routes = [
@@ -39,13 +40,19 @@ const appRoutes: Routes = [
   { path: 'tutoral/flight', component: JnRootComponent,                    data: {  data: { ServiceLocation:'/NvaAx/FlightFids'  } } },  
   { path: '**',             component: JnNotFoundComponent }
 ];
+// const appRoutes: Routes = [
+//   { path: '',               component: JnRootComponent, pathMatch: 'full'   },
+//   { path: '**',             component: JnNotFoundComponent }
+// ];
+
 
 @NgModule({
   declarations: [
     AppComponent,
     JnRootPageComponent,
     JnRootComponent,
-    JnNotFoundComponent
+    JnNotFoundComponent,
+    JnNewItemComponent
 
 
   ],

@@ -17,7 +17,7 @@ import { anyEntityOptions } from "@appModels/any-entity";
 
 
 @Injectable()
-export class anyEntytySetEffects {
+export class anyEntytyLazySetEffects {
   constructor(
       private actions$: Actions, 
       //private store$: Store<State>,

@@ -7,58 +7,71 @@ import * as fromEntityReduser from "./any-entity.reduser"
 // 
 export interface AnyEntytySetItemState<T> {
     state      : AnyEntytyState<T>,
-    option     : anyEntityOptions<T>
+    option     : anyEntityOptions<T>,
     action?    : anyEntityActions 
 } 
 
 // key as location
 export interface State {  
-    [key: string]: AnyEntytySetItemState<any>
-    error: any;
+    items:      { [key: string]: AnyEntytySetItemState<any> };      // poot datas
+    currentId?: string                                              // active Entity name    
+    error:      any ;
 }
 
 export const initialState: State = {
-    error:null
+    items: ({}),
+    currentId:null,
+    error:null,
 };
 
 export function reducer(state :State  = initialState, action: AnyEntitySetAction): State {
     //console.log( action) ;
     switch (action.type) {
-
-
         case AnyEntitySetActionTypes.ADD_ANY_ENTITY:
-            return { ...state, [action.payload.name]: { 
-                                    state:      fromEntityReduser.initStateFromSelFoo( action.payload.selectId),
-                                    option:     action.payload,
-                                    action:     null 
-                                } };    
+            return { 
+                ...state, 
+                items:{ ...state.items,  
+                    [action.payload.name]: { 
+                        state:      fromEntityReduser.initStateFromSelFoo( action.payload.selectId),
+                        option:     action.payload,
+                        action:     null
+                    }
+                }
+            };   
+            // return { ...state,  [action.payload.name]: { 
+            //                         state:      fromEntityReduser.initStateFromSelFoo( action.payload.selectId),
+            //                         option:     action.payload,
+            //                         action:     null 
+            //                     } };    
 
         case AnyEntitySetActionTypes.EXEC : {                                
-            action.reduserData = (< AnyEntytySetItemState<any>>state[action.payload.name]).option;
+            action.reduserData = (< AnyEntytySetItemState<any>>state.items[action.payload.name]).option;
             return {...state};
         }            
 
         case AnyEntitySetActionTypes.EXEC_ANY_ENTITY_ACTION: {
-            //console.log(action.payload);
-            //console.log(state);
+            console.log(action.payload);
+            console.log(state);
             var s = { ...state, 
+                items:{ ...state.items,
                         [action.payload.itemOption.name]:{ 
-                            ...state[action.payload.itemOption.name],
+                            ...state.items[action.payload.itemOption.name],
                             action: (<ExecItemAction>action).payload.itemAction,
-                            state: fromEntityReduser.reducerFromSelFoo( state[action.payload.itemOption.name].option.selectId )(
-                                state[action.payload.itemOption.name].state, (<ExecItemAction>action).payload.itemAction 
+                            state: fromEntityReduser.reducerFromSelFoo( state.items[action.payload.itemOption.name].option.selectId )(
+                                state.items[action.payload.itemOption.name].state, (<ExecItemAction>action).payload.itemAction 
                             )     
-                    }};
-            //console.log(s);        
+                    }}};
+            console.log(s);        
             return s;        
         };    
         
         case AnyEntitySetActionTypes.COMPLETE_ANY_ENTITY_ACTION: {
-            return { ...state, 
-                [action.payload.name]:{ 
-                    ...state[action.payload.name],
-                    action: null
-            }};
+            return { ...state,
+                items:{ ...state.items,  
+                    [action.payload.name]:{ 
+                        ...state.items[action.payload.name],
+                        action: null
+                    }}};        
         };    
 
         case AnyEntitySetActionTypes.EROR_ANY_ENTITY_SET:{        
