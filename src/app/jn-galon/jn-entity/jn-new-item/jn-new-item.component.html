@@ -1,3 +1,10 @@
-<p>
-  jn-new-item works!
-</p>
+<div *ngIf="controls$ | async as ctrls ; else loading;">
+
+    <form (ngSubmit)="onSubmit()" [formGroup]="ctrls.formGroup"> 
+        <div *ngFor="let question of ctrls.questions" class="form-row">
+            <app-jn-item-question [question]="question" [form]="ctrls.formGroup"></app-jn-item-question> 
+        </div>
+    </form>
+
+</div>  
+

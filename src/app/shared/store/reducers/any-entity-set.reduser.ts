@@ -50,8 +50,8 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
         }            
 
         case AnyEntitySetActionTypes.EXEC_ANY_ENTITY_ACTION: {
-            console.log(action.payload);
-            console.log(state);
+            //console.log(action.payload);
+            //console.log(state);
             var s = { ...state, 
                 items:{ ...state.items,
                         [action.payload.itemOption.name]:{ 
@@ -61,7 +61,7 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
                                 state.items[action.payload.itemOption.name].state, (<ExecItemAction>action).payload.itemAction 
                             )     
                     }}};
-            console.log(s);        
+            //console.log(s);        
             return s;        
         };    
         
@@ -78,6 +78,11 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
                 //console.log(action);
                 return { ...state, error:action.payload };    
             }    
+
+        case AnyEntitySetActionTypes.SET_CURRENT:{        
+                //console.log(action);
+                return { ...state, currentId:action.payload };    
+            }        
 
         default:
             return state;

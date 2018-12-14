@@ -87,7 +87,7 @@ export class DataProvService {
   private get = ( loc:string , subloc:string = undefined , type:RequestType = RequestType.Ordinary  ) =>
     this.buildDataUri_v2(loc, subloc,type )
         .pipe(
-            tap(x=>console.log(x)), 
+            //tap(x=>console.log(x)), 
             mergeMap( x => this.getDataFromUri( x )),
             map(x  => x.trim()===""? {}: JSON.parse(x) )
         ) ;           

@@ -3,12 +3,12 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 
 import { of } from "rxjs";
 
-import { map, mergeMap } from "rxjs/operators";
+import { map, mergeMap, catchError, tap } from "rxjs/operators";
 import { Observable } from "rxjs/Observable";
 
 import { DataProvService } from "app/shared/services/data-prov.service";
 import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction } from "@appStore/actions/any-entity-set.actions";
-import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess } from "@appStore/actions/any-entity.actions";
+import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 
@@ -50,13 +50,19 @@ export class anyEntytySetEffects {
             case ( AnyEntityActionTypes.GET_ITEMS_META ) :
                 return this.metadataService.metadata$( options.location ) // options.selBack(action.payload)
                     .pipe(
-                        map(x => new GetItemsMetaSuccess(x) )
-                        
-                        // map( x => x.length > 0 ? 
-                        //   //new GetItemSuccess(x[0]) :
-                        //   //new GetItemNotFound( action.payload ) 
-                        // )
+                        map(x => new GetItemsMetaSuccess(x) ),
+                        catchError(error => of(new ErrorAnyEntity(error)))
                     ); 
+
+            case ( AnyEntityActionTypes.GET_TEMPLATE ) :{
+                console.log('ssssssssssssss');
+                return this.dataService.template$( options.location ) // options.selBack(action.payload)
+                    .pipe(
+                        tap(x=> console.log(x)),
+                        map(x => new GetTemplateSuccess(x) ),
+                        catchError(error => of(new ErrorAnyEntity(error)))
+                    ); 
+            }            
                         
             default:
                 return of(null);

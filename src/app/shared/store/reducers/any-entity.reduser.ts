@@ -10,7 +10,8 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     loading: boolean;
     metaLoaded: boolean;
     metaLoading: boolean;
-    metadata:any             ///rrrrr!!!
+    metadata:any;           ///rrrrr!!!
+    template?:T;
     error: any;
 }
 
@@ -20,6 +21,7 @@ export const initialSubState = {
     metaLoaded: false,
     metaLoading: false,
     metadata:{},
+    template:null,
     error: null,
 
 }
@@ -45,7 +47,7 @@ export function selectorsFromSelFoo<T>( selFoo: ((T) => any) ){
 } 
 
 /// From adapter reduser && initstate 
-export function initStateFromAdapter( adapter: EntityAdapter<any> ){
+export function initStateFromAdapter( adapter: EntityAdapter<any> ):AnyEntytyState<any> {
     return adapter.getInitialState(initialSubState) ;
 } 
 
@@ -75,6 +77,14 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             case AnyEntityActionTypes.GET_ITEMS_META_SUCCESS:{
                 return { ...state,  metaLoading:false, metaLoaded: true , metadata:action.payload };
             }
+
+            case AnyEntityActionTypes.GET_TEMPLATE:{
+                return { ...state };    
+            }    
+
+            case AnyEntityActionTypes.GET_TEMPLATE_SUCCESS:{
+                return { ...state, template:action.payload  };    
+            }    
                 
             case AnyEntityActionTypes.EROR_ANY_ENTITY:
                 return { ...state, loaded: false, loading: false, error:  action.payload};            

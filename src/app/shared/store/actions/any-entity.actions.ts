@@ -13,6 +13,9 @@ export enum AnyEntityActionTypes {
     ADD_ITEM                =  '[Entity] Add item',
     ADD_ITEM_SUCCESS        =  '[Entity] Item added success',
 
+    GET_TEMPLATE            = '[Entity] Load template',
+    GET_TEMPLATE_SUCCESS    = '[Entity] Item template loaded success',
+
     EROR_ANY_ENTITY         = '[Entity] Error'
 }
 
@@ -43,6 +46,15 @@ export class GetItemsMetaSuccess implements Action {
     constructor(public payload: any  ) {}  //FieldDescribes
 }
 
+export class GetTemplate implements Action {
+    readonly type = AnyEntityActionTypes.GET_TEMPLATE;
+    constructor() {}
+}
+export class GetTemplateSuccess<T> implements Action {
+    readonly type = AnyEntityActionTypes.GET_TEMPLATE_SUCCESS;
+    constructor(public payload: T  ) {}  //FieldDescribes
+}
+
 export class ErrorAnyEntity implements Action {
     readonly type = AnyEntityActionTypes.EROR_ANY_ENTITY;
     constructor(public payload: any) {}
@@ -55,5 +67,7 @@ export type anyEntityActions =
   | GetItemsMetaSuccess
   | AddItem<any>
   | AddItemSuccess<any>
+  | GetTemplate
+  | GetTemplateSuccess<any>
   | ErrorAnyEntity
   ;

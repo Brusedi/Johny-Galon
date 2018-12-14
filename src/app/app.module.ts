@@ -13,7 +13,11 @@ import {
   MatMenuModule,
   MatDividerModule,
   MatToolbarModule,
-  MatTabsModule
+  MatTabsModule,
+  MatFormFieldModule,
+  MatSelectModule,
+  MatInputModule,
+  MatDatepickerModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -32,12 +36,16 @@ import { StoreRouterConnectingModule, RouterStateSerializer  } from '@ngrx/route
 import { CustomRouterStateSerializer } from '@appStore/router';
 import { JnNewItemComponent } from './jn-galon/jn-entity/jn-new-item/jn-new-item.component';
 
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { JnItemQuestionComponent } from './jn-galon/jn-entity/jn-item-question/jn-item-question.component';
+import { ReactiveFormsModule ,FormsModule } from '@angular/forms';
+import { JgMockTableOption, SdIncomingOption } from '@appModels/entity-options';
+import { AppResolverService } from './shared/services/app-resolver.service';
 
 const appRoutes: Routes = [
-  { path: '',               component: JnRootComponent, pathMatch: 'full' ,data: {  data: { ServiceLocation:'/NvaSd2/JgMockTable'    } } },
-  { path: 'tutoral/mock',   component: JnRootComponent,                    data: {  data: { ServiceLocation:'/NvaSd2/JgMockTable'    } } },  
-  { path: 'tutoral/sd',     component: JnRootComponent,                    data: {  data: { ServiceLocation:'/NvaSd2/NvaSdIncoming'  } } },  
-  { path: 'tutoral/flight', component: JnRootComponent,                    data: {  data: { ServiceLocation:'/NvaAx/FlightFids'  } } },  
+  { path: '',               component: JnRootComponent, pathMatch: 'full' ,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  }  },
+  { path: 'tutoral/mock',   component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
+  { path: 'tutoral/sd',     component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
   { path: '**',             component: JnNotFoundComponent }
 ];
 // const appRoutes: Routes = [
@@ -52,7 +60,8 @@ const appRoutes: Routes = [
     JnRootPageComponent,
     JnRootComponent,
     JnNotFoundComponent,
-    JnNewItemComponent
+    JnNewItemComponent,
+    JnItemQuestionComponent
 
 
   ],
@@ -61,6 +70,9 @@ const appRoutes: Routes = [
     BrowserModule,
     BrowserAnimationsModule,
     StoreModule.forRoot( fromStore.reducers ),
+    StoreDevtoolsModule.instrument({
+      maxAge: 10
+    }),
     EffectsModule.forRoot( fromStore.effects), 
     StoreRouterConnectingModule.forRoot({
         stateKey: 'router' // name of reducer key
@@ -81,12 +93,19 @@ const appRoutes: Routes = [
     MatToolbarModule,
     MatTableModule,
     MatTabsModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    FormsModule,
+    MatSelectModule,
+    MatInputModule,
+    MatDatepickerModule 
     
   ],
   providers: [
     {provide: RouterStateSerializer,   useClass: CustomRouterStateSerializer },
     AppSettingsService,
     DataProvService,
+    AppResolverService
 
   ],
   bootstrap: [AppComponent]

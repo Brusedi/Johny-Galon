@@ -7,6 +7,7 @@ import { anyEntityActions } from './any-entity.actions';
 
 export enum AnyEntitySetActionTypes {
     ADD_ANY_ENTITY                      = '[Entity set] Add any entity',
+    SET_CURRENT                         = '[Entity set] Set current entity',  
     EXEC                                = '[Entity set] Executing' ,
     EXEC_ANY_ENTITY_ACTION              = '[Entity set] Entyty action executing' ,
     COMPLETE_ANY_ENTITY_ACTION          = '[Entity set] Entyty action chain completed' ,
@@ -17,6 +18,11 @@ export enum AnyEntitySetActionTypes {
 export class AddItem implements Action {
     readonly type = AnyEntitySetActionTypes.ADD_ANY_ENTITY
     constructor(public payload: anyEntityOptions<any> )  { }
+}
+
+export class SetCurrent implements Action {
+    readonly type = AnyEntitySetActionTypes.SET_CURRENT
+    constructor(public payload: string )  { }
 }
 
 export class Exec implements Action {
@@ -43,6 +49,7 @@ export class ErrorAnyEntitySet implements Action {
 export type AnyEntitySetAction =
   | Exec
   | AddItem
+  | SetCurrent
   | ExecItemAction
   | CompleteItemAction
   | ErrorAnyEntitySet  
