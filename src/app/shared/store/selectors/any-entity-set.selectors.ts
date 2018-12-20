@@ -4,6 +4,7 @@ import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
 import { _Start } from "@angular/cdk/scrolling";
+import { getLocationMacros } from "app/shared/services/metadata/metadata.helper";
 
 export const dataStore = createFeatureSelector<State>('data');
 
@@ -80,13 +81,108 @@ export const selectTemplate = (id: string) =>
 
 // ANONIMUS SELECTOR --------------------------------------------------------------------------
 
-export const selectCurentName = () => 
+export const selCurName = () => 
     createSelector( selectDatas, x => x.currentId ) ;
 
-export const selectCurentItem = () => 
+export const selCurItem = () => 
     createSelector(selectDatas, x => x.items[x.currentId] );  //x.currentId ? x.items[x.currentId] : null ); 
 
-export const selectIsMetaLoaded = () => 
-    createSelector(selectDatas, x => x.currentId ? x.items[x.currentId].state.loaded : false);  
+export const selCurItemMeta = () => 
+    createSelector(selectDatas, x => 
+        !x.currentId ? undefined :
+            x.items[x.currentId].state.metadata 
+    ); 
 
+export const selCurItemMetaNote = () => 
+    createSelector(selectDatas, x => 
+        ! x.currentId ? "" : 
+            ! x.items[x.currentId].state.metaLoaded ? x.currentId :
+                !x.items[x.currentId].state.metadata.table.hasOwnProperty("DisplayName") ? x.currentId :
+                    x.items[x.currentId].state.metadata.table["DisplayName"]
+    );  
+
+export const selCurRowTemplate = () =>
+    createSelector( selectDatas, x => 
+        ! x.currentId ? {} : 
+            ! x.items[x.currentId].state.template ? {} :
+                x.items[x.currentId].state.template 
+    );        
+
+export const selCurIsMetaLoaded = () =>  createSelector(selectDatas, x => x.currentId ? x.items[x.currentId].state.loaded : false);  
+
+//Question Current------------------------------------------------------------------------------------------------------------------
+// FieldDescribes[]
+export const selCurFieldDescribes = () =>  
+    createSelector(  selCurItemMeta(), x =>   
+        !x ? undefined :  Object.keys(x.fieldsDesc).map(y => x.fieldsDesc[y]) 
+    ) ;     
+
+export const selCurQuestions = () =>  
+    createSelector( 
+        selCurFieldDescribes(), 
+        selCurRowTemplate(),
+        (x, t) => !x ? undefined : 
+            fldDescsToQuestions( Object.keys(x).map(y => x[y]) , t ) 
+    );     
+
+export const selCurFormGroup = ( ) => 
+    createSelector(
+        selCurQuestions(),
+        selCurRowTemplate(),
+        (x, t) =>  toFormGroup( x, t )        
+    );
+
+// Controls data for form
+export const selCurFormControls = () =>
+    createSelector( 
+        selCurQuestions(),
+        selCurFormGroup(),
+        (x,y) =>  ({ questions:x, formGroup:y})       
+    );    
+
+/**
+ * список полей изменения которых влияют на значения списков вторичных ключей    
+ * т.е. формальным языком которые упоминаются как макросы в FK-выражениях 
+ */    
+export const selCurMacroParentFields = () => 
+        createSelector(
+            selCurFieldDescribes(),
+            x => x.map( y => y.foreignKey)
+                .filter( x => !! x )
+                .map(x => getLocationMacros(x))
+                .reduce( (a,i) => [...a,...i] , [] )
+                .filter( (e,i,a) =>  i === a.indexOf(e) )
+        )
+
+
+// // Controls data for form
+// export const selectCurentFormControls = () =>
+//     createSelector( 
+
+//         selectCurentName,
+//         selectCurentRowTemplate,
+
+
+//         selectFormControls
+
+//         (items) =>  ({ questions:items, formGroup:toFormGroup( items, rowSeed ) })       
+// );
+
+
+// Controls data for form
+// export const selectCurentFormControls = (id: string, rowSeed:Observable<{}>) =>
+//     createSelector( 
+//         selectQuestions(id,rowSeed),
+//         (items) =>  ({ questions:items, formGroup:toFormGroup( items, rowSeed ) })       
+// );    
+
+// export const selectCurentNote = () => 
+//     createSelector(selectDatas, x => 
+//         !x.currentId ?  "" : (
+//             !x.items[x.currentId].state.metaLoaded ? "" :
+//                 x.items[x.currentId].state.metadata.
+//         )
+            
+//            // x.items[x.currentId].state.loaded : 
+//     );  
 

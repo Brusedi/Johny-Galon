@@ -3,6 +3,20 @@ import { FieldDescribe, ValidatorFn } from '@appModels/metadata';
 import { Validators } from '@angular/forms';
 
 
+/**
+ *  Бля, 191218 получение референсных данных посредством стора:  
+ *  1. получение контекстнонезависимой подписки:
+ *  Итак, на каком этапе ? 
+ *      a. На этапе ресолвинга 
+ *            минусы - не подходит (или усложняется) для контекстно зависимых подписок (не универсален)
+ *            плюсы    не надо делать диспатчи из контрола
+ *      б. На этапе активации подписчиков (контролов формы)
+ * 
+ * 
+ *  2. получение контекстнозависимой подписки
+ */
+
+
 interface IMetadata{
   [propertyName: string]: any; 
 }
@@ -129,10 +143,6 @@ private buildvalidationMessages(data:IMetadata, defVal:string){
     .reduce( (acc,i) => { acc[i.key] = i.val ; return acc; } , {} ) 
 }    
 
-
-
-
-
   /** 170418 Чета я не понимаю, при выборке данных посредством entyty  
   * с регистром лэйблов происходят чудеса
   * нужна затычка до выяснения обстоятельств такого поведения. :( 
@@ -200,6 +210,9 @@ private buildvalidationMessages(data:IMetadata, defVal:string){
    */
   defineOrValFuncIfExistGroup = (source: IMetadata, keyGroup: string, keysAcc: { atr:string, fn:( (src: any) => any)}[], defVal: any, noGroupVal: any ) =>     
     this.existGroup( source, keyGroup ) ? this.defineOrValFunc(source, keysAcc, defVal) : noGroupVal ;
+
+ 
+ 
 
 }
 

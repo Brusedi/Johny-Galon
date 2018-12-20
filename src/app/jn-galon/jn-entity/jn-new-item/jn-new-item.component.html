@@ -4,7 +4,17 @@
         <div *ngFor="let question of ctrls.questions" class="form-row">
             <app-jn-item-question [question]="question" [form]="ctrls.formGroup"></app-jn-item-question> 
         </div>
+
+        <div class="form-row">
+           <button mat-raised-button type="submit" [disabled]="!ctrls.formGroup.valid">Добавить запись</button>
+        </div> 
+            
+        <div *ngIf="payLoad" class="form-row">
+            <strong>Saved the following values</strong><br>{{payLoad}}
+        </div>
+
     </form>
 
 </div>  
 
+<ng-template #loading>Загрузка...</ng-template>

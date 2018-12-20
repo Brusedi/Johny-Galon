@@ -1,6 +1,5 @@
 import { Action } from "@ngrx/store";
-import { FieldDescribes } from "@appModels/metadata";
-
+//import { FieldDescribes } from "@appModels/metadata";
 
 
 export enum AnyEntityActionTypes {
@@ -15,6 +14,8 @@ export enum AnyEntityActionTypes {
 
     GET_TEMPLATE            = '[Entity] Load template',
     GET_TEMPLATE_SUCCESS    = '[Entity] Item template loaded success',
+
+    SET_ROW_SEED            = '[Entity] Item rowseed set (changed)',    
 
     EROR_ANY_ENTITY         = '[Entity] Error'
 }
@@ -50,9 +51,15 @@ export class GetTemplate implements Action {
     readonly type = AnyEntityActionTypes.GET_TEMPLATE;
     constructor() {}
 }
+
 export class GetTemplateSuccess<T> implements Action {
     readonly type = AnyEntityActionTypes.GET_TEMPLATE_SUCCESS;
-    constructor(public payload: T  ) {}  //FieldDescribes
+    constructor(public payload: T  ) {}  
+}
+
+export class SetRowSeed<T> implements Action {
+    readonly type = AnyEntityActionTypes.SET_ROW_SEED;
+    constructor(public payload: T  ) {}  
 }
 
 export class ErrorAnyEntity implements Action {
@@ -69,5 +76,6 @@ export type anyEntityActions =
   | AddItemSuccess<any>
   | GetTemplate
   | GetTemplateSuccess<any>
+  | SetRowSeed<any>
   | ErrorAnyEntity
   ;

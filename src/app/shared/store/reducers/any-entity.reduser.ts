@@ -3,6 +3,10 @@ import { anyEntityActions, AnyEntityActionTypes } from "@appStore/actions/any-en
 import { FieldDescribes } from "@appModels/metadata";
 
 //import { anyEntityLazyActions, AnyEntityLazyActionTypes } from "@appStore/actions/any-entity-lazy.actions";
+export interface Metadata {
+    table: any
+    fieldsDesc: FieldDescribes
+}
 
 
 export interface AnyEntytyState<T> extends EntityState<T> {
@@ -10,8 +14,9 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     loading: boolean;
     metaLoaded: boolean;
     metaLoading: boolean;
-    metadata:any;           ///rrrrr!!!
+    metadata:Metadata;           ///rrrrr!!!
     template?:T;
+    rowSeed?:T;
     error: any;
 }
 
@@ -20,8 +25,9 @@ export const initialSubState = {
     loading: false,
     metaLoaded: false,
     metaLoading: false,
-    metadata:{},
+    metadata:{ table:{} ,fieldsDesc:{} },
     template:null,
+    rowSeed:null,
     error: null,
 
 }
@@ -85,7 +91,11 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             case AnyEntityActionTypes.GET_TEMPLATE_SUCCESS:{
                 return { ...state, template:action.payload  };    
             }    
-                
+
+            case AnyEntityActionTypes.SET_ROW_SEED:{
+                return { ...state, rowSeed:action.payload  };    
+            }    
+
             case AnyEntityActionTypes.EROR_ANY_ENTITY:
                 return { ...state, loaded: false, loading: false, error:  action.payload};            
                 

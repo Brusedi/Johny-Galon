@@ -40,11 +40,11 @@ export class JnRootComponent implements OnInit , OnDestroy {
     private store: Store<fromStore.State>
   ){
 
-    this.store.select( fromSelectors.selectDatas ).subscribe(x=>console.log(x))
+    //this.store.select( fromSelectors.selectDatas ).subscribe(x=>console.log(x))
 
     //this.route.data.subscribe( x => console.log(x ) );
-
-    this.store.select( fromSelectors.selectIsMetaLoaded()).subscribe(x=>console.log(x))
+ 
+    //this.store.select( fromSelectors.selectIsMetaLoaded()).subscribe(x=>console.log(x))
 
     // route.data.pipe(
     //      map(x => x.option )

@@ -26,6 +26,13 @@
                 <p></p>
                 <!-- <mat-hint *ngIf="!!question.hint"> {{question.hint}} </mat-hint>  -->
             </div>  
+
+            <mat-form-field *ngSwitchCase="'dropdown'">
+                    <p>{{question.optionsLoc}} </p>
+                    <mat-select placeholder={{question.label}} [id]="question.key"  [formControlName]="question.key"  >
+                      <!-- <mat-option *ngFor="let opt of question.options$ | async" [value]="opt.key">{{opt.value}}</mat-option> -->
+                    </mat-select>
+            </mat-form-field>
         
             <mat-form-field *ngSwitchCase="'datepicker'">
                 <input matInput [matDatepicker]="picker" placeholder={{question.label}} [formControlName]="question.key" [id]="question.key" [type]="question.type" >

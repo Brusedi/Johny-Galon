@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { DataProvService } from '../data-prov.service';
-import { tap, map, mergeAll, toArray, mergeMap } from 'rxjs/operators';
-import { FieldDescribe, FieldDescribes } from '@appModels/metadata';
-import { Observable, of, from } from 'rxjs';
+import { tap, map, mergeAll, toArray, mergeMap, combineLatest, reduce } from 'rxjs/operators';
+import { FieldDescribe} from '@appModels/metadata';
+import { Observable,  from } from 'rxjs';
 import { MetadataAdaptService } from './metadata-adapt.service';
-
-
 
 const IS_FIELD_TAG_BEGIN = "["; 
 const IS_FIELD_TAG_END = "]";
@@ -29,28 +27,106 @@ export class MetadataProvService {
     private adapterService: MetadataAdaptService
     ) { }
 
-  public metadata$(loc:string ):Observable<FieldDescribes>{
-    const r$ =  
-      this.loadMetadata(loc).pipe(
-        map( x => x.reduce( (a,e) => ({...a, [e.name]:e }) ,  {}  ) )
-      );
-    
 
+  public metadata$(loc:string ):Observable<any>{  
+    const r$ = this.loadMetadata2(loc); 
     r$.subscribe( x=> console.log(x));
-
     return r$;
   }
+
+  private loadMetadata2 = (loc:string ) => {
+    const tMeta$ = this.dataService.metadata$(loc);
+    const fList$ = tMeta$.pipe( map( x =>  this.toFieldsList(x)) )
+    const fListDesc$ = fList$.pipe(
+      map( x =>  x.map( x =>   this.dataService.metadata$(loc, x ))),
+      mergeMap( x => from(x).pipe(mergeAll(),toArray())),  
+      map( x => x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) )),    
+      map( x => x.reduce((a,e) => ({...a, [e.id]:e }) ,  {})   )
+    )
+    return tMeta$.pipe(
+      combineLatest( fListDesc$, (v1,v2) => ({table:v1 ,fieldsDesc: v2 })   )
+    )
+
+
+  }
+
+  // public metadata$(loc:string ):Observable<FieldDescribes>{
+  //   const r$ =  
+  //     this.loadMetadata(loc).pipe(
+  //       map( x => x.reduce( (a,e) => ({...a, [e.name]:e }) ,  {}  ) )
+  //     );
+  //   r$.subscribe( x=> console.log(x));
+  //   return r$;
+  // }
   
   /**
   * Prepare metadata
   */
   private loadMetadata = ( loc:string ) => 
     this.dataService.metadata$(loc).pipe(
-        map( x => this.toFieldsList(x) ),
-        map( x => x.map( fld => this.dataService.metadata$(loc, fld ) ) ),
-        mergeMap( x => from(x).pipe(mergeAll(),toArray())),
-        map( x =>  x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) ))
-    );
+      tap( x => console.log(x) ),
+      map( x => ({table:x ,fieldsDesc: this.toFieldsDescribe(loc, x)}) ),
+      tap( x => console.log(x) ),        
+  )    
+  
+  
+  // {
+  //   const tablMeta$ = this.dataService.metadata$(loc);
+  //   const fieldsDesc$ = this.
+
+  //   return tablMeta$.pipe(
+  //       combineLatest( fieldsDesc$ , (f,d) => { } )
+  //   )
+  // }
+
+  //  /**
+  //   * Prepare metadata
+  //   */
+  //  private loadMetadata = ( loc:string ) => 
+  //  this.dataService.metadata$(loc).pipe(
+  //      map( x => this.toFieldsList(x) ),
+  //      map( x => x.map( fld => this.dataService.metadata$(loc, fld ) ) ),
+  //      mergeMap( x => from(x).pipe(mergeAll(),toArray())),
+  //      map( x =>  x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) ))
+  //  );
+
+  /**
+   *  Convert table metadata to FieldDescribe[]$
+   */
+  private toFieldsDescribe = (loc:string, tableMeta:any) =>{ 
+    const fieldsMetadata = 
+      this.toFieldsList(tableMeta)
+        .map( fld => this.fldToFieldsDescribe$(loc, fld));
+
+    console.log(fieldsMetadata);
+
+    return from(fieldsMetadata).pipe(
+      mergeAll(),
+      reduce( (a,e:FieldDescribe) => ({...a, [e.name]:e }) ,  {}  ) ,     
+      tap(x=>console.log(x))
+    )
+  }
+  
+  /**
+   *  get FieldDescr by fieldName
+   */
+  private fldToFieldsDescribe$ = (loc:string, fieldName:string ) => 
+    this.dataService.metadata$(loc, fieldName ).pipe( 
+      map( x => this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) )  , 
+      tap(x=>console.log(x))
+    )
+   
+  // private toFieldsDescribe = (loc:string, tableMeta$:Observable<any>) => 
+  //   tableMeta$.pipe(
+  //     map( x => this.toFieldsList(x) ),
+  //     map( x => x.map( fld => this.dataService.metadata$(loc, fld ) ) ),
+  //     mergeMap( x => from(x).pipe(mergeAll(),toArray())),
+  //     map( x =>  x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) )),
+  //     map( x => x.reduce( (a,e) => ({...a, [e.name]:e }) ,  {}  ) )
+  //   )  
+  
+
+
 
   /**
    *  Convert table metadata to fields list
