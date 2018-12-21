@@ -18,6 +18,7 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     template?:T;
     rowSeed?:T;
     error: any;
+    jab:        boolean;
 }
 
 export const initialSubState = {
@@ -29,7 +30,7 @@ export const initialSubState = {
     template:null,
     rowSeed:null,
     error: null,
-
+    jab: true
 }
 
 export function adapter<T>(){ return  createEntityAdapter<T>() }
@@ -41,14 +42,14 @@ export function anyEntytyinitialState<T>(){
 export function anyEntityLazySelectors<T>(){ return adapter<T>().getSelectors()};
 
 /// From selfunction reduser && initstate 
-export function initStateFromSelFoo<T>( selFoo: ((T) => any) ){ 
+export function initStateFromSelFoo<T>( selFoo: ((x: T) => any) ){ 
     return initStateFromAdapter( createEntityAdapter<T>({selectId:selFoo}))
 } 
-export function reducerFromSelFoo<T>( selFoo: ((T) => any) ){ 
+export function reducerFromSelFoo<T>( selFoo: ((x:T) => any) ){ 
     return reducerFromAdapter( createEntityAdapter<T>({selectId:selFoo}))
 } 
 
-export function selectorsFromSelFoo<T>( selFoo: ((T) => any) ){
+export function selectorsFromSelFoo<T>( selFoo: ((x:T) => any) ){
     return createEntityAdapter<T>({selectId:selFoo}).getSelectors()
 } 
 
@@ -85,7 +86,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             }
 
             case AnyEntityActionTypes.GET_TEMPLATE:{
-                return { ...state };    
+                return { ...state, template: null };    
             }    
 
             case AnyEntityActionTypes.GET_TEMPLATE_SUCCESS:{
@@ -98,6 +99,9 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
 
             case AnyEntityActionTypes.EROR_ANY_ENTITY:
                 return { ...state, loaded: false, loading: false, error:  action.payload};            
+
+            case AnyEntityActionTypes.JAB_STATE:
+                return { ...state, jab:!state.jab};            
                 
             default:
                 return state;

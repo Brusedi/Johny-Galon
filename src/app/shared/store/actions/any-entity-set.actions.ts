@@ -11,9 +11,14 @@ export enum AnyEntitySetActionTypes {
     EXEC                                = '[Entity set] Executing' ,
     EXEC_ANY_ENTITY_ACTION              = '[Entity set] Entyty action executing' ,
     COMPLETE_ANY_ENTITY_ACTION          = '[Entity set] Entyty action chain completed' ,
-    EROR_ANY_ENTITY_SET                 = '[Entity set] Error' 
+    EROR_ANY_ENTITY_SET                 = '[Entity set] Error' ,
+    JAB_STATE                           = '[Entity set] Jab (pure state change)' 
 }
 
+export class Jab implements Action {
+    readonly type = AnyEntitySetActionTypes.JAB_STATE
+    constructor( )  { }
+}
 
 export class AddItem implements Action {
     readonly type = AnyEntitySetActionTypes.ADD_ANY_ENTITY
@@ -53,5 +58,6 @@ export type AnyEntitySetAction =
   | ExecItemAction
   | CompleteItemAction
   | ErrorAnyEntitySet  
+  | Jab
   
   ;

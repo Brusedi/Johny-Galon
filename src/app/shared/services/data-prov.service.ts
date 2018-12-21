@@ -90,7 +90,7 @@ export class DataProvService {
             //tap(x=>console.log(x)), 
             mergeMap( x => this.getDataFromUri( x )),
             map(x  => x.trim()===""? {}: JSON.parse(x) ),
-            tap(x=>console.log(x)) 
+            //tap(x=>console.log(x)) 
         ) ;           
   
 

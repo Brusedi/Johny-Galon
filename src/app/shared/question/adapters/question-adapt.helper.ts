@@ -72,7 +72,7 @@ export const fldDescsToQuestions = (flds:FieldDescribe[],rowSeed:Observable<{}>)
 
 /******************************************************************************************************* */
 const buildQuestionBaseOption = (x:FieldDescribe, rowSeed$:Observable<{}>) => ({  
-    key: x.altId,
+    key:x.id,                //x.altId,  поправил бэкэнд верблюд ушел нах
     label:x.name, 
     required:!!x.required, 
     hint: x.description,

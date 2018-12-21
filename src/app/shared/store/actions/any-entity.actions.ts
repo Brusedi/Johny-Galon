@@ -17,7 +17,14 @@ export enum AnyEntityActionTypes {
 
     SET_ROW_SEED            = '[Entity] Item rowseed set (changed)',    
 
-    EROR_ANY_ENTITY         = '[Entity] Error'
+    EROR_ANY_ENTITY         = '[Entity] Error',
+
+    JAB_STATE               = '[Entity] Jab (pure state change)' 
+}
+
+export class Jab implements Action {
+    readonly type = AnyEntityActionTypes.JAB_STATE
+    constructor( )  { }
 }
 
 export class GetItems implements Action {
@@ -78,4 +85,5 @@ export type anyEntityActions =
   | GetTemplateSuccess<any>
   | SetRowSeed<any>
   | ErrorAnyEntity
+  | Jab
   ;

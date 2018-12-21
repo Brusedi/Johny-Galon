@@ -30,7 +30,7 @@ export class MetadataProvService {
 
   public metadata$(loc:string ):Observable<any>{  
     const r$ = this.loadMetadata2(loc); 
-    r$.subscribe( x=> console.log(x));
+    //r$.subscribe( x=> console.log(x));
     return r$;
   }
 

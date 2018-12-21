@@ -55,10 +55,10 @@ export class anyEntytySetEffects {
                     ); 
 
             case ( AnyEntityActionTypes.GET_TEMPLATE ) :{
-                console.log('ssssssssssssss');
+                //console.log('ssssssssssssss');
                 return this.dataService.template$( options.location ) // options.selBack(action.payload)
                     .pipe(
-                        tap(x=> console.log(x)),
+                        //tap(x=> console.log(x)),
                         map(x => new GetTemplateSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))
                     ); 

@@ -40,9 +40,11 @@ export class JnRootComponent implements OnInit , OnDestroy {
     private store: Store<fromStore.State>
   ){
 
+
+    //console.log('3333333333333333333333333');
     //this.store.select( fromSelectors.selectDatas ).subscribe(x=>console.log(x))
 
-    //this.route.data.subscribe( x => console.log(x ) );
+    //this.route.data.subscribe( x => console.log(x.isLoad ) );
  
     //this.store.select( fromSelectors.selectIsMetaLoaded()).subscribe(x=>console.log(x))
 
@@ -78,6 +80,8 @@ export class JnRootComponent implements OnInit , OnDestroy {
 
   ngOnInit() {
       //this.store.subscribe(x=>console.log(x));
+
+      
   }
 
   ngOnDestroy(){

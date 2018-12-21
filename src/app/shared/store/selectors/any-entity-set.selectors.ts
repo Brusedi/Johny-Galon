@@ -20,7 +20,23 @@ export const selectIsExist = ( id: string ) =>
         dt =>  (id in dt.items)
 );
 
+// Загруженны ли метаданные
+export const selectIsMetadataLoaded= ( id: string ) => 
+    createSelector(
+        selectDatas,
+        selectIsExist(id),
+        (dt, is) =>  is && dt.items[id].state.metaLoaded
+);
+
+// пукалка
+export const selectJab = () => 
+    createSelector(
+        selectDatas,
+        dt =>  dt.jab
+);
+
 // NAMED SELECTORS -----------------------------------------------------
+
 export const selectData = ( id: string ) => 
     createSelector(
         selectDatas,
@@ -80,7 +96,6 @@ export const selectTemplate = (id: string) =>
 );    
 
 // ANONIMUS SELECTOR --------------------------------------------------------------------------
-
 export const selCurName = () => 
     createSelector( selectDatas, x => x.currentId ) ;
 
@@ -103,7 +118,7 @@ export const selCurItemMetaNote = () =>
 
 export const selCurRowTemplate = () =>
     createSelector( selectDatas, x => 
-        ! x.currentId ? {} : 
+        ! x.currentId ? null : 
             ! x.items[x.currentId].state.template ? {} :
                 x.items[x.currentId].state.template 
     );        
@@ -153,6 +168,12 @@ export const selCurMacroParentFields = () =>
                 .reduce( (a,i) => [...a,...i] , [] )
                 .filter( (e,i,a) =>  i === a.indexOf(e) )
         )
+
+// Controls data for form
+export const selCurJab = () =>
+    createSelector( 
+        selCurItem(), x=> x.state.jab
+    );    
 
 
 // // Controls data for form

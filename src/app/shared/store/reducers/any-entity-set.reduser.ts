@@ -16,12 +16,14 @@ export interface State {
     items:      { [key: string]: AnyEntytySetItemState<any> };      // poot datas
     currentId?: string                                              // active Entity name    
     error:      any ;
+    jab:        boolean;
 }
 
 export const initialState: State = {
     items: ({}),
     currentId:null,
     error:null,
+    jab: true
 };
 
 export function reducer(state :State  = initialState, action: AnyEntitySetAction): State {
@@ -82,6 +84,10 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
         case AnyEntitySetActionTypes.SET_CURRENT:{        
                 //console.log(action);
                 return { ...state, currentId:action.payload };    
+            }        
+
+        case AnyEntitySetActionTypes.JAB_STATE:{        
+                return { ...state, jab:!state.jab};    
             }        
 
         default:
