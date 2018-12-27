@@ -4,13 +4,13 @@ import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
 import { _Start } from "@angular/cdk/scrolling";
-import { getLocationMacros } from "app/shared/services/metadata/metadata.helper";
+import { getLocationMacros } from "app/shared/services/foregin/foreign-key.helper";
 
 export const dataStore = createFeatureSelector<State>('data');
 
 export const selectDatas = createSelector(
     dataStore,
-    x => x 
+    (x:State) => x 
 ); 
 
 // MANAGEMENT 
@@ -95,6 +95,18 @@ export const selectTemplate = (id: string) =>
         (x:AnyEntytySetItemState<any>) => x.state.template
 );    
 
+
+/**
+ *  item is Loading (buzy)
+ */
+export const selectIsLoading = (id: string) =>
+    createSelector( 
+        selectData(id),
+        (x:AnyEntytySetItemState<any>) => x.state.loading || x.state.metaLoading
+);    
+
+
+
 // ANONIMUS SELECTOR --------------------------------------------------------------------------
 export const selCurName = () => 
     createSelector( selectDatas, x => x.currentId ) ;
@@ -174,6 +186,18 @@ export const selCurJab = () =>
     createSelector( 
         selCurItem(), x=> x.state.jab
     );    
+
+
+/// COMMON SELECTORS------------------------------------------------------------------------------------------------------
+
+/**
+ *  items is Loading (buzy)
+ */
+export const selItemsIsLoading = () =>
+    createSelector( 
+        selectDatas,
+        (dt) => Object.keys(dt.items).reduce( (a,i) => a || dt.items[i].state.loading || dt.items[i].state.metaLoading ,false ) 
+);    
 
 
 // // Controls data for form

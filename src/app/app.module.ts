@@ -17,7 +17,8 @@ import {
   MatFormFieldModule,
   MatSelectModule,
   MatInputModule,
-  MatDatepickerModule
+  MatDatepickerModule,
+  MatProgressSpinnerModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -62,8 +63,6 @@ const appRoutes: Routes = [
     JnNotFoundComponent,
     JnNewItemComponent,
     JnItemQuestionComponent
-
-
   ],
   imports: [
     HttpModule,
@@ -81,6 +80,7 @@ const appRoutes: Routes = [
       appRoutes,
       { enableTracing: false } // <-- debugging purposes only
     ),
+    
     AppRoutingModule,
     MatCardModule,
     MatTableModule,
@@ -98,7 +98,8 @@ const appRoutes: Routes = [
     FormsModule,
     MatSelectModule,
     MatInputModule,
-    MatDatepickerModule 
+    MatDatepickerModule,
+    MatProgressSpinnerModule
     
   ],
   providers: [

@@ -89,10 +89,11 @@ const toTextBox = (x:FieldDescribe, rowSeed$:Observable<{}>) =>
   );
     
 const toDropDown = (x:FieldDescribe, rowSeed$:Observable<{}>) => { 
-    const buildOptions = (loc:string, rs$:Observable<{}> ) =>  ({})//this.fkEngin.getForeginList$(loc, rs$ ) ;
+    //const buildOptions = (loc:string, rs$:Observable<{}> ) =>  ({})//this.fkEngin.getForeginList$(loc, rs$ ) ;
     const buildBaseOption = (x:FieldDescribe, rowSeed$:Observable<{}>) => {
         var ret = buildQuestionBaseOption(x, rowSeed$ );
-        ret['options$'] = buildOptions(x.foreignKey, rowSeed$);      
+        //ret['options$'] = buildOptions(x.foreignKey, rowSeed$);      
+        ret['optionsRefLoc'] = x.foreignKey;      
         return ret;
     }
   return new DropdownQuestion(buildBaseOption(x,rowSeed$)) ; 

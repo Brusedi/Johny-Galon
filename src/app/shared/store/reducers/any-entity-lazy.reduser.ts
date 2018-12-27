@@ -34,14 +34,14 @@ export function anyEntytyinitialState<T>(){
 export function anyEntityLazySelectors<T>(){ return adapter<T>().getSelectors()};
 
 /// From selfunction reduser && initstate 
-export function initStateFromSelFoo<T>( selFoo: ((T) => any) ){ 
+export function initStateFromSelFoo<T>( selFoo: ((x:T) => any) ){ 
     return initStateFromAdapter( createEntityAdapter<T>({selectId:selFoo}))
 } 
-export function reducerFromSelFoo<T>( selFoo: ((T) => any) ){ 
+export function reducerFromSelFoo<T>( selFoo: ((x:T) => any) ){ 
     return reducerFromAdapter( createEntityAdapter<T>({selectId:selFoo}))
 } 
 
-export function selectorsFromSelFoo<T>( selFoo: ((T) => any) ){
+export function selectorsFromSelFoo<T>( selFoo: ((x:T) => any) ){
     return createEntityAdapter<T>({selectId:selFoo}).getSelectors()
 } 
 

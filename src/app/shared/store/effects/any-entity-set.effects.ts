@@ -7,7 +7,7 @@ import { map, mergeMap, catchError, tap } from "rxjs/operators";
 import { Observable } from "rxjs/Observable";
 
 import { DataProvService } from "app/shared/services/data-prov.service";
-import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction } from "@appStore/actions/any-entity-set.actions";
+import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent } from "@appStore/actions/any-entity-set.actions";
 import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
@@ -31,6 +31,13 @@ export class anyEntytySetEffects {
         ofType(AnyEntitySetActionTypes.EXEC),
         //map( (x:Exec) => {console.log(x); return x }  ),
         map( (x:Exec) => new ExecItemAction({ itemOption: x.reduserData, itemAction: x.payload.itemAction } ))   
+    )
+
+    @Effect()   //
+    ExecCurentItemAction$ = this.actions$.pipe(
+        ofType(AnyEntitySetActionTypes.EXEC_CURENT),
+        tap((x:ExecCurrent) => console.log('Exec curent'+ x.reduserData)),
+        map( (x:ExecCurrent) => new Exec({ name: x.reduserData, itemAction: x.payload } ))   
     )
       
     @Effect()   //.insert(action.payload.location, action.payload.data)

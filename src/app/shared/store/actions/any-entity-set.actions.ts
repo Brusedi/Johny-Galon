@@ -8,7 +8,8 @@ import { anyEntityActions } from './any-entity.actions';
 export enum AnyEntitySetActionTypes {
     ADD_ANY_ENTITY                      = '[Entity set] Add any entity',
     SET_CURRENT                         = '[Entity set] Set current entity',  
-    EXEC                                = '[Entity set] Executing' ,
+    EXEC_CURENT                         = '[Entity set] Execute current entity' ,
+    EXEC                                = '[Entity set] Execute' ,
     EXEC_ANY_ENTITY_ACTION              = '[Entity set] Entyty action executing' ,
     COMPLETE_ANY_ENTITY_ACTION          = '[Entity set] Entyty action chain completed' ,
     EROR_ANY_ENTITY_SET                 = '[Entity set] Error' ,
@@ -36,6 +37,12 @@ export class Exec implements Action {
     constructor(public payload: {name:string, itemAction: anyEntityActions  } ) {}
 }
 
+export class ExecCurrent implements Action {
+    readonly type = AnyEntitySetActionTypes.EXEC_CURENT
+    reduserData: string; // курент
+    constructor(public payload: anyEntityActions  ) {}
+}
+
 export class ExecItemAction implements Action {
     readonly type = AnyEntitySetActionTypes.EXEC_ANY_ENTITY_ACTION
     constructor(public payload: {itemOption:anyEntityOptions<any> , itemAction: anyEntityActions  } ) {}
@@ -53,11 +60,11 @@ export class ErrorAnyEntitySet implements Action {
 
 export type AnyEntitySetAction =
   | Exec
+  | ExecCurrent
   | AddItem
   | SetCurrent
   | ExecItemAction
   | CompleteItemAction
   | ErrorAnyEntitySet  
   | Jab
-  
-  ;
+;

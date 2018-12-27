@@ -14,7 +14,7 @@ export interface AnyEntytySetItemState<T> {
 // key as location
 export interface State {  
     items:      { [key: string]: AnyEntytySetItemState<any> };      // poot datas
-    currentId?: string                                              // active Entity name    
+    currentId?: string ;                                             // active Entity name    
     error:      any ;
     jab:        boolean;
 }
@@ -47,7 +47,7 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
             //                     } };    
 
         case AnyEntitySetActionTypes.EXEC : {                                
-            action.reduserData = (< AnyEntytySetItemState<any>>state.items[action.payload.name]).option;
+            action.reduserData = (< AnyEntytySetItemState<any>>state.items[action.payload.name]).option; // догрузка
             return {...state};
         }            
 
@@ -89,6 +89,12 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
         case AnyEntitySetActionTypes.JAB_STATE:{        
                 return { ...state, jab:!state.jab};    
             }        
+
+        case AnyEntitySetActionTypes.EXEC_CURENT:{  
+            action.reduserData = state.currentId;      // догруз
+                return { ...state};    
+            }        
+
 
         default:
             return state;

@@ -5,11 +5,14 @@ export class DropdownQuestion extends QuestionBase<string> {
   controlType = 'dropdown';
   options: {key: string, value: string}[] = [];
   options$: Observable<{key: string, value: string}[]> = null;
+  optionsRefLoc: string = null;
 
   constructor(options: {} = {} ) {
     super(options);
+
     this.options = options['options'] || [];
     this.options$ = options['options$'] || null;
+    this.optionsRefLoc = options['optionsRefLoc'] || null;
     //console.log(this.order);
   }
 }

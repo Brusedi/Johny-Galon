@@ -12,11 +12,16 @@
         <button mat-menu-item [routerLink]="['/tutoral/flight']" >flight table</button>
     </mat-menu> 
     <div class="flex-spacer" ></div>
+    
     <div class="tb-note" >
-      <p >{{subCaption}}</p>
+      <p >{{subCaption$ | async }} </p>
     </div>
+    <mat-spinner *ngIf="!(spiner$ |async)"  color="accent" diameter="36"> </mat-spinner>
   </mat-toolbar>
 </nav> 
+
+<!-- <h1 class="mat-display-1">Jackdaws love my big sphinx of quartz.</h1> -->
+
 
 <router-outlet></router-outlet> 
 

@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
+import {MatIconRegistry} from '@angular/material';
 
 import * as fromSelectors from '@appStore/selectors/index';
 import * as fromStore     from '@appStore/index';
+import { Observable, of } from 'rxjs';
+import { delay, startWith, take, map } from 'rxjs/operators';
+
+
 
 
 const SUB_SOURCE_PARAM_DATA_KEY = 'ServiceLocation';
@@ -14,7 +19,8 @@ const SUB_SOURCE_PARAM_DATA_KEY = 'ServiceLocation';
 })
 export class JnRootPageComponent implements OnInit {
 
-  private subCaption : string; 
+  private subCaption$ : Observable<string>; 
+  private spiner$ : Observable<boolean>; 
 
   constructor(private store: Store<fromStore.State>
     ) {
@@ -22,15 +28,8 @@ export class JnRootPageComponent implements OnInit {
   }
 
   ngOnInit() {
-
-    this.subCaption = "";
-    this.store.select( fromSelectors.selCurItemMetaNote() ).subscribe(x => this.subCaption = x);
-    
-    //console.log(this.store);
-    //this.store.pipe(tap( x => console.log(x) ) );
-
-    //this.store.dispatch(new RouterActions.Go({ path:['tutoral/sd']}));
-    //this.store.dispatch(new RouterActions.Back());
+    this.subCaption$ = this.store.select( fromSelectors.selCurItemMetaNote() ); 
+    this.spiner$ = this.store.select(  fromSelectors.selItemsIsLoading() ).pipe(map(x =>!x) );
   }
 
 }

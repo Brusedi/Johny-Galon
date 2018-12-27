@@ -3,12 +3,13 @@ import { Store } from '@ngrx/store';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
-import { of, Observable, Subscription, interval } from 'rxjs';
+import { of, Observable, Subscription, interval, BehaviorSubject } from 'rxjs';
 import { GetTemplate, Jab } from '@appStore/actions/any-entity.actions';
-import { Exec } from '@appStore/actions/any-entity-set.actions';
-import { FormGroup } from '@angular/forms';
+import { Exec, ExecCurrent } from '@appStore/actions/any-entity-set.actions';
+import { FormGroup, AbstractControl } from '@angular/forms';
 import { take,combineLatest, filter, map, tap } from 'rxjs/operators';
 import { state } from '@angular/animations';
+import { ForeignKeyService } from 'app/shared/services/foregin/foreign-key.service';
 
 
 /**
@@ -26,35 +27,55 @@ import { state } from '@angular/animations';
 export class JnNewItemComponent implements OnInit {
 
   private controls$:     Observable<{ questions:any, formGroup:FormGroup} >;
+  private rowSeed$ = new BehaviorSubject({});  
   private subscriptions: Subscription[] = [];
+  private ctrlChangesSubscr: Subscription[] = [];
 
-  constructor(private store: Store<fromStore.State>) { }
+  constructor(
+    private store: Store<fromStore.State>//,
+    //private fkService: ForeignKeyService
+  ) { }
 
   ngOnInit() {
-    console.log('oninit')
-
-    // this.subscriptions.push( this.store.select( fromSelectors.selCurMacroParentFields())
-    //   .subscribe(x=> console.log(x)) );
-
-
-    // this.subscriptions.push( this.store.select( fromSelectors.selCurFieldDescribes())
-    //   .subscribe(x=> console.log(x)) );
-
-    this.subscriptions.push( this.store.select( fromSelectors.selCurName())
-       .subscribe(x=> console.log(x)) );
-      
+    console.log('oninit');
+    // Мозг не ебем, диспатчим обновить темплэйт строки Работаем с куром ! 
+    this.store.dispatch( new ExecCurrent( new GetTemplate() ) );
 
 
-    this.subscriptions.push(this.freshRowTemplate());
+
+
+
+    this.subscriptions.push(this.freshRowTemplate()); //Вот это разовая подписка ее впрынцыпе не надо держать,  но я по другому не умею.
     this.controls$ = this.store.select( fromSelectors.selCurFormControls()).pipe(filter( x => x.questions.length > 0 ),take(1));
 
-    //.pipe(take(1))
-    // const observablesControls$ = 
-    //   this.controls$.pipe(
-    //     combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()), (x1,x2) => ({ fGroup:x1.formGroup, flds: x2 })) ,
-    //     tap(x=> console.log(x)),
-    //     map( x =>  x.flds.map( itm => x.fGroup.get(itm) ))  
-    //   )
+    // это набор контролов изменения которых требуют перестройки как минимум опшинов дроп-даунов.
+    const observablesControls$ = 
+      this.controls$.pipe(
+        combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()), (x1,x2) => ({ fGroup:x1.formGroup, flds: x2 })) ,
+        map( x =>  x.flds.map( itm => x.fGroup.get(itm) )),
+      )
+
+     
+    observablesControls$.pipe(
+        map( x => x.map( i =>  i.valueChanges.subscribe( x=> console.log(x))  ) )
+    )    
+
+    // const ctrlChnge = (ctrls:AbstractControl[]) => {
+    //   while(this.ctrlChangesSubscr.length > 0){
+    //     this.ctrlChangesSubscr.pop().unsubscribe(); 
+    //   } 
+    //   ctrls.forEach( x => 
+    //     this.ctrlChangesSubscr.push( 
+    //       x.valueChanges.pipe( 
+    //           map(x => x), 
+    //       )
+    //     )
+    //   );
+    // }
+          
+
+
+    this.subscriptions.push( observablesControls$.subscribe(x=> console.log(x)) );    
 
   }
   
@@ -68,7 +89,6 @@ export class JnNewItemComponent implements OnInit {
         x => {  
           console.log("fresh temptate disp");
           this.store.dispatch( new Exec( {name: x , itemAction: new GetTemplate() }) )  
-          
       }
     )
   }
