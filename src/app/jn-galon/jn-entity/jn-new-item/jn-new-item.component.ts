@@ -1,16 +1,14 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { FormGroup} from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { Observable, Subscription} from 'rxjs';
+import {  skipUntil, skip } from 'rxjs/operators';
+
+import { GetTemplate } from '@appStore/actions/any-entity.actions';
+import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
-import { of, Observable, Subscription, interval, BehaviorSubject } from 'rxjs';
-import { GetTemplate, Jab } from '@appStore/actions/any-entity.actions';
-import { Exec, ExecCurrent } from '@appStore/actions/any-entity-set.actions';
-import { FormGroup, AbstractControl } from '@angular/forms';
-import { take,combineLatest, filter, map, tap } from 'rxjs/operators';
-import { state } from '@angular/animations';
-import { ForeignKeyService } from 'app/shared/services/foregin/foreign-key.service';
-
 
 /**
  *  План 
@@ -27,9 +25,9 @@ import { ForeignKeyService } from 'app/shared/services/foregin/foreign-key.servi
 export class JnNewItemComponent implements OnInit {
 
   private controls$:     Observable<{ questions:any, formGroup:FormGroup} >;
-  private rowSeed$ = new BehaviorSubject({});  
+  //private rowSeed$ = new BehaviorSubject({});  
   private subscriptions: Subscription[] = [];
-  private ctrlChangesSubscr: Subscription[] = [];
+  //private ctrlChangesSubscr: Subscription[] = [];
 
   constructor(
     private store: Store<fromStore.State>//,
@@ -41,24 +39,32 @@ export class JnNewItemComponent implements OnInit {
     // Мозг не ебем, диспатчим обновить темплэйт строки Работаем с куром ! 
     this.store.dispatch( new ExecCurrent( new GetTemplate() ) );
 
+    this.controls$ = 
+      this.store.select( fromSelectors.selCurFormControls()).pipe(
+         skipUntil( this.store.select( fromSelectors.selCurRowTemplate() ).pipe( skip(1) ) )   //горбатенько немного...
+      );  
 
 
+    this.controls$.subscribe( x => console.log(x) ) ;
+      // .pipe(
+      //   filter( x => x.questions.length > 0 ),take(1)
+      //   );
 
 
-    this.subscriptions.push(this.freshRowTemplate()); //Вот это разовая подписка ее впрынцыпе не надо держать,  но я по другому не умею.
-    this.controls$ = this.store.select( fromSelectors.selCurFormControls()).pipe(filter( x => x.questions.length > 0 ),take(1));
+    //this.subscriptions.push(this.freshRowTemplate()); //Вот это разовая подписка ее впрынцыпе не надо держать,  но я по другому не умею.
+    
 
-    // это набор контролов изменения которых требуют перестройки как минимум опшинов дроп-даунов.
-    const observablesControls$ = 
-      this.controls$.pipe(
-        combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()), (x1,x2) => ({ fGroup:x1.formGroup, flds: x2 })) ,
-        map( x =>  x.flds.map( itm => x.fGroup.get(itm) )),
-      )
+    // // это набор контролов изменения которых требуют перестройки как минимум опшинов дроп-даунов.
+    // const observablesControls$ = 
+    //   this.controls$.pipe(
+    //     combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()), (x1,x2) => ({ fGroup:x1.formGroup, flds: x2 })) ,
+    //     map( x =>  x.flds.map( itm => x.fGroup.get(itm) )),
+    //   )
 
      
-    observablesControls$.pipe(
-        map( x => x.map( i =>  i.valueChanges.subscribe( x=> console.log(x))  ) )
-    )    
+    // observablesControls$.pipe(
+    //     map( x => x.map( i =>  i.valueChanges.subscribe( x=> console.log(x))  ) )
+    //)    
 
     // const ctrlChnge = (ctrls:AbstractControl[]) => {
     //   while(this.ctrlChangesSubscr.length > 0){
@@ -75,22 +81,8 @@ export class JnNewItemComponent implements OnInit {
           
 
 
-    this.subscriptions.push( observablesControls$.subscribe(x=> console.log(x)) );    
+    //this.subscriptions.push( observablesControls$.subscribe(x=> console.log(x)) );    
 
-  }
-  
-
-  /**
-   *  Dispatching request get new row template
-   */
-  freshRowTemplate(){
-    return this.store.select( fromSelectors.selCurName() ).pipe(take(1))
-      .subscribe(
-        x => {  
-          console.log("fresh temptate disp");
-          this.store.dispatch( new Exec( {name: x , itemAction: new GetTemplate() }) )  
-      }
-    )
   }
 
   ngOnDestroy(){ 
@@ -99,6 +91,21 @@ export class JnNewItemComponent implements OnInit {
       this.subscriptions.pop().unsubscribe(); 
     } 
   }
+  
+
+  /**
+   *  Dispatching request get new row template
+   */
+  // freshRowTemplate(){
+  //   return this.store.select( fromSelectors.selCurName() ).pipe(take(1))
+  //     .subscribe(
+  //       x => {  
+  //         console.log("fresh temptate disp");
+  //         this.store.dispatch( new Exec( {name: x , itemAction: new GetTemplate() }) )  
+  //     }
+  //   )
+  // }
+
 
 }
 

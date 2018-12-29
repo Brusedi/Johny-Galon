@@ -3,6 +3,17 @@ import { anyEntityActions, AnyEntityActionTypes } from "@appStore/actions/any-en
 import { FieldDescribes } from "@appModels/metadata";
 
 //import { anyEntityLazyActions, AnyEntityLazyActionTypes } from "@appStore/actions/any-entity-lazy.actions";
+
+// Использование в качестве форегинов 
+// 1. Полная идентификация , 
+// 2. частичная 
+// 3. ссылочная 
+//
+//
+//
+
+
+
 export interface Metadata {
     table: any
     fieldsDesc: FieldDescribes
@@ -65,6 +76,8 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
         //console.log(state)
         //console.log(action)
         switch (action.type) {
+
+
             case AnyEntityActionTypes.GET_ITEMS:
                 return { ...state, loading: true };    
 

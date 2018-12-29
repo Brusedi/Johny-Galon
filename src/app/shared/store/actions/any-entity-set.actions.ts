@@ -7,6 +7,8 @@ import { anyEntityActions } from './any-entity.actions';
 
 export enum AnyEntitySetActionTypes {
     ADD_ANY_ENTITY                      = '[Entity set] Add any entity',
+    PREPARE_BY_LOC                      = '[Entity set] Try prepare entity by location',
+    PREPARE_BY_LOC_COMPLETE             = '[Entity set] Prepare entity by location completed',
     SET_CURRENT                         = '[Entity set] Set current entity',  
     EXEC_CURENT                         = '[Entity set] Execute current entity' ,
     EXEC                                = '[Entity set] Execute' ,
@@ -14,6 +16,16 @@ export enum AnyEntitySetActionTypes {
     COMPLETE_ANY_ENTITY_ACTION          = '[Entity set] Entyty action chain completed' ,
     EROR_ANY_ENTITY_SET                 = '[Entity set] Error' ,
     JAB_STATE                           = '[Entity set] Jab (pure state change)' 
+}
+
+export class PrepareByLoc implements Action {
+    readonly type = AnyEntitySetActionTypes.PREPARE_BY_LOC
+    constructor(public payload: string )  { }
+}
+
+export class PrepareByLocComplete implements Action {
+    readonly type = AnyEntitySetActionTypes.PREPARE_BY_LOC_COMPLETE
+    constructor(public payload: boolean )  { }
 }
 
 export class Jab implements Action {
@@ -59,6 +71,8 @@ export class ErrorAnyEntitySet implements Action {
 }  
 
 export type AnyEntitySetAction =
+  | PrepareByLocComplete
+  | PrepareByLoc
   | Exec
   | ExecCurrent
   | AddItem

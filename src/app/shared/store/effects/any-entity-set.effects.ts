@@ -3,14 +3,15 @@ import { Actions, Effect, ofType } from "@ngrx/effects";
 
 import { of } from "rxjs";
 
-import { map, mergeMap, catchError, tap } from "rxjs/operators";
+import { map, mergeMap, catchError, tap, switchMap, filter } from "rxjs/operators";
 import { Observable } from "rxjs/Observable";
 
 import { DataProvService } from "app/shared/services/data-prov.service";
-import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent } from "@appStore/actions/any-entity-set.actions";
-import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess } from "@appStore/actions/any-entity.actions";
+import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete } from "@appStore/actions/any-entity-set.actions";
+import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, AddItem } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
+import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
 
 //import { AnyEntityLazySetActionTypes, ExecItemAction,  CompleteItemAction, Exec } from "@appStore/actions/any-entity-lazy-set.actions";
 //import { AnyEntityLazyActionTypes, anyEntityLazyActions, GetItemSuccess, GetItemNotFound } from "@appStore/actions/any-entity-lazy.actions";
@@ -23,10 +24,33 @@ export class anyEntytySetEffects {
   constructor(
       private actions$:         Actions, 
       private dataService:      DataProvService,
-      private metadataService:  MetadataProvService
+      private metadataService:  MetadataProvService,
+      private foreignService:   ForeignKeyService
 ) {}
 
-    @Effect()   //.insert(action.payload.location, action.payload.data)
+    //const PrepareByLocBranch$ = ( loc:string  )   
+
+    @Effect()   
+    PrepareByLoc1$ = this.actions$.pipe(
+        ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+        map( (x:PrepareByLoc) => x.payload),
+        mergeMap( (loc:string) =>  this.foreignService.isExist$(loc)),
+        filter( x => x),
+        map( x => new PrepareByLocComplete(true) )   
+    ) ;        
+
+    @Effect()   
+    PrepareByLoc2$ = this.actions$.pipe(
+        ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+        map( (x:PrepareByLoc) => x.payload),
+        mergeMap( (loc:string) =>  this.foreignService.isExist$(loc).pipe(map( x=>({ l:loc , exist:x }) )) ),
+        filter( x => !x.exist ),
+        mergeMap( x => this.foreignService.buildOptions$(x.l)),
+        map( x => new AddItem(x) ),
+        catchError(error => of(new ErrorAnyEntity(error)))
+    );
+
+    @Effect()   
     ExecAction$ = this.actions$.pipe(
         ofType(AnyEntitySetActionTypes.EXEC),
         //map( (x:Exec) => {console.log(x); return x }  ),

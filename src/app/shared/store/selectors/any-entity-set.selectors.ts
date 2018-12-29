@@ -191,6 +191,16 @@ export const selCurJab = () =>
 /// COMMON SELECTORS------------------------------------------------------------------------------------------------------
 
 /**
+ *  Foreign is Prepared (buzy)
+ */
+export const selForeignIsPreparing = () =>
+    createSelector( 
+        selectDatas,
+        (dt) => dt.prepareQueue.length > 0 && dt.preparing != null    
+    )        
+
+
+/**
  *  items is Loading (buzy)
  */
 export const selItemsIsLoading = () =>
@@ -198,6 +208,14 @@ export const selItemsIsLoading = () =>
         selectDatas,
         (dt) => Object.keys(dt.items).reduce( (a,i) => a || dt.items[i].state.loading || dt.items[i].state.metaLoading ,false ) 
 );    
+
+export const selIsBuzy = () =>
+    createSelector( 
+        selItemsIsLoading(),
+        selForeignIsPreparing(),
+        (x,y) => x || y 
+);    
+
 
 
 // // Controls data for form

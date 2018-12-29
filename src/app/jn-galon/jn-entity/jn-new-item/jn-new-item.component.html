@@ -2,7 +2,7 @@
 
     <form (ngSubmit)="onSubmit()" [formGroup]="ctrls.formGroup"> 
         <div *ngFor="let question of ctrls.questions" class="form-row">
-            <app-jn-item-question [question]="question" [form]="ctrls.formGroup"></app-jn-item-question> 
+            <app-jn-item-question [question]="question" [form]="ctrls.formGroup" ></app-jn-item-question> 
         </div>
 
         <div class="form-row">
@@ -17,4 +17,6 @@
 
 </div>  
 
-<ng-template #loading>Загрузка...</ng-template>
+<ng-template #loading >
+    <mat-spinner class = "spinner"> </mat-spinner>
+</ng-template>

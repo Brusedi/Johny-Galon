@@ -1,5 +1,6 @@
 import { QuestionBase } from './question-base';
 import { Observable } from 'rxjs';
+//import { locationToEntityOption, locationInfo } from '../services/foregin/foreign-key.helper';
 
 export class DropdownQuestion extends QuestionBase<string> {
   controlType = 'dropdown';
@@ -13,7 +14,12 @@ export class DropdownQuestion extends QuestionBase<string> {
     this.options = options['options'] || [];
     this.options$ = options['options$'] || null;
     this.optionsRefLoc = options['optionsRefLoc'] || null;
+
+    //
+    //const a = this.optionsRefLoc ? locationToEntityOption(this.optionsRefLoc) : null ;
+    //if(this.optionsRefLoc){console.log(locationInfo(this.optionsRefLoc )) }
     //console.log(this.order);
+    
   }
 }
 

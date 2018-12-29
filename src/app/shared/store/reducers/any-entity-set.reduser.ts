@@ -14,7 +14,9 @@ export interface AnyEntytySetItemState<T> {
 // key as location
 export interface State {  
     items:      { [key: string]: AnyEntytySetItemState<any> };      // poot datas
-    currentId?: string ;                                             // active Entity name    
+    currentId?: string ;                                            // active Entity name    
+    prepareQueue: string[];                                         // 
+    preparing?: string;
     error:      any ;
     jab:        boolean;
 }
@@ -22,14 +24,35 @@ export interface State {
 export const initialState: State = {
     items: ({}),
     currentId:null,
+    prepareQueue:[],
+    preparing: null,
     error:null,
     jab: true
 };
 
 export function reducer(state :State  = initialState, action: AnyEntitySetAction): State {
     //console.log( action) ;
+    console.log(action);
     switch (action.type) {
-        case AnyEntitySetActionTypes.ADD_ANY_ENTITY:
+        
+
+        case AnyEntitySetActionTypes.PREPARE_BY_LOC_COMPLETE: {
+            const que =  state.prepareQueue.length > 0 ? state.prepareQueue.slice(1,state.prepareQueue.length) : [];
+            return { ...state,
+                 preparing: (state.prepareQueue.length > 0 ?  state.preparing[0] : null ),
+                 prepareQueue: que,      
+            }
+        };
+        case AnyEntitySetActionTypes.PREPARE_BY_LOC:{
+            return { ...state,
+                prepareQueue: (state.preparing ? [...state.prepareQueue, action.payload ]  : state.prepareQueue),      // если что то обраб, то в очередь ссукины дети, иначе в обработку                    
+                preparing: (state.preparing ?  state.preparing : action.payload)
+            }
+        }    
+        case AnyEntitySetActionTypes.ADD_ANY_ENTITY:{
+            console.log('ADD_ANY_ENTITY');
+            console.log(action.payload);
+            
             return { 
                 ...state, 
                 items:{ ...state.items,  
@@ -40,12 +63,7 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
                     }
                 }
             };   
-            // return { ...state,  [action.payload.name]: { 
-            //                         state:      fromEntityReduser.initStateFromSelFoo( action.payload.selectId),
-            //                         option:     action.payload,
-            //                         action:     null 
-            //                     } };    
-
+        }    
         case AnyEntitySetActionTypes.EXEC : {                                
             action.reduserData = (< AnyEntytySetItemState<any>>state.items[action.payload.name]).option; // догрузка
             return {...state};
@@ -54,7 +72,7 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
         case AnyEntitySetActionTypes.EXEC_ANY_ENTITY_ACTION: {
             //console.log(action.payload);
             //console.log(state);
-            var s = { ...state, 
+            const s = { ...state, 
                 items:{ ...state.items,
                         [action.payload.itemOption.name]:{ 
                             ...state.items[action.payload.itemOption.name],

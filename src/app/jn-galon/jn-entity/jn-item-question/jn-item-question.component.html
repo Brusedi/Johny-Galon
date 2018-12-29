@@ -1,7 +1,5 @@
 
  <div [formGroup]="form"> 
-    <!-- <label [attr.for]="question.key">{{question.label}}</label> -->
-    
     <div [ngSwitch]="question.controlType">
         
         <mat-form-field *ngSwitchCase="'textbox'" class="example-full-width" >
@@ -37,14 +35,11 @@
             <mat-form-field *ngSwitchCase="'datepicker'">
                 <input matInput [matDatepicker]="picker" placeholder={{question.label}} [formControlName]="question.key" [id]="question.key" [type]="question.type" >
                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-                <mat-datepicker #picker></mat-datepicker>
+                <mat-datepicker #picker></mat-datepicker> 
             </mat-form-field>
 
             <mat-form-field *ngSwitchCase="'datetimepicker'" class="example-datetime-width" >
                 <input type="datetime-local"  matInput  placeholder={{question.label}} [formControlName]="question.key" [id]="question.key"   >
             </mat-form-field>   
-                
-                   
     </div> 
-    <!-- <div class="errorMessage" *ngIf="!isValid">{{question.label}} is required</div> -->
   </div> 
