@@ -7,9 +7,11 @@ import { Store } from '@ngrx/store';
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 import { Observable } from 'rxjs';
+import { PrepareByLoc } from '@appStore/actions/any-entity-set.actions';
 
 
 const DEF_VALID_ERROR = "Неверное значение";
+const REF_LOC_PROP    = "optionsRefLoc";
 
 @Component({
   selector: 'app-jn-item-question',
@@ -34,10 +36,21 @@ export class JnItemQuestionComponent implements OnInit{
 
   ngOnInit(){
     this.control = this.form.controls[this.question.key];
-
+    this.prepareSecondaryData();
     //options$ = this.question.controlType != 'dropdown' ? null : this.buildOptions$
 
+    //this.question.controlType == 'dropdown'?this.prepareSecondaryData():null;
   }
+
+  private prepareSecondaryData (){
+    return !this.question.hasOwnProperty(REF_LOC_PROP) ? null
+      :this.store.dispatch( 
+          new PrepareByLoc(
+            this.question[REF_LOC_PROP]
+    ));
+  }  
+
+
 
   buildOptions$(){
     return 

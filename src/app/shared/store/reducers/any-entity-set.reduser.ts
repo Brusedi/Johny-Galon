@@ -32,7 +32,7 @@ export const initialState: State = {
 
 export function reducer(state :State  = initialState, action: AnyEntitySetAction): State {
     //console.log( action) ;
-    console.log(action);
+    
     switch (action.type) {
         
 

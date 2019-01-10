@@ -45,7 +45,7 @@ export class JnNewItemComponent implements OnInit {
       );  
 
 
-    this.controls$.subscribe( x => console.log(x) ) ;
+    //this.controls$.subscribe( x => console.log(x) ) ;
       // .pipe(
       //   filter( x => x.questions.length > 0 ),take(1)
       //   );

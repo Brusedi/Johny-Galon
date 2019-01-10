@@ -34,21 +34,31 @@ export class anyEntytySetEffects {
     PrepareByLoc1$ = this.actions$.pipe(
         ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
         map( (x:PrepareByLoc) => x.payload),
-        mergeMap( (loc:string) =>  this.foreignService.isExist$(loc)),
+        mergeMap( (loc:string) =>  this.foreignService.prepareForeignData$(loc)),
         filter( x => x),
         map( x => new PrepareByLocComplete(true) )   
     ) ;        
 
-    @Effect()   
-    PrepareByLoc2$ = this.actions$.pipe(
-        ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
-        map( (x:PrepareByLoc) => x.payload),
-        mergeMap( (loc:string) =>  this.foreignService.isExist$(loc).pipe(map( x=>({ l:loc , exist:x }) )) ),
-        filter( x => !x.exist ),
-        mergeMap( x => this.foreignService.buildOptions$(x.l)),
-        map( x => new AddItem(x) ),
-        catchError(error => of(new ErrorAnyEntity(error)))
-    );
+
+    // @Effect()   
+    // PrepareByLoc1$ = this.actions$.pipe(
+    //     ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+    //     map( (x:PrepareByLoc) => x.payload),
+    //     mergeMap( (loc:string) =>  this.foreignService.isExist$(loc)),
+    //     filter( x => x),
+    //     map( x => new PrepareByLocComplete(true) )   
+    // ) ;        
+
+    // @Effect()   
+    // PrepareByLoc2$ = this.actions$.pipe(
+    //     ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+    //     map( (x:PrepareByLoc) => x.payload),
+    //     mergeMap( (loc:string) =>  this.foreignService.isExist$(loc).pipe(map( x=>({ l:loc , exist:x }) )) ),
+    //     filter( x => !x.exist ),
+    //     mergeMap( x => this.foreignService.buildOptions$(x.l)),
+    //     map( x => new AddItem(x) ),
+    //     catchError(error => of(new ErrorAnyEntity(error)))
+    // );
 
     @Effect()   
     ExecAction$ = this.actions$.pipe(
