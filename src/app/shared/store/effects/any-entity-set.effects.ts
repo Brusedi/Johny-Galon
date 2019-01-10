@@ -7,8 +7,8 @@ import { map, mergeMap, catchError, tap, switchMap, filter } from "rxjs/operator
 import { Observable } from "rxjs/Observable";
 
 import { DataProvService } from "app/shared/services/data-prov.service";
-import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete } from "@appStore/actions/any-entity-set.actions";
-import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, AddItem } from "@appStore/actions/any-entity.actions";
+import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem } from "@appStore/actions/any-entity-set.actions";
+import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess  } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
