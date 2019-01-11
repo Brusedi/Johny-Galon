@@ -39,10 +39,12 @@ export class MetadataProvService {
     const fList$ = tMeta$.pipe( map( x =>  this.toFieldsList(x)) )
     const fListDesc$ = fList$.pipe(
       map( x =>  x.map( x =>   this.dataService.metadata$(loc, x ))),
+      tap( x => console.log(x) ),
       mergeMap( x => from(x).pipe(mergeAll(),toArray())),  
       map( x => x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) )),    
       map( x => x.reduce((a,e) => ({...a, [e.id]:e }) ,  {})   )
     )
+
     return tMeta$.pipe(
       combineLatest( fListDesc$, (v1,v2) => ({table:v1 ,fieldsDesc: v2 })   )
     )

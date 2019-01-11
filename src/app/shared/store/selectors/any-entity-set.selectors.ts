@@ -21,12 +21,20 @@ export const selectIsExist = ( id: string ) =>
 );
 
 // Загруженны ли метаданные
-export const selectIsMetadataLoaded= ( id: string ) => 
+export const selectIsMetadataLoaded = ( id: string ) => 
     createSelector(
         selectDatas,
         selectIsExist(id),
         (dt, is) =>  is && dt.items[id].state.metaLoaded
 );
+
+// Загруженны ли метаданные
+// export const selectIsMetadataLoaded = ( id: string ) => 
+//     createSelector(
+//         selectDatas,
+//         dt =>  (id in dt.items && dt.items[id].state.metaLoaded)
+// );
+
 
 // пукалка
 export const selectJab = () => 
