@@ -4,7 +4,8 @@ import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
 import { _Start } from "@angular/cdk/scrolling";
-import { getLocationMacros } from "app/shared/services/foregin/foreign-key.helper";
+import { getLocationMacros, locationToName } from "app/shared/services/foregin/foreign-key.helper";
+import { getMdOptons, getMdOptonsFromDict } from "app/shared/services/metadata/metadata.helper";
 
 export const dataStore = createFeatureSelector<State>('data');
 
@@ -225,35 +226,59 @@ export const selIsBuzy = () =>
 );    
 
 
+/// FOREIGN DATA SELECTORS ========================================================================================================
 
-// // Controls data for form
-// export const selectCurentFormControls = () =>
-//     createSelector( 
+/**
+*   Select datas state if exist else null
+*/
+export const selectStateIfExist = ( id: string ) =>
+    createSelector(
+        selectDatas,
+        dt =>  (id in dt.items) ? dt.items[id] : null
+    );
 
-//         selectCurentName,
-//         selectCurentRowTemplate,
+/**
+*   Select entytes by location if exist & loading
+*/
+export const selectDataIfExist = ( id: string ) =>
+    createSelector(
+        selectStateIfExist(id),
+        (x) => x ? ( x.state.loaded ? x.state.entities : null ) : null
+    );
+
+/**
+*   Select entytes & metadata if exist & loading
+*/
+export const selectDataAndMetaIfExist = ( id: string ) =>
+    createSelector(
+        selectStateIfExist(id),
+        (x) => x ? ( x.state.loaded &&  x.state.metaLoaded ? ({ data: (x.state.entities), meta:(x.state.metadata ) }) : null ) : null
+    );
+
+/**
+*   Select datas and meta by location
+*/
+export const selectOptions = ( id: string ) => 
+    createSelector(
+        selectDataAndMetaIfExist(id),
+        (x) => !!x?getMdOptonsFromDict( x.data, x.meta.table): null 
+    );  //[{key:undefined, value:'Загруз...'} ]
+   
+
+export const selectOptionsByLoc = ( loc: string ) => selectOptions( locationToName(loc) ) ;
 
 
-//         selectFormControls
 
-//         (items) =>  ({ questions:items, formGroup:toFormGroup( items, rowSeed ) })       
-// );
+// /**
+// *   Select datas by location
+// */
+// export const selectDataByLoc = ( loc: string ) =>{
+//     const locId = locationToName(loc);
 
+//     return createSelector(
+//         selectDataIfExist(locId),
+//         (x) => x ? [{key:undefined, value:'Зeeeагруз...'} ] : [{key:undefined, value:'Загруз...'} ]
+//     );
+// }
 
-// Controls data for form
-// export const selectCurentFormControls = (id: string, rowSeed:Observable<{}>) =>
-//     createSelector( 
-//         selectQuestions(id,rowSeed),
-//         (items) =>  ({ questions:items, formGroup:toFormGroup( items, rowSeed ) })       
-// );    
-
-// export const selectCurentNote = () => 
-//     createSelector(selectDatas, x => 
-//         !x.currentId ?  "" : (
-//             !x.items[x.currentId].state.metaLoaded ? "" :
-//                 x.items[x.currentId].state.metadata.
-//         )
-            
-//            // x.items[x.currentId].state.loaded : 
-//     );  
 

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DataProvService } from '../data-prov.service';
-import { tap, map, mergeAll, toArray, mergeMap, combineLatest, reduce } from 'rxjs/operators';
+import { tap, map, mergeAll, toArray, mergeMap, combineLatest, reduce, catchError } from 'rxjs/operators';
 import { FieldDescribe} from '@appModels/metadata';
 import { Observable,  from } from 'rxjs';
 import { MetadataAdaptService } from './metadata-adapt.service';
@@ -34,12 +34,14 @@ export class MetadataProvService {
     return r$;
   }
 
+  
   private loadMetadata2 = (loc:string ) => {
     const tMeta$ = this.dataService.metadata$(loc);
     const fList$ = tMeta$.pipe( map( x =>  this.toFieldsList(x)) )
     const fListDesc$ = fList$.pipe(
-      map( x =>  x.map( x =>   this.dataService.metadata$(loc, x ))),
-      tap( x => console.log(x) ),
+     //tap( x => console.log(x) ),
+      map( x =>  x.map( x =>   this.dataService.metadata$(loc, x).pipe( catchError( error => ([{ [META_FIELDNAME_KEY_NAME]:x}]) )))), 
+      //tap( x => console.log(x) ),
       mergeMap( x => from(x).pipe(mergeAll(),toArray())),  
       map( x => x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) )),    
       map( x => x.reduce((a,e) => ({...a, [e.id]:e }) ,  {})   )

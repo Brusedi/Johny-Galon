@@ -24,13 +24,12 @@ export class JnItemQuestionComponent implements OnInit{
   @Input() form: FormGroup;
   
   private control: AbstractControl;
-  private options$: Observable<string>;
+  private options$: Observable<{}[]>;
 
   constructor(
     private store: Store<fromStore.State>//,
     //private fkService: ForeignKeyService
   ) { 
-
 
   }
 
@@ -40,6 +39,12 @@ export class JnItemQuestionComponent implements OnInit{
     //options$ = this.question.controlType != 'dropdown' ? null : this.buildOptions$
 
     //this.question.controlType == 'dropdown'?this.prepareSecondaryData():null;
+    if(this.question.controlType == 'dropdown'){
+       this.options$ = this.store.select( fromSelectors.selectOptionsByLoc( this.question[REF_LOC_PROP] )); 
+
+       this.options$.subscribe(x=>console.log(x) ) ;
+    }
+    
   }
 
   private prepareSecondaryData (){

@@ -30,7 +30,9 @@ export class JnRootPageComponent implements OnInit {
 
   ngOnInit() {
     this.subCaption$ = this.store.select( fromSelectors.selCurItemMetaNote() ); 
-    this.spiner$ = this.store.select(  fromSelectors.selIsBuzy() ).pipe( map(x =>!x)  );
+    this.spiner$ = this.store.select(  fromSelectors.selIsBuzy() ).pipe( map(x => !x)  );
+
+    this.spiner$.subscribe(x=>console.log(x));
    
     // this.store.dispatch( new PrepareByLoc( './Ax/Enum/NVASDServiceDesc' )  );
     // this.store.dispatch( new PrepareByLoc( './Ax/NvaSdEventType?servicedescid={ServiceDescID}' )  );

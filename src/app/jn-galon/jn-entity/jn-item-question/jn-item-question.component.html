@@ -29,6 +29,7 @@
                     <p>{{question.optionsLoc}} </p>
                     <mat-select placeholder={{question.label}} [id]="question.key"  [formControlName]="question.key"  >
                       <!-- <mat-option *ngFor="let opt of question.options$ | async" [value]="opt.key">{{opt.value}}</mat-option> -->
+                      <mat-option *ngFor="let opt of options$ | async" [value]="opt.key">{{opt.value}}</mat-option>
                     </mat-select>
             </mat-form-field>
         

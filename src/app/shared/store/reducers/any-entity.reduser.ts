@@ -82,11 +82,11 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                 return { ...state, loading: true };    
 
             case AnyEntityActionTypes.GET_ITEMS_SUCCESS:{
-                //console.log(state);
+                console.log('GET_ITEMS_SUCCESS');
                 var s =
                     adapt.addMany( 
                         action.payload,
-                        { ...state , loaded: false, loading: true  }
+                        { ...state , loaded: true, loading: false  }
                     );  
                 return s;        
             }

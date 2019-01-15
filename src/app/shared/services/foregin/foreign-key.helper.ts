@@ -1,5 +1,3 @@
-import { compose } from "@ngrx/store";
-
 /**
  *  Helper 
  *      
@@ -82,7 +80,7 @@ export const getBaseLocation = (loc:string) =>
 
 
 /**
- *  location ino descriptor
+ *  location info descriptor
  */
 export const locationInfo = (loc: string) => ({
     optionSeed:  locToEntityOptionSeed(loc),
@@ -92,11 +90,18 @@ export const locationInfo = (loc: string) => ({
 });
 
 /**
+ * Location types flags
+*/ 
+export const isFullIndepended = (loc: string) => isLocationUndepended(loc) && !isLocationParameterized(loc) ;
+export const isPartIndepended = (loc: string) => isLocationUndepended(loc) &&  isLocationParameterized(loc) ;
+export const isDepended       = (loc: string) => !isLocationUndepended(loc) ;
+
+
+/**
  *  name key field from metadata
  */
 export const getIdFromMeta = ( meta:any ) => 
     meta.hasOwnProperty(ID_NAME_META_PROP) ?  meta[ID_NAME_META_PROP] : undefined;
-
 
 /**
  *  location to option
@@ -119,6 +124,7 @@ export const buildSelectIdFoo = ( key: string ) => (x:any) => x[key] ;
  *  select key from row func 
  */
 export const buildSelBackIdFoo = ( key: string ) => (x:string) => ("?"+key+"=") + x ;
+
 
 
 
