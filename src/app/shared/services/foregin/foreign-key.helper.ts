@@ -54,9 +54,11 @@ export const isLocationParameterized = (location: string) => ( location.indexOf(
  *  Cut native name from location
  */
 export const locationToName = (loc: string) => {
+    console.log(loc);
     const e = loc.indexOf(FK_PARS_PATR_DEVIDER);
     const l = e > 0 ?  loc.substring(0,e) : loc;
     const b = l.lastIndexOf(FK_NAME_PATR_DEVIDER);
+    
     return b>0 ? l.substring(b+1): l;
 }
     
@@ -124,6 +126,16 @@ export const buildSelectIdFoo = ( key: string ) => (x:any) => x[key] ;
  *  select key from row func 
  */
 export const buildSelBackIdFoo = ( key: string ) => (x:string) => ("?"+key+"=") + x ;
+
+/**
+* Fill macros values from row 
+*/
+export const fillLocationMacros = ( loc: string, row:{}) => {
+    const prepVal = (v:any) => v==undefined?'null':((typeof v) == 'string' ? "'"+v+"'" : ""+v);
+    const getVal = ( p:string, r:{}) => prepVal( p in r ? undefined : r[p] );  
+    return getLocationMacros(loc).reduce((a:string, x) => a.replace(FK_MACRO_BEGIN+x+FK_MACRO_END, getVal(x,row)),loc);
+}
+
 
 
 

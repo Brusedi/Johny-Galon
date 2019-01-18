@@ -4,8 +4,9 @@ import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
 import { _Start } from "@angular/cdk/scrolling";
-import { getLocationMacros, locationToName } from "app/shared/services/foregin/foreign-key.helper";
+import { getLocationMacros, locationToName, locationInfo } from "app/shared/services/foregin/foreign-key.helper";
 import { getMdOptons, getMdOptonsFromDict } from "app/shared/services/metadata/metadata.helper";
+import { EntityAdapter } from "@ngrx/entity";
 
 export const dataStore = createFeatureSelector<State>('data');
 
@@ -146,6 +147,14 @@ export const selCurRowTemplate = () =>
 
 export const selCurIsMetaLoaded = () =>  createSelector(selectDatas, x => x.currentId ? x.items[x.currentId].state.loaded : false);  
 
+export const selCurRowSeed = () =>
+    createSelector( selectDatas, x => 
+        ! x.currentId ? null : 
+            ! x.items[x.currentId].state.rowSeed ? {} :
+                x.items[x.currentId].state.rowSeed 
+    );        
+
+
 //Question Current------------------------------------------------------------------------------------------------------------------
 // FieldDescribes[]
 export const selCurFieldDescribes = () =>  
@@ -175,6 +184,8 @@ export const selCurFormControls = () =>
         selCurFormGroup(),
         (x,y) =>  ({ questions:x, formGroup:y})       
     );    
+
+
 
 /**
  * список полей изменения которых влияют на значения списков вторичных ключей    
@@ -256,16 +267,73 @@ export const selectDataAndMetaIfExist = ( id: string ) =>
     );
 
 /**
-*   Select datas and meta by location
+*   Select entytes & partLoaded dictionary
+*/
+export const selectDataAndPartLoadedIfExist = ( id: string ) =>
+    createSelector(
+        selectStateIfExist(id),
+        (x) => (x && Object.keys(x.state.partLoaded).length > 0) ? ({ data: (x.state.entities), parts:(x.state.partLoaded) }) : null  
+    );
+
+
+export const selectIsExistByLoc = ( loc: string ) => selectIsExist( locationToName(loc) ) ;
+
+export const selectIsPreparedByLoc = ( loc: string ) => selectIsMetadataLoaded( locationToName(loc) ) ;
+
+export const selectDataOptionsByLoc = ( loc: string ) => selectDataOptions( locationToName(loc) ) ;
+    
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+/**
+*   Select dropDown option by id (Full independed)
 */
 export const selectOptions = ( id: string ) => 
     createSelector(
         selectDataAndMetaIfExist(id),
         (x) => !!x?getMdOptonsFromDict( x.data, x.meta.table): null 
     );  //[{key:undefined, value:'Загруз...'} ]
-   
 
 export const selectOptionsByLoc = ( loc: string ) => selectOptions( locationToName(loc) ) ;
+
+/**
+*   Select part independed dropDown option by location
+*   Селеектор с разрешенными макросами либо 
+*/
+export const selPartIndOptions = ( resolvedLoc: string ) => 
+    createSelector(
+        selectDataAndPartLoadedIfExist(locationToName(resolvedLoc)),
+        (cntr) => !(resolvedLoc in cntr.parts)? null: 
+            cntr.parts[resolvedLoc].reduce( (a,x) => ({...a, [x]:cntr.data[x]}) , {} )
+
+            // Object.keys(cntr.data)
+            //     .filter(x => cntr.parts[resolvedLoc].includes(x))
+            //     .reduce( (a,x) => ({...a, [x]:cntr.data[x]}) , {} )
+    );  
+
+
+/**
+*   180119 Сложный депенденс-дропдаун-оптион селектор 
+*   Возможен только относительно лукашина, начну сразу с депенденса    
+*/
+export const selectForeignOptionsByLoc =  ( loc: string ) => {
+    const locInfo = locationInfo(loc);
+
+    //EntityAdapter
+    //getSelectors() 
+    //selCurRowSeed() //
+    //illLocationMacros = ( loc: string, row:{}) 
+
+    
+    return locInfo.isLocationUndepended && !locInfo.isLocationParameterized ? 
+        selectDataOptionsByLoc( loc ) : (
+            
+            locInfo
+        )
+
+}
+
+
+
 
 
 

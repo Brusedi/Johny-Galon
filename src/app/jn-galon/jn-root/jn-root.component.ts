@@ -11,9 +11,9 @@ import * as fromStore from '@appStore/index';
 
 import * as fromSelectors from '@appStore/selectors/index';
 import { tap, map } from 'rxjs/operators';
-import { Exec, AddItem, SetCurrent } from '@appStore/actions/any-entity-set.actions';
+import { Exec, AddItem, SetCurrent, PrepareByLoc } from '@appStore/actions/any-entity-set.actions';
 import { anyEntityOptions, AnyEntityId, AnyEntity } from '@appModels/any-entity';
-import { GetItemsMeta } from '@appStore/actions/any-entity.actions';
+import { GetItemsMeta, GetItemsPart } from '@appStore/actions/any-entity.actions';
 
 
 
@@ -40,7 +40,9 @@ export class JnRootComponent implements OnInit , OnDestroy {
     private store: Store<fromStore.State>
   ){
 
-
+    //this.store.dispatch( new PrepareByLoc( '/Ax/NvaSdEventType?SERVICEDESCID=1'));  // Debug
+    
+    //this.store.dispatch( new Exec( {name:'NvaSdEventType' , itemAction: new GetItemsPart('/Ax/NvaSdEventType?SERVICEDESCID=1') }) );  // Debug
     //console.log('3333333333333333333333333');
     //this.store.select( fromSelectors.selectDatas ).subscribe(x=>console.log(x))
 
@@ -80,8 +82,6 @@ export class JnRootComponent implements OnInit , OnDestroy {
 
   ngOnInit() {
       //this.store.subscribe(x=>console.log(x));
-
-      
   }
 
   ngOnDestroy(){

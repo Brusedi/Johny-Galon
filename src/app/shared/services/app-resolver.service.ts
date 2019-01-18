@@ -3,7 +3,7 @@ import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/r
 import { filter, take, map, tap, combineLatest, startWith, switchMap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { anyEntityOptions, AnyEntity } from '@appModels/any-entity';
-import { GetItemsMeta } from '@appStore/actions/any-entity.actions';
+import { GetItemsMeta, GetItemsPart } from '@appStore/actions/any-entity.actions';
 import { SetCurrent, Exec, AddItem } from '@appStore/actions/any-entity-set.actions';
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
@@ -39,6 +39,7 @@ export class AppResolverService implements Resolve<any> {
         switchMap( () => this.store.select( fromSelectors.selCurName()) ),
         tap(x => x != opt.name ? this.store.dispatch( new SetCurrent(opt.name) ) : null ),
         filter( x => x == opt.name ),
+        //tap( x=> this.store.dispatch( new Exec( {name:'NvaSdEventType' , itemAction: new GetItemsPart('/Ax/NvaSdEventType?SERVICEDESCID=1') }) )),  // Debug
         map( x => !!x ),
       ).pipe(
         startWith(false),

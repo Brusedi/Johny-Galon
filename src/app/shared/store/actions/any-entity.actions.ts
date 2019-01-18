@@ -1,10 +1,16 @@
 import { Action } from "@ngrx/store";
 //import { FieldDescribes } from "@appModels/metadata";
 
+// Для GET_ITEMS_PART не совсем верная семантика надо повошкатся потом может быть скоректировать
+//
+
 
 export enum AnyEntityActionTypes {
-    GET_ITEMS               = '[Entity] Load item',
-    GET_ITEMS_SUCCESS       = '[Entity] Item loaded success ',
+    GET_ITEMS               = '[Entity] Load all items',
+    GET_ITEMS_SUCCESS       = '[Entity] All items loaded success ',
+
+    GET_ITEMS_PART          = '[Entity] Load one or some items',
+    GET_ITEMS_PART_SUCCESS  = '[Entity] One or some item loaded success',
 
     GET_ITEMS_META          = '[Entity] Load items medadata',
     GET_ITEMS_META_SUCCESS  = '[Entity] Item medadata loaded success',
@@ -25,6 +31,16 @@ export enum AnyEntityActionTypes {
 export class Jab implements Action {
     readonly type = AnyEntityActionTypes.JAB_STATE
     constructor( )  { }
+}
+
+export class GetItemsPart implements Action {
+    readonly type = AnyEntityActionTypes.GET_ITEMS_PART;
+    constructor(public payload: string ) {}
+}
+
+export class GetItemsPartSuccess<T> implements Action {
+    readonly type = AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS;
+    constructor(public payload: ({ entites: T[] , ids:any[], request:string })  ) {}
 }
 
 export class GetItems implements Action {
@@ -77,6 +93,8 @@ export class ErrorAnyEntity implements Action {
 export type anyEntityActions =
   | GetItems
   | GetItemsSuccess<any>
+  | GetItemsPart
+  | GetItemsPartSuccess<any>
   | GetItemsMeta
   | GetItemsMetaSuccess
   | AddItem<any>

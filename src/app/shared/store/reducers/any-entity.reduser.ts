@@ -1,4 +1,4 @@
-import { EntityState, createEntityAdapter, EntityAdapter } from "@ngrx/entity";
+import { EntityState, createEntityAdapter, EntityAdapter, Dictionary } from "@ngrx/entity";
 import { anyEntityActions, AnyEntityActionTypes } from "@appStore/actions/any-entity.actions";
 import { FieldDescribes } from "@appModels/metadata";
 
@@ -22,6 +22,7 @@ export interface Metadata {
 
 export interface AnyEntytyState<T> extends EntityState<T> {
     loaded: boolean;
+    partLoaded: Dictionary<string[]>;
     loading: boolean;
     metaLoaded: boolean;
     metaLoading: boolean;
@@ -30,10 +31,12 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     rowSeed?:T;
     error: any;
     jab:        boolean;
+    
 }
 
 export const initialSubState = {
     loaded: false,
+    partLoaded: {},
     loading: false,
     metaLoaded: false,
     metaLoading: false,
@@ -70,13 +73,26 @@ export function initStateFromAdapter( adapter: EntityAdapter<any> ):AnyEntytySta
 } 
 
 export function reducerFromAdapter( adapt: EntityAdapter<any>){
-
+    
     function reducer(state = initStateFromAdapter(adapt), action: anyEntityActions): AnyEntytyState<any>{
         const removeIfExit = (x:any[], v:any ) => x.indexOf(v) > 0 ? x.slice( x.indexOf(v), 1): x ; 
         //console.log(state)
         //console.log(action)
         switch (action.type) {
 
+            case AnyEntityActionTypes.GET_ITEMS_PART:
+                return { ...state, loading: true };    
+
+            case AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS:{
+                console.log('GET_ITEMS_PART_SUCCESS');
+
+                var r = adapt.addMany( 
+                        action.payload.entites,
+                        { ...state , loading: false , partLoaded:  { ...state.partLoaded , [action.payload.request]:action.payload.ids  }  }
+                    );  
+
+                return r;                    
+            }
 
             case AnyEntityActionTypes.GET_ITEMS:
                 return { ...state, loading: true };    
