@@ -70,7 +70,7 @@ export class anyEntytySetEffects {
     @Effect()   //
     ExecCurentItemAction$ = this.actions$.pipe(
         ofType(AnyEntitySetActionTypes.EXEC_CURENT),
-        tap((x:ExecCurrent) => console.log('Exec curent'+ x.reduserData)),
+        //tap((x:ExecCurrent) => console.log('Exec curent'+ x.reduserData)),
         map( (x:ExecCurrent) => new Exec({ name: x.reduserData, itemAction: x.payload } ))   
     )
       
@@ -92,7 +92,7 @@ export class anyEntytySetEffects {
             case ( AnyEntityActionTypes.GET_ITEMS_PART) :
                 return this.foreignService.getItemsPart$( action.payload )
                     .pipe(
-                        tap( x=>  console.log(x) ),
+                        //tap( x=>  console.log(x) ),
                         map( x => new GetItemsPartSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
@@ -118,7 +118,7 @@ export class anyEntytySetEffects {
             case ( AnyEntityActionTypes.GET_ITEMS ) :
                 return this.dataService.items$( options.location, options.selBack(action.payload) )
                     .pipe(
-                        tap( x=>  console.log(x) ),
+                        //tap( x=>  console.log(x) ),
                         map( x => new GetItemsSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )

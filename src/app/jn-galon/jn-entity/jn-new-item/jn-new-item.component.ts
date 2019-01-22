@@ -1,14 +1,16 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup} from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription} from 'rxjs';
-import {  skipUntil, skip } from 'rxjs/operators';
+import { Observable, Subscription, of }  from 'rxjs';
+import {  skipUntil, skip, combineLatest, map, tap, combineAll, mergeAll, merge, flatMap, mergeMap, filter, switchMap } from 'rxjs/operators';
 
-import { GetTemplate } from '@appStore/actions/any-entity.actions';
+import { GetTemplate, SetRowSeed } from '@appStore/actions/any-entity.actions';
 import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
+
+const FG_VALID_STATE ='VALID';
 
 /**
  *  План 
@@ -25,9 +27,7 @@ import * as fromSelectors from '@appStore/selectors/index';
 export class JnNewItemComponent implements OnInit {
 
   private controls$:     Observable<{ questions:any, formGroup:FormGroup} >;
-  //private rowSeed$ = new BehaviorSubject({});  
   private subscriptions: Subscription[] = [];
-  //private ctrlChangesSubscr: Subscription[] = [];
 
   constructor(
     private store: Store<fromStore.State>//,
@@ -43,6 +43,132 @@ export class JnNewItemComponent implements OnInit {
       this.store.select( fromSelectors.selCurFormControls()).pipe(
          skipUntil( this.store.select( fromSelectors.selCurRowTemplate() ).pipe( skip(1) ) )   //горбатенько немного...
       );  
+
+    // при любых изменениях пашим ровсид в стор  
+    this.subscriptions.push(
+        this.controls$
+          .pipe( mergeMap(x => x.formGroup.valueChanges))
+          .subscribe( x=> this.store.dispatch(new ExecCurrent( new SetRowSeed(x)  ) )) 
+      );
+  
+    // this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?SERVICEDESCID=1') }  
+
+    //const obsInfo$ = 
+
+
+    // Стрим отслеживающий тока нужные изменения формы с возвратом соответствующих локашинов
+    const observablesControls$ =  this.controls$.pipe(
+      map(x => x.formGroup),
+      combineLatest( 
+          this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()),
+          (fgr,fInfo) => 
+              Object.keys(fInfo)
+                .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
+      ),
+      tap(x=>console.log(x)),
+      mergeMap( 
+        x => x.map( y => 
+              y.ctrl.valueChanges.pipe( 
+                  combineLatest( of(y) , (v1,v2)=>({fld:v2.name, val:v1, locs:v2.locs })  )
+              ))
+      ),
+      mergeAll(),
+    );
+  
+    const dispRequestForeignData$ = observablesControls$.pipe(
+        map( x => x.locs),
+        mergeMap((x:[]) => x.map( v =>  this.store.select( fromSelectors.selectResolvedLoc(v)))),
+        mergeAll()
+    )              
+
+    //selectResolvedLoc(loc),            
+
+    this.subscriptions.push( 
+      dispRequestForeignData$.subscribe(x=>console.log(x)) 
+    );
+
+    //this.subscriptions.push( 
+    //  this.store.select( fromSelectors.selCurMacroParentFieldsWithLocs()).subscribe(x=>console.log(x)) 
+    //);
+
+    // Итак надо получить контролы которые должны менять  РАБОЧИЙ СТРИМ !!!!  
+    // const observablesControls$ =  this.controls$.pipe(
+    //   map(x => x.formGroup),
+    //   //filter( x => !!x && x.status == FG_VALID_STATE  ),
+    //   combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()),(x1,x2)=> x2.map( x => x1.get(x) ).filter(z=>!!z)),
+    //   tap(x=>console.log(x)),
+    //   mergeMap( x => x.map( y => y.valueChanges)  ),
+    //   mergeAll(),
+    // );
+  }
+
+  ngOnDestroy(){ 
+    console.log("unsubscribe");
+    while(this.subscriptions.length > 0){
+      this.subscriptions.pop().unsubscribe(); 
+    } 
+  }
+  
+
+  /**
+   *  Dispatching request get new row template
+   */
+  // freshRowTemplate(){
+  //   return this.store.select( fromSelectors.selCurName() ).pipe(take(1))
+  //     .subscribe(
+  //       x => {  
+  //         console.log("fresh temptate disp");
+  //         this.store.dispatch( new Exec( {name: x , itemAction: new GetTemplate() }) )  
+  //     }
+  //   )
+  // }
+
+
+}
+// const observablesControls$ =  this.controls$.pipe(
+    //   map(x => Object.keys(x.formGroup.controls).map(y=> x.formGroup.get(y))   ),
+    //   mergeMap(x => x.map(y => y.valueChanges) ),
+    //   mergeAll(),
+    // )  
+    //this.subscriptions.push(observablesControls$.subscribe(x => console.log(x) ) )  ;
+    //this.subscriptions.push(observablesControls$.subscribe( x=>x.subscribe( x=> console.log(x)))); 
+    
+    
+    // const observablesControls$ =  this.controls$.pipe(
+    //   combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()),(x1,x2)=> x2.map( x => x1.formGroup.get(x) )),
+    //   //flatMap( x => x.map( y => y.valueChanges)  ),
+    //   //flatMap( x => of(x) ),
+      
+    //   //combineAll(),
+    //   //merge()
+    // );
+
+    // const observablesControls$ =  this.controls$.pipe(
+    //   tap(x=>x.formGroup.valueChanges.subscribe( x=> console.log(x)))
+    // );
+
+
+    //this.subscriptions.push(observablesControls$.subscribe( x=>x.subscribe( x=> console.log(x))));    
+
+
+    //this.subscriptions.push(this.store.select( fromSelectors.selCurMacroParentFields()).subscribe( x=>console.log(x)));    
+
+    // // это набор контролов изменения которых требуют перестройки как минимум опшинов дроп-даунов.
+    // const observablesControls$ = 
+    //    this.controls$.pipe(
+    //      combineLatest( this.store.select( fromSelectors.selCurMacroParentFields()), (x1,x2) => ({ fGroup:x1.formGroup, flds: x2 })) ,
+    //      map( x =>  x.flds.map( itm => x.fGroup.get(itm) )),
+    //    );
+
+    // observablesControls$.subscribe( x=>console.log(x)  );    
+     
+    // observablesControls$.pipe(
+    //     tap(x => console.log(x) ),
+    //     map( x => x.map( i =>  i.valueChanges.subscribe( x=> console.log(x))  ) )
+    //  )    
+
+
+        
 
 
     //this.controls$.subscribe( x => console.log(x) ) ;
@@ -82,32 +208,6 @@ export class JnNewItemComponent implements OnInit {
 
 
     //this.subscriptions.push( observablesControls$.subscribe(x=> console.log(x)) );    
-
-  }
-
-  ngOnDestroy(){ 
-    console.log("unsubscribe");
-    while(this.subscriptions.length > 0){
-      this.subscriptions.pop().unsubscribe(); 
-    } 
-  }
-  
-
-  /**
-   *  Dispatching request get new row template
-   */
-  // freshRowTemplate(){
-  //   return this.store.select( fromSelectors.selCurName() ).pipe(take(1))
-  //     .subscribe(
-  //       x => {  
-  //         console.log("fresh temptate disp");
-  //         this.store.dispatch( new Exec( {name: x , itemAction: new GetTemplate() }) )  
-  //     }
-  //   )
-  // }
-
-
-}
 
   //  // this.store.select( fromSelectors.selectDataOptions("JgMockTable")).subscribe(x => console.log(x) );
   //   //this.store.select( fromSelectors.selectData("JgMockTable")).subscribe(x => console.log(x) );

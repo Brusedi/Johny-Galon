@@ -4,7 +4,7 @@ import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
 import { _Start } from "@angular/cdk/scrolling";
-import { getLocationMacros, locationToName, locationInfo } from "app/shared/services/foregin/foreign-key.helper";
+import { getLocationMacros, locationToName, locationInfo, fillLocationMacros, isFullIndepended } from "app/shared/services/foregin/foreign-key.helper";
 import { getMdOptons, getMdOptonsFromDict } from "app/shared/services/metadata/metadata.helper";
 import { EntityAdapter } from "@ngrx/entity";
 
@@ -198,8 +198,34 @@ export const selCurMacroParentFields = () =>
                 .filter( x => !! x )
                 .map(x => getLocationMacros(x))
                 .reduce( (a,i) => [...a,...i] , [] )
-                .filter( (e,i,a) =>  i === a.indexOf(e) )
+                .filter( (e,i,a) =>  i === a.indexOf(e) )  // ? убираем повторы штоли 
         )
+
+// Список есть (это контролы изменения знач которых мы отслеживаем)
+// Так же необходимо отслеживать ключи для соответстующих запросов 
+// Типа на выхде нужно иметь не обработанный локйшн
+// тута нада на выходе штото вроде: [ { f1, [rloc1, rloc2, ....] }, { f2, [ rl2, rl3, ...] } ]
+// иля даже точнее { [fieldName:string]:(refs:string[]) }
+/**
+ *  Return object contains depend fields as props of array of location as value:
+ *  { 
+ *      [fieldName:string]:string[] // list locations
+ *  }
+ */
+export const selCurMacroParentFieldsWithLocs = () => 
+    createSelector(
+        selCurFieldDescribes(),
+        x => {
+            const foo = ( l:string, f:string[] , ret: { [fieldName:string]:string[] } ) => {
+                const addLoc = ( l1:string, fn:string , r:{} ) => fn in r ? { ...r, [fn]:[...r[fn], l1]} : {...r, [fn]:[l1] } 
+                return f.reduce( (a,i) => addLoc(l,i,a) , ret  )
+            }
+            return  x.map( y => y.foreignKey)
+            .filter( x => !! x )
+            .map(x => ({loc:x,  mac:getLocationMacros(x)}))  
+            .reduce(  (a,i) => foo(i.loc, i.mac, a) ,{})
+        }    
+    )
 
 // Controls data for form
 export const selCurJab = () =>
@@ -297,56 +323,52 @@ export const selectOptionsByLoc = ( loc: string ) => selectOptions( locationToNa
 
 /**
 *   Select part independed dropDown option by location
-*   Селеектор с разрешенными макросами либо 
+*   Селеектор с разрешенными макросами либо тн PartIndepended
 */
 export const selPartIndOptions = ( resolvedLoc: string ) => 
     createSelector(
         selectDataAndPartLoadedIfExist(locationToName(resolvedLoc)),
         (cntr) => !(resolvedLoc in cntr.parts)? null: 
             cntr.parts[resolvedLoc].reduce( (a,x) => ({...a, [x]:cntr.data[x]}) , {} )
-
-            // Object.keys(cntr.data)
-            //     .filter(x => cntr.parts[resolvedLoc].includes(x))
-            //     .reduce( (a,x) => ({...a, [x]:cntr.data[x]}) , {} )
     );  
 
+/**
+*  Select resolved location by location
+*  TODO Chek if empty...
+*/
+export const selectResolvedLoc =  ( loc: string ) => 
+    createSelector( 
+        selCurRowSeed(),
+        x => fillLocationMacros(loc,x)
+    );        
+    
 
 /**
 *   180119 Сложный депенденс-дропдаун-оптион селектор 
 *   Возможен только относительно лукашина, начну сразу с депенденса    
+*   Сделать через два готовых селектора передав результат одного в качестве параметра другого не вышло - пока не парюся....    
 */
-export const selectForeignOptionsByLoc =  ( loc: string ) => {
-    const locInfo = locationInfo(loc);
+export const selectForeignOptionsByLoc = ( loc: string ) => 
+    createSelector(
+        selectStateIfExist(locationToName(loc)),
+        selectResolvedLoc(loc),
+        (x,l) => {
+            //console.log(loc);
+            //console.log(x);
+            console.log(l);
+            const dap = x ? ({ data: (x.state.entities), parts: ( Object.keys(x.state.partLoaded).length > 0) ? (x.state.partLoaded):null, meta:x.state.metadata }) : null ;
 
-    //EntityAdapter
-    //getSelectors() 
-    //selCurRowSeed() //
-    //illLocationMacros = ( loc: string, row:{}) 
-
-    
-    return locInfo.isLocationUndepended && !locInfo.isLocationParameterized ? 
-        selectDataOptionsByLoc( loc ) : (
-            
-            locInfo
-        )
-
-}
-
-
-
-
-
-
-// /**
-// *   Select datas by location
-// */
-// export const selectDataByLoc = ( loc: string ) =>{
-//     const locId = locationToName(loc);
-
-//     return createSelector(
-//         selectDataIfExist(locId),
-//         (x) => x ? [{key:undefined, value:'Зeeeагруз...'} ] : [{key:undefined, value:'Загруз...'} ]
-//     );
-// }
-
+            const selData = !x ? null:(
+                isFullIndepended(loc) ? dap.data :(
+                    !dap || !dap.parts ? null :(
+                            !(l in dap.parts)? null: 
+                            dap.parts[l].reduce( (a,x) => ({...a, [x]:dap.data[x]}) , {} )
+            )));
+            //console.log(selData);
+            //console.log(dap);
+            const ret = selData && dap && dap.meta && dap.meta.table ? getMdOptonsFromDict(selData, dap.meta.table ):null;             
+            //console.log(ret);
+            return ret;
+        }
+    );  
 

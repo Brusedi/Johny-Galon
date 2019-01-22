@@ -84,7 +84,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                 return { ...state, loading: true };    
 
             case AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS:{
-                console.log('GET_ITEMS_PART_SUCCESS');
+                //console.log('GET_ITEMS_PART_SUCCESS');
 
                 var r = adapt.addMany( 
                         action.payload.entites,
@@ -98,7 +98,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                 return { ...state, loading: true };    
 
             case AnyEntityActionTypes.GET_ITEMS_SUCCESS:{
-                console.log('GET_ITEMS_SUCCESS');
+                //console.log('GET_ITEMS_SUCCESS');
                 var s =
                     adapt.addMany( 
                         action.payload,

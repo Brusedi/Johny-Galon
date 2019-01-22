@@ -90,9 +90,9 @@ export class ForeignKeyService {
     return this.store.select( fromSelectors.selectDataOptionsByLoc(loc)).pipe(
       filter( x => !!x ),
       combineLatest(  this.dataService.items$(loc) , (o,d) => ({opt:o, data:d})),
-      tap( x=> console.log(x) ),
+      //tap( x=> console.log(x) ),
       map( x => ({ entites:x.data , ids: x.data.map( y => x.opt.selectId(y) ) , request:loc})  ),
-      tap( x=> console.log(x) )
+      //tap( x=> console.log(x) )
     ); 
   }
 }
