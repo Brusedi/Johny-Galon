@@ -9,6 +9,7 @@ export enum AnyEntitySetActionTypes {
     ADD_ANY_ENTITY                      = '[Entity set] Add any entity',
     PREPARE_BY_LOC                      = '[Entity set] Try prepare entity by location',
     PREPARE_BY_LOC_COMPLETE             = '[Entity set] Prepare entity by location completed',
+    PART_LOAD_BY_LOC                    = '[Entity set] Load data by resolved location',
     SET_CURRENT                         = '[Entity set] Set current entity',  
     EXEC_CURENT                         = '[Entity set] Execute current entity' ,
     EXEC                                = '[Entity set] Execute' ,
@@ -17,6 +18,12 @@ export enum AnyEntitySetActionTypes {
     EROR_ANY_ENTITY_SET                 = '[Entity set] Error' ,
     JAB_STATE                           = '[Entity set] Jab (pure state change)' 
 }
+
+export class PartLoadByLoc implements Action {
+    readonly type = AnyEntitySetActionTypes.PART_LOAD_BY_LOC
+    constructor(public payload: string )  { }
+}
+
 
 export class PrepareByLoc implements Action {
     readonly type = AnyEntitySetActionTypes.PREPARE_BY_LOC
@@ -71,6 +78,7 @@ export class ErrorAnyEntitySet implements Action {
 }  
 
 export type AnyEntitySetAction =
+  | PartLoadByLoc
   | PrepareByLocComplete
   | PrepareByLoc
   | Exec

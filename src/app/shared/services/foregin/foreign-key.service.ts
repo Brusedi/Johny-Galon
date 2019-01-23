@@ -41,7 +41,7 @@ export class ForeignKeyService {
 
   public isExist$ = (loc:string) => this.store.select(fromSelectors.selectIsExist(locationToName(loc)));
   
-  
+  public locToName = locationToName;  
   
   public buildOptions$ = (loc:string) =>  
     this.dataService.metadata$( getBaseLocation(loc) ).pipe(

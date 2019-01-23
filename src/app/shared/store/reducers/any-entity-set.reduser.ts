@@ -35,6 +35,9 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
     
     switch (action.type) {
         
+        case AnyEntitySetActionTypes.PART_LOAD_BY_LOC:{        
+            return { ...state, jab:!state.jab};    
+        }     
 
         case AnyEntitySetActionTypes.PREPARE_BY_LOC_COMPLETE: {
             const que =  state.prepareQueue.length > 0 ? state.prepareQueue.slice(1,state.prepareQueue.length) : [];

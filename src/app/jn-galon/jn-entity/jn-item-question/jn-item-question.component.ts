@@ -38,14 +38,10 @@ export class JnItemQuestionComponent implements OnInit{
   ngOnInit(){
     this.control = this.form.controls[this.question.key];
     this.prepareSecondaryData();
-    //options$ = this.question.controlType != 'dropdown' ? null : this.buildOptions$
 
-    //this.question.controlType == 'dropdown'?this.prepareSecondaryData():null;
     if(this.question.controlType == 'dropdown'){
        //this.options$ = this.store.select( fromSelectors.selectOptionsByLoc( this.question[REF_LOC_PROP] ));             //чистый 
        this.options$ = this.store.select( fromSelectors.selectForeignOptionsByLoc( this.question[REF_LOC_PROP] ));        //референсный 
-       
-       //this.options$.subscribe(x=>console.log(x) ) ;
     }
     
   }
@@ -55,30 +51,21 @@ export class JnItemQuestionComponent implements OnInit{
         this.store.dispatch( new PrepareByLoc( this.question[REF_LOC_PROP] ));
     
     // еуыештп 
-    !this.question.hasOwnProperty(REF_LOC_PROP) ? null:
-        // this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?SERVICEDESCID=1') })  ) ;
-        this.store.select( fromSelectors.selectIsExistByLoc( this.question[REF_LOC_PROP] )).pipe(
-             filter( x => !!x && this.question[REF_LOC_PROP] == './Ax/NvaSdEventType?servicedescid={ServiceDescID}' )
-           ).subscribe( x => //console.log('eeeeeeeeeeeeeeeeeeeeeeeeee') 
-               this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?servicedescid=1') })  )  
-           ) 
+    // !this.question.hasOwnProperty(REF_LOC_PROP) ? null:
+    //     // this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?SERVICEDESCID=1') })  ) ;
+    //     this.store.select( fromSelectors.selectIsExistByLoc( this.question[REF_LOC_PROP] )).pipe(
+    //          filter( x => !!x && this.question[REF_LOC_PROP] == './Ax/NvaSdEventType?servicedescid={ServiceDescID}' )
+    //        ).subscribe( x => //console.log('eeeeeeeeeeeeeeeeeeeeeeeeee') 
+    //            this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?servicedescid=1') })  )  
+    //        ) 
 
   }  
 
-
-
-  buildOptions$(){
-    return 
-
-  }
-
   get isValid() { 
-    //return this.form.controls[this.question.key].valid; 
     return  this.control.valid;
   }
 
   hasError(errorCode: string, path?: string[]) { 
-    //return this.form.controls[this.question.key].hasError(errorCode, path); 
     return this.control.hasError(errorCode, path); 
   }
 

@@ -220,10 +220,11 @@ export const selCurMacroParentFieldsWithLocs = () =>
                 const addLoc = ( l1:string, fn:string , r:{} ) => fn in r ? { ...r, [fn]:[...r[fn], l1]} : {...r, [fn]:[l1] } 
                 return f.reduce( (a,i) => addLoc(l,i,a) , ret  )
             }
-            return  x.map( y => y.foreignKey)
-            .filter( x => !! x )
-            .map(x => ({loc:x,  mac:getLocationMacros(x)}))  
-            .reduce(  (a,i) => foo(i.loc, i.mac, a) ,{})
+            return  x
+                .map( y => y.foreignKey)
+                .filter( x => !! x )
+                .map(x => ({loc:x,  mac:getLocationMacros(x)}))  
+                .reduce(  (a,i) => foo(i.loc, i.mac, a) ,{})
         }    
     )
 
@@ -355,7 +356,7 @@ export const selectForeignOptionsByLoc = ( loc: string ) =>
         (x,l) => {
             //console.log(loc);
             //console.log(x);
-            console.log(l);
+            //console.log(l);
             const dap = x ? ({ data: (x.state.entities), parts: ( Object.keys(x.state.partLoaded).length > 0) ? (x.state.partLoaded):null, meta:x.state.metadata }) : null ;
 
             const selData = !x ? null:(
@@ -372,3 +373,20 @@ export const selectForeignOptionsByLoc = ( loc: string ) =>
         }
     );  
 
+/**
+ * Select selected partLocation
+ */
+export const selectPartLocationByLoc = ( loc: string ) => 
+    createSelector(
+        selectStateIfExist(locationToName(loc)),
+        x => x && x.state.partLoaded ? Object.keys(x.state.partLoaded) : []
+    );
+
+/**
+ * Select selected partLocation if notExist
+ */
+export const selectPartLocationIfNotExist = ( loc: string ) => 
+    createSelector(
+        selectPartLocationByLoc(loc),
+        x => x.indexOf(loc) >= 0 ?  null : loc
+    );    

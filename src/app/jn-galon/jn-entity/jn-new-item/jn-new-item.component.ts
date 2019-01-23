@@ -1,11 +1,11 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { FormGroup} from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Observable, Subscription, of }  from 'rxjs';
-import {  skipUntil, skip, combineLatest, map, tap, combineAll, mergeAll, merge, flatMap, mergeMap, filter, switchMap } from 'rxjs/operators';
+import { Observable, Subscription, of, from }  from 'rxjs';
+import {  skipUntil, skip, combineLatest, map, tap, combineAll, mergeAll, merge, flatMap, mergeMap, filter, switchMap, groupBy, take, distinctUntilChanged } from 'rxjs/operators';
 
 import { GetTemplate, SetRowSeed } from '@appStore/actions/any-entity.actions';
-import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
+import { ExecCurrent, PartLoadByLoc } from '@appStore/actions/any-entity-set.actions';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
@@ -44,6 +44,15 @@ export class JnNewItemComponent implements OnInit {
          skipUntil( this.store.select( fromSelectors.selCurRowTemplate() ).pipe( skip(1) ) )   //горбатенько немного...
       );  
 
+    // this.subscriptions.push( 
+    //       this.store.select( fromSelectors.selCurRowTemplate()).pipe(
+    //         skip(1)
+    //         //filter( x => Object.keys(x).length > 0 )
+    //       ).subscribe( //x=>  console.log(x)
+    //               x=>this.store.dispatch(new ExecCurrent( new SetRowSeed(x)  ))
+    //       )
+    // );    
+      
     // при любых изменениях пашим ровсид в стор  
     this.subscriptions.push(
         this.controls$
@@ -53,40 +62,70 @@ export class JnNewItemComponent implements OnInit {
   
     // this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?SERVICEDESCID=1') }  
 
-    //const obsInfo$ = 
-
-
-    // Стрим отслеживающий тока нужные изменения формы с возвратом соответствующих локашинов
-    const observablesControls$ =  this.controls$.pipe(
+    const observablesFields$ = this.controls$.pipe(
       map(x => x.formGroup),
       combineLatest( 
           this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()),
           (fgr,fInfo) => 
               Object.keys(fInfo)
                 .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
-      ),
-      tap(x=>console.log(x)),
+    ));
+    
+
+
+    const observablesControls$ =  observablesFields$.pipe(
       mergeMap( 
         x => x.map( y => 
               y.ctrl.valueChanges.pipe( 
                   combineLatest( of(y) , (v1,v2)=>({fld:v2.name, val:v1, locs:v2.locs })  )
-              ))
-      ),
-      mergeAll(),
-    );
+      ))),
+      mergeMap(x => from(x) )          
+    );  
+
+    //this.subscriptions.push( 
+    //  observablesControls$.subscribe(x=>console.log(x)) 
+    //);
+
+
+    // Стрим отслеживающий тока нужные изменения формы с возвратом соответствующих локашинов
+    // const observablesControls$ =  this.controls$.pipe(
+    //   map(x => x.formGroup),
+    //   combineLatest( 
+    //       this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()),
+    //       (fgr,fInfo) => 
+    //           Object.keys(fInfo)
+    //             .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
+    //   ),
+    //   //tap(x=>console.log(x)),
+    //   mergeMap( 
+    //     x => x.map( y => 
+    //           y.ctrl.valueChanges.pipe( 
+    //               combineLatest( of(y) , (v1,v2)=>({fld:v2.name, val:v1, locs:v2.locs })  )
+    //           ))
+    //   ),
+    //   mergeAll(),
+    // );
   
+    // ресолвим локашин и фильтруем тока новые... почему мультиплекс не понял ?  
     const dispRequestForeignData$ = observablesControls$.pipe(
         map( x => x.locs),
-        mergeMap((x:[]) => x.map( v =>  this.store.select( fromSelectors.selectResolvedLoc(v)))),
-        mergeAll()
+        mergeMap((x:string[]) => from(x) ),
+        mergeMap( x => this.store.select( fromSelectors.selectResolvedLoc(x))), 
+        mergeMap( x => this.store.select( fromSelectors.selectPartLocationIfNotExist(x))),
+        //tap(x=> console.log(x)),
+        distinctUntilChanged( ),
+        filter(x=>!!x)
     )              
-
-    //selectResolvedLoc(loc),            
-
+    
     this.subscriptions.push( 
-      dispRequestForeignData$.subscribe(x=>console.log(x)) 
+      dispRequestForeignData$.subscribe(
+         x=> this.store.dispatch(new PartLoadByLoc( x ) )
+      ) 
     );
+  
 
+
+    //this.store.dispatch( new ExecCurrent( new GetTemplate() ) );
     //this.subscriptions.push( 
     //  this.store.select( fromSelectors.selCurMacroParentFieldsWithLocs()).subscribe(x=>console.log(x)) 
     //);

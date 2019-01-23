@@ -7,8 +7,8 @@ import { map, mergeMap, catchError, tap, switchMap, filter } from "rxjs/operator
 import { Observable } from "rxjs/Observable";
 
 import { DataProvService } from "app/shared/services/data-prov.service";
-import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem } from "@appStore/actions/any-entity-set.actions";
-import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess  } from "@appStore/actions/any-entity.actions";
+import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem, PartLoadByLoc } from "@appStore/actions/any-entity-set.actions";
+import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart  } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
@@ -29,6 +29,13 @@ export class anyEntytySetEffects {
 ) {}
 
     //const PrepareByLocBranch$ = ( loc:string  )   
+
+    @Effect()   
+    PartLoadByLoc$ = this.actions$.pipe(
+        ofType(AnyEntitySetActionTypes.PART_LOAD_BY_LOC),
+        map( (x:PartLoadByLoc) => new Exec(  {name:this.foreignService.locToName(x.payload) , itemAction: new GetItemsPart( x.payload)} ) )  
+    ) ;        
+
 
     @Effect()   
     PrepareByLoc1$ = this.actions$.pipe(
