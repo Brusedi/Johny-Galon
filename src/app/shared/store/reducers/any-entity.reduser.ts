@@ -114,6 +114,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                 return { ...state,  metaLoading:false, metaLoaded: true , metadata:action.payload };
             }
 
+            case AnyEntityActionTypes.GET_TEMPLATE_ROWSEED:
             case AnyEntityActionTypes.GET_TEMPLATE:{
                 return { ...state, template: null };    
             }    

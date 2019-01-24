@@ -19,6 +19,7 @@ export enum AnyEntityActionTypes {
     ADD_ITEM_SUCCESS        =  '[Entity] Item added success',
 
     GET_TEMPLATE            = '[Entity] Load template',
+    GET_TEMPLATE_ROWSEED    = '[Entity] Load template and set in rowSeed',
     GET_TEMPLATE_SUCCESS    = '[Entity] Item template loaded success',
 
     SET_ROW_SEED            = '[Entity] Item rowseed set (changed)',    
@@ -75,6 +76,13 @@ export class GetTemplate implements Action {
     constructor() {}
 }
 
+export class GetTemplateRowSeed implements Action {
+    readonly type = AnyEntityActionTypes.GET_TEMPLATE_ROWSEED;
+    constructor() {}
+}
+
+
+
 export class GetTemplateSuccess<T> implements Action {
     readonly type = AnyEntityActionTypes.GET_TEMPLATE_SUCCESS;
     constructor(public payload: T  ) {}  
@@ -100,6 +108,7 @@ export type anyEntityActions =
   | AddItem<any>
   | AddItemSuccess<any>
   | GetTemplate
+  | GetTemplateRowSeed
   | GetTemplateSuccess<any>
   | SetRowSeed<any>
   | ErrorAnyEntity

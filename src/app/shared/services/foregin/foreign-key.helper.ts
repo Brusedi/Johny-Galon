@@ -133,7 +133,7 @@ export const buildSelBackIdFoo = ( key: string ) => (x:string) => ("?"+key+"=") 
 export const fillLocationMacros = ( loc: string, row:{}) => {
     const prepVal = (v:any) => v==undefined?'null':((typeof v) == 'string' ? "'"+v+"'" : ""+v);
     const getVal = ( p:string, r:{}) => prepVal( p in r ? r[p] : undefined );  
-    
+
     return getLocationMacros(loc).reduce((a:string, x) => a.replace(FK_MACRO_BEGIN+x+FK_MACRO_END, getVal(x,row)),loc);
 }
 

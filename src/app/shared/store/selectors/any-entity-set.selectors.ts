@@ -341,8 +341,17 @@ export const selectResolvedLoc =  ( loc: string ) =>
     createSelector( 
         selCurRowSeed(),
         x => fillLocationMacros(loc,x)
-    );        
-    
+    );  
+
+/**
+*  Select resolved location by location
+*  TODO Chek if empty...
+*/
+export const selectResolvedLocFromTemplate =  ( loc: string ) => 
+    createSelector( 
+        selCurRowTemplate(),
+        x => fillLocationMacros(loc,x)
+    );      
 
 /**
 *   180119 Сложный депенденс-дропдаун-оптион селектор 

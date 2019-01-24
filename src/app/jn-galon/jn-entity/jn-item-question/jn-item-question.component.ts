@@ -42,8 +42,10 @@ export class JnItemQuestionComponent implements OnInit{
     if(this.question.controlType == 'dropdown'){
        //this.options$ = this.store.select( fromSelectors.selectOptionsByLoc( this.question[REF_LOC_PROP] ));             //чистый 
        this.options$ = this.store.select( fromSelectors.selectForeignOptionsByLoc( this.question[REF_LOC_PROP] ));        //референсный 
+       
+      // this.options$.subscribe( x=>{ console.log(this.question.key);console.log(this.question[REF_LOC_PROP]) ;console.log(x); })
     }
-    
+
   }
 
   private prepareSecondaryData (){

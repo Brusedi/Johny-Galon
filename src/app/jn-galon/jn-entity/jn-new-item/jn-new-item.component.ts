@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subscription, of, from }  from 'rxjs';
 import {  skipUntil, skip, combineLatest, map, tap, combineAll, mergeAll, merge, flatMap, mergeMap, filter, switchMap, groupBy, take, distinctUntilChanged } from 'rxjs/operators';
 
-import { GetTemplate, SetRowSeed } from '@appStore/actions/any-entity.actions';
+import { GetTemplate, SetRowSeed, GetTemplateRowSeed } from '@appStore/actions/any-entity.actions';
 import { ExecCurrent, PartLoadByLoc } from '@appStore/actions/any-entity-set.actions';
 
 import * as fromStore from '@appStore/index';
@@ -26,8 +26,10 @@ const FG_VALID_STATE ='VALID';
 })
 export class JnNewItemComponent implements OnInit {
 
-  private controls$:     Observable<{ questions:any, formGroup:FormGroup} >;
-  private subscriptions: Subscription[] = [];
+  private controls$:                      Observable<{ questions:any, formGroup:FormGroup} >;
+  private dispChangeRequestForeignData$ : Observable<string> ;  // Triger for load foreign data (Not loaded location with resolved macros)    
+  private dispPrimaryRequestForeignData$: Observable<any> ;  // Triger for primaryload foreign data 
+  private subscriptions:                  Subscription[] = [];
 
   constructor(
     private store: Store<fromStore.State>//,
@@ -35,95 +37,111 @@ export class JnNewItemComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    console.log('oninit');
+    //console.log('oninit');
     // Мозг не ебем, диспатчим обновить темплэйт строки Работаем с куром ! 
-    this.store.dispatch( new ExecCurrent( new GetTemplate() ) );
+    
 
+    this.buildStreams() ;   
+    this.buildSubscriptions();
+    
+    this.store.dispatch( new ExecCurrent( new GetTemplateRowSeed() ) );
+  }
+
+  buildStreams(){
+    // Build controls set after getting row template
     this.controls$ = 
       this.store.select( fromSelectors.selCurFormControls()).pipe(
          skipUntil( this.store.select( fromSelectors.selCurRowTemplate() ).pipe( skip(1) ) )   //горбатенько немного...
       );  
 
-    // this.subscriptions.push( 
-    //       this.store.select( fromSelectors.selCurRowTemplate()).pipe(
-    //         skip(1)
-    //         //filter( x => Object.keys(x).length > 0 )
-    //       ).subscribe( //x=>  console.log(x)
-    //               x=>this.store.dispatch(new ExecCurrent( new SetRowSeed(x)  ))
-    //       )
-    // );    
-      
-    // при любых изменениях пашим ровсид в стор  
-    this.subscriptions.push(
-        this.controls$
-          .pipe( mergeMap(x => x.formGroup.valueChanges))
-          .subscribe( x=> this.store.dispatch(new ExecCurrent( new SetRowSeed(x)  ) )) 
-      );
-  
-    // this.store.dispatch( new Exec( { name:'NvaSdEventType' , itemAction: new GetItemsPart('./Ax/NvaSdEventType?SERVICEDESCID=1') }  
-
+    // Form Controls set  
     const observablesFields$ = this.controls$.pipe(
-      map(x => x.formGroup),
-      combineLatest( 
-          this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()),
-          (fgr,fInfo) => 
-              Object.keys(fInfo)
-                .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
+       map(x => x.formGroup),
+        combineLatest( 
+            this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()),
+            (fgr,fInfo) => 
+                Object.keys(fInfo)
+                  .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
     ));
     
 
-
+    // Change owner controls stream  
     const observablesControls$ =  observablesFields$.pipe(
       mergeMap( 
         x => x.map( y => 
               y.ctrl.valueChanges.pipe( 
                   combineLatest( of(y) , (v1,v2)=>({fld:v2.name, val:v1, locs:v2.locs })  )
       ))),
-      mergeMap(x => from(x) )          
+      mergeMap(x => from(x))          
     );  
-
-    //this.subscriptions.push( 
-    //  observablesControls$.subscribe(x=>console.log(x)) 
-    //);
-
-
-    // Стрим отслеживающий тока нужные изменения формы с возвратом соответствующих локашинов
-    // const observablesControls$ =  this.controls$.pipe(
-    //   map(x => x.formGroup),
-    //   combineLatest( 
-    //       this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()),
-    //       (fgr,fInfo) => 
-    //           Object.keys(fInfo)
-    //             .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
-    //   ),
-    //   //tap(x=>console.log(x)),
-    //   mergeMap( 
-    //     x => x.map( y => 
-    //           y.ctrl.valueChanges.pipe( 
-    //               combineLatest( of(y) , (v1,v2)=>({fld:v2.name, val:v1, locs:v2.locs })  )
-    //           ))
-    //   ),
-    //   mergeAll(),
-    // );
-  
-    // ресолвим локашин и фильтруем тока новые... почему мультиплекс не понял ?  
-    const dispRequestForeignData$ = observablesControls$.pipe(
-        map( x => x.locs),
-        mergeMap((x:string[]) => from(x) ),
-        mergeMap( x => this.store.select( fromSelectors.selectResolvedLoc(x))), 
-        mergeMap( x => this.store.select( fromSelectors.selectPartLocationIfNotExist(x))),
-        //tap(x=> console.log(x)),
-        distinctUntilChanged( ),
-        filter(x=>!!x)
-    )              
+                
     
+    // тригер первичная загрузка вторичных данных из темплэйта
+    this.dispPrimaryRequestForeignData$ = this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()).pipe(
+        filter(x => Object.keys(x).length>0),
+        map( (x:{[key:string]:string[]}) => Object.keys(x).map( i => x[i] ) ), // [loc1,loc2,...][]
+        map( x => x.reduce( (a,i) => [...a, ...i]  ,[] ).filter( (e,i,a) =>  i === a.indexOf(e) ) ),
+        mergeMap((x:string[]) => from(x) ),
+        mergeMap( x => this.store.select( fromSelectors.selectResolvedLocFromTemplate(x))), 
+        mergeMap( x => this.store.select( fromSelectors.selectPartLocationIfNotExist(x))),
+        filter(x=>!!x)
+    ).pipe(    
+        mergeMap( x =>  this.store.select( fromSelectors.selectIsExistByLoc(x) ).pipe( map(y=>({l:x,isexist:y}) ) )),
+        distinctUntilChanged( ),
+        filter(x => !!x.l && x.isexist),
+        map(x=>x.l )
+    )            
+
+       
+    // ресолвим локашин и фильтруем тока новые... почему мультиплекс не понял ?  
+    this.dispChangeRequestForeignData$ = observablesControls$.pipe(
+          map( x => x.locs),
+          mergeMap((x:string[]) => from(x) ),
+          mergeMap( x => this.store.select( fromSelectors.selectResolvedLoc(x))), 
+          mergeMap( x => this.store.select( fromSelectors.selectPartLocationIfNotExist(x))),
+          //tap(x=> console.log(x)),
+          distinctUntilChanged( ),
+          filter(x=>!!x),
+    )   
+  
+  } 
+
+  buildSubscriptions(){
+    // при любых изменениях пашим ровсид в стор  
+    this.subscriptions.push(
+      this.controls$
+        .pipe( mergeMap(x => x.formGroup.valueChanges))
+        .subscribe( x=> this.store.dispatch(new ExecCurrent( new SetRowSeed(x)  ) )) 
+    );
+
+    // 
     this.subscriptions.push( 
-      dispRequestForeignData$.subscribe(
+      this.dispPrimaryRequestForeignData$.subscribe(
+         x=> this.store.dispatch(new PartLoadByLoc( x ) )
+         //x=>console.log(x)
+      ) 
+    );
+
+    // если требуются не подгруженные вторичны данные диспатчим частичную загрузку
+    this.subscriptions.push( 
+      this.dispChangeRequestForeignData$.subscribe(
          x=> this.store.dispatch(new PartLoadByLoc( x ) )
       ) 
     );
-  
+  } 
 
+  ngOnDestroy(){ 
+    //console.log("unsubscribe");
+    while(this.subscriptions.length > 0){
+      this.subscriptions.pop().unsubscribe(); 
+    } 
+  }
+}  
+
+
+
+
+  
 
     //this.store.dispatch( new ExecCurrent( new GetTemplate() ) );
     //this.subscriptions.push( 
@@ -139,15 +157,7 @@ export class JnNewItemComponent implements OnInit {
     //   mergeMap( x => x.map( y => y.valueChanges)  ),
     //   mergeAll(),
     // );
-  }
 
-  ngOnDestroy(){ 
-    console.log("unsubscribe");
-    while(this.subscriptions.length > 0){
-      this.subscriptions.pop().unsubscribe(); 
-    } 
-  }
-  
 
   /**
    *  Dispatching request get new row template
@@ -163,7 +173,7 @@ export class JnNewItemComponent implements OnInit {
   // }
 
 
-}
+//}
 // const observablesControls$ =  this.controls$.pipe(
     //   map(x => Object.keys(x.formGroup.controls).map(y=> x.formGroup.get(y))   ),
     //   mergeMap(x => x.map(y => y.valueChanges) ),
