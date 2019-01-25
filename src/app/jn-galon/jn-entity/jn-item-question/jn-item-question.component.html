@@ -1,7 +1,7 @@
 
  <div [formGroup]="form"> 
     <div [ngSwitch]="question.controlType">
-        
+                  
         <mat-form-field *ngSwitchCase="'textbox'" class="example-full-width" >
             <input matInput placeholder={{question.getExLabel()}} [formControlName]="question.key" [id]="question.key" [type]="question.type"   > 
             <mat-hint *ngIf="!!question.hint"> {{question.hint}} </mat-hint> 
@@ -19,7 +19,7 @@
             </mat-form-field>          
       
             <div *ngSwitchCase="'checkbox'">
-                <p></p>
+                <p>rrrr</p>
                 <mat-checkbox  [formControlName]="question.key" [id]="question.key"> {{question.getExLabel()}} </mat-checkbox>
                 <p></p>
                 <!-- <mat-hint *ngIf="!!question.hint"> {{question.hint}} </mat-hint>  -->

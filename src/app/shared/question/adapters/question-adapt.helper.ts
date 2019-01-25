@@ -42,6 +42,7 @@ export const fldDescsToQuestions = (flds:FieldDescribe[],rowSeed:Observable<{}>)
     const toCdata = ( d:FieldDescribe) => ( { descr:d , ctrl:null, rowSeed$:rowSeed } as cdata ); 
     const fromCdata = ( d:cdata) =>  d.ctrl ;
     const toQuest = (fld:FieldDescribe, rowSeed:Observable<{}> ) => {
+        //console.log(fld);
         if( fld.foreignKey) {
             return toDropDown(fld, rowSeed)
         }
@@ -50,19 +51,18 @@ export const fldDescsToQuestions = (flds:FieldDescribe[],rowSeed:Observable<{}>)
                 case BKND_DATETIME_DATATYPE_NAME: 
                     return toDateTimePicker(fld, rowSeed);
                 case BKND_DATE_DATATYPE_NAME: 
-                    return toDateTimePicker(fld, rowSeed);
+                    return toDatePicker(fld, rowSeed);
                 case BKND_DATE_DATATYPE_NAME_NULABLE: 
-                    return toDateTimePicker(fld, rowSeed);
+                    return toDatePicker(fld, rowSeed);
                 case BKND_TEXT_DATATYPE_NAME: 
-                    return toDateTimePicker(fld, rowSeed);
+                    return toTextArea(fld, rowSeed);
                 case BKND_BOOL_DATATYPE_NAME: 
-                    return toDateTimePicker(fld, rowSeed);
+                    return toCheckbox(fld, rowSeed);
                 case BKND_BOOL_DATATYPE_NAME_NULABLE: 
-                    return toDateTimePicker(fld, rowSeed);
+                    return toCheckbox(fld, rowSeed);
                 default: 
                     return toTextBox(fld, rowSeed);
             }
-
         }
     } 
     return flds

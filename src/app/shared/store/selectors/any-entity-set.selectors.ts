@@ -158,9 +158,12 @@ export const selCurRowSeed = () =>
 //Question Current------------------------------------------------------------------------------------------------------------------
 // FieldDescribes[]
 export const selCurFieldDescribes = () =>  
-    createSelector(  selCurItemMeta(), x =>   
-        !x ? undefined :  Object.keys(x.fieldsDesc).map(y => x.fieldsDesc[y]) 
-    ) ;     
+    createSelector(  selCurItemMeta(), x => {   
+        console.log(x.fieldsDesc)
+        return !x ? undefined : Object.keys(x.fieldsDesc)
+                                    .map(y => x.fieldsDesc[y])
+                                    .sort( (a, b) => a.order - b.order  )
+    });     
 
 export const selCurQuestions = () =>  
     createSelector( 

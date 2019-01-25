@@ -47,7 +47,7 @@ export class MetadataAdaptService {
    */
   public toFieldDescribe = ( source:any, tag:any = undefined, toDefault:defFooType = defFoo )  =>{
     const md = source as IMetadata;
-    //console.log(toDefault(md,tag));
+    console.log(md);
     return md ? this.toFieldDescribeFunc(md, toDefault(md,tag)):undefined ;
   }  
   
@@ -65,7 +65,7 @@ export class MetadataAdaptService {
             {atr:"DataType", fn: (x => x==2 ? "Date" : null )},
             {atr:"DataType", fn: (x => x==7 || x==6 || x==9 ? "Text" : null )},
             {atr:ADD_META_TYPE_KEY_NAME, fn: (x => x)} 
-          ],"string"),
+          ],undefined),  //string
 
         name: this.existOrVal(data, ["DisplayName", "Display.Name"] ,defVal),
         description: this.existOrVal(data, ["Description", "Display.Description"] ,undefined),
