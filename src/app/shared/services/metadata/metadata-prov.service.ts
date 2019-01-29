@@ -29,19 +29,26 @@ export class MetadataProvService {
 
 
   public metadata$(loc:string ):Observable<any>{  
-    const r$ = this.loadMetadata2(loc); 
+    const r$ = this.loadMetadata3(loc);    //loadMetadata2
     //r$.subscribe( x=> console.log(x));
     return r$;
   }
 
 
-  private loadMetadata3 = (loc:string ) => 
-    this.dataService.metadata$(loc).pipe(
+  private loadMetadata3 = (loc:string ) => {
+    const tmeta$ = this.dataService.metadata$(loc);
+    const fdesc$ = tmeta$.pipe(
       map(this.toFieldsType),
-      map( x => Object.keys(x).map( f => this.getFieldDescr$(loc, f, x[f] ) ) ),            
-      map( x => x )
-  );  
-
+      mergeMap( x => from(Object.keys(x)).pipe(
+                    mergeMap( f => this.getFieldDescr$(loc, f, x[f] )),
+                    reduce( (a,f:FieldDescribe) => ({...a, [f.id]:f }), ({}) )
+      )),
+    );
+    return tmeta$.pipe( 
+      combineLatest( fdesc$ , (v1,v2) => ({table:v1 ,fieldsDesc: v2 }) )
+      //, tap(x=>console.log(x)) 
+    );     
+  };      
 
   private getFieldDescr$ = (loc:string, id:string, typeSeed:string ) =>
       this.dataService.metadata$(loc, id)
@@ -51,20 +58,6 @@ export class MetadataProvService {
             map( x => ({...x, type:(x.type === undefined ? typeSeed : x.type) }))
         );
         
-                              
-
- 
- // const tMeta$ = this.dataService.metadata$(loc);
-
-    // const fList$ = tMeta$.pipe( map( x =>  this.toFieldsList(x)) )
-    // const fListDesc$ = fList$.pipe(
-    //  //tap( x => console.log(x) ),
-    //   map( x =>  x.map( x =>   this.dataService.metadata$(loc, x).pipe( catchError( error => ([{ [META_FIELDNAME_KEY_NAME]:x}]) )))), 
-    //   //tap( x => console.log(x) ),
-    //   mergeMap( x => from(x).pipe(mergeAll(),toArray())),  
-    //   map( x => x.map( x=> this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] ) )),    
-    //   map( x => x.reduce((a,e) => ({...a, [e.id]:e }) ,  {})   )
-    // )    
 
   /**
   *  Convert table metadata to fields list
@@ -74,16 +67,9 @@ export class MetadataProvService {
     const clear   = (key:string) => key.length > 2 ? key.substring(1, key.length - 1) : key  ;
     return Object.getOwnPropertyNames(data)
           .filter(isField)
-          .reduce( (a,i) => a[clear(i)] = data[i] , {}  )
+          .reduce( (a,i) => ({ ...a, [clear(i)]:data[i] }) , {}  )
   } 
   
- 
-
-    // return tMeta$.pipe(
-    //   combineLatest( fListDesc$, (v1,v2) => ({table:v1 ,fieldsDesc: v2 })   )
-    // )
-  
-
   
   private loadMetadata2 = (loc:string ) => {
     const tMeta$ = this.dataService.metadata$(loc);

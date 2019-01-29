@@ -1,16 +1,16 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormGroup} from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subscription, of, from }  from 'rxjs';
-import {  skipUntil, skip, combineLatest, map, tap, combineAll, mergeAll, merge, flatMap, mergeMap, filter, switchMap, groupBy, take, distinctUntilChanged } from 'rxjs/operators';
+import {  skipUntil, skip, combineLatest, map, mergeMap, filter, distinctUntilChanged } from 'rxjs/operators';
 
-import { GetTemplate, SetRowSeed, GetTemplateRowSeed } from '@appStore/actions/any-entity.actions';
+import { GetTemplateRowSeed, AddItem, ChangeRowSeed } from '@appStore/actions/any-entity.actions';
 import { ExecCurrent, PartLoadByLoc } from '@appStore/actions/any-entity-set.actions';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 
-const FG_VALID_STATE ='VALID';
+//const FG_VALID_STATE ='VALID';
 
 /**
  *  План 
@@ -37,13 +37,8 @@ export class JnNewItemComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    //console.log('oninit');
-    // Мозг не ебем, диспатчим обновить темплэйт строки Работаем с куром ! 
-    
-
     this.buildStreams() ;   
     this.buildSubscriptions();
-    
     this.store.dispatch( new ExecCurrent( new GetTemplateRowSeed() ) );
   }
 
@@ -63,7 +58,6 @@ export class JnNewItemComponent implements OnInit {
                 Object.keys(fInfo)
                   .map( x => ({ ctrl:fgr.get(x), name:x, locs:fInfo[x] }) ).filter(z=>!!z.ctrl)
     ));
-    
 
     // Change owner controls stream  
     const observablesControls$ =  observablesFields$.pipe(
@@ -75,7 +69,6 @@ export class JnNewItemComponent implements OnInit {
       mergeMap(x => from(x))          
     );  
                 
-    
     // тригер первичная загрузка вторичных данных из темплэйта
     this.dispPrimaryRequestForeignData$ = this.store.select(fromSelectors.selCurMacroParentFieldsWithLocs()).pipe(
         filter(x => Object.keys(x).length>0),
@@ -89,10 +82,9 @@ export class JnNewItemComponent implements OnInit {
         mergeMap( x =>  this.store.select( fromSelectors.selectIsExistByLoc(x) ).pipe( map(y=>({l:x,isexist:y}) ) )),
         distinctUntilChanged( ),
         filter(x => !!x.l && x.isexist),
-        map(x=>x.l )
+        map(x => x.l )
     )            
 
-       
     // ресолвим локашин и фильтруем тока новые... почему мультиплекс не понял ?  
     this.dispChangeRequestForeignData$ = observablesControls$.pipe(
           map( x => x.locs),
@@ -103,7 +95,6 @@ export class JnNewItemComponent implements OnInit {
           distinctUntilChanged( ),
           filter(x=>!!x),
     )   
-  
   } 
 
   buildSubscriptions(){
@@ -111,7 +102,7 @@ export class JnNewItemComponent implements OnInit {
     this.subscriptions.push(
       this.controls$
         .pipe( mergeMap(x => x.formGroup.valueChanges))
-        .subscribe( x=> this.store.dispatch(new ExecCurrent( new SetRowSeed(x)  ) )) 
+        .subscribe( x=> this.store.dispatch(new ExecCurrent( new ChangeRowSeed(x)  ) ))   ///new SetRowSeed(x)
     );
 
     // 
@@ -131,11 +122,20 @@ export class JnNewItemComponent implements OnInit {
   } 
 
   ngOnDestroy(){ 
-    //console.log("unsubscribe");
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe(); 
     } 
   }
+
+  // ---------------------
+  onSubmit() {
+    //по дурацки пока...
+    this.store.select(fromSelectors.selCurRowSeed()).subscribe( 
+      x => this.store.dispatch(new ExecCurrent( new AddItem(x) ))
+    ).unsubscribe();
+    
+  }
+
 }  
 
 

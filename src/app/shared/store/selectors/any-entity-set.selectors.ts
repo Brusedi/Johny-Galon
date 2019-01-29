@@ -159,7 +159,7 @@ export const selCurRowSeed = () =>
 // FieldDescribes[]
 export const selCurFieldDescribes = () =>  
     createSelector(  selCurItemMeta(), x => {   
-        console.log(x.fieldsDesc)
+        //console.log(x.fieldsDesc)
         return !x ? undefined : Object.keys(x.fieldsDesc)
                                     .map(y => x.fieldsDesc[y])
                                     .sort( (a, b) => a.order - b.order  )
@@ -259,11 +259,22 @@ export const selItemsIsLoading = () =>
         (dt) => Object.keys(dt.items).reduce( (a,i) => a || dt.items[i].state.loading || dt.items[i].state.metaLoading ,false ) 
 );    
 
+/**
+ *  items is Uploading (buzy)
+ */
+export const selItemsIsUploading = () =>
+    createSelector( 
+        selectDatas,
+        (dt) => Object.keys(dt.items).reduce( (a,i) => a || dt.items[i].state.uploading ,false ) 
+);    
+
+
 export const selIsBuzy = () =>
     createSelector( 
         selItemsIsLoading(),
         selForeignIsPreparing(),
-        (x,y) => x || y 
+        selItemsIsUploading(),
+        (x,y,z) => x || y || z
 );    
 
 

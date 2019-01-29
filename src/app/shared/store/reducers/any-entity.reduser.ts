@@ -24,6 +24,8 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     loaded: boolean;
     partLoaded: Dictionary<string[]>;
     loading: boolean;
+    uploading:boolean;
+    uploaded:boolean;
     metaLoaded: boolean;
     metaLoading: boolean;
     metadata:Metadata;           ///rrrrr!!!
@@ -38,6 +40,8 @@ export const initialSubState = {
     loaded: false,
     partLoaded: {},
     loading: false,
+    uploading:false,
+    uploaded:false,
     metaLoaded: false,
     metaLoading: false,
     metadata:{ table:{} ,fieldsDesc:{} },
@@ -79,6 +83,12 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
         //console.log(state)
         //console.log(action)
         switch (action.type) {
+
+            case AnyEntityActionTypes.ADD_ITEM:
+                 return { ...state, uploading: true };    
+
+            case AnyEntityActionTypes.ADD_ITEM_SUCCESS:
+                 return { ...state, uploading: false, uploaded:true };    
 
             case AnyEntityActionTypes.GET_ITEMS_PART:
                 return { ...state, loading: true };    
@@ -126,6 +136,11 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             case AnyEntityActionTypes.SET_ROW_SEED:{
                 return { ...state, rowSeed:action.payload  };    
             }    
+
+            case AnyEntityActionTypes.CHANGE_ROW_SEED:{
+                return { ...state, rowSeed:(state.rowSeed? ({...state.rowSeed, ...action.payload }): action.payload ) };    
+            }    
+
 
             case AnyEntityActionTypes.EROR_ANY_ENTITY:
                 return { ...state, loaded: false, loading: false, error:  action.payload};            

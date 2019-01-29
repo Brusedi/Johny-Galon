@@ -22,7 +22,8 @@ export enum AnyEntityActionTypes {
     GET_TEMPLATE_ROWSEED    = '[Entity] Load template and set in rowSeed',
     GET_TEMPLATE_SUCCESS    = '[Entity] Item template loaded success',
 
-    SET_ROW_SEED            = '[Entity] Item rowseed set (changed)',    
+    SET_ROW_SEED            = '[Entity] Item rowseed set ',    
+    CHANGE_ROW_SEED         = '[Entity] Applay data to rowseed set (changed)',  
 
     EROR_ANY_ENTITY         = '[Entity] Error',
 
@@ -81,8 +82,6 @@ export class GetTemplateRowSeed implements Action {
     constructor() {}
 }
 
-
-
 export class GetTemplateSuccess<T> implements Action {
     readonly type = AnyEntityActionTypes.GET_TEMPLATE_SUCCESS;
     constructor(public payload: T  ) {}  
@@ -91,7 +90,14 @@ export class GetTemplateSuccess<T> implements Action {
 export class SetRowSeed<T> implements Action {
     readonly type = AnyEntityActionTypes.SET_ROW_SEED;
     constructor(public payload: T  ) {}  
+
 }
+
+export class ChangeRowSeed<T> implements Action {
+    readonly type = AnyEntityActionTypes.CHANGE_ROW_SEED;
+    constructor(public payload: T  ) {}  
+}
+
 
 export class ErrorAnyEntity implements Action {
     readonly type = AnyEntityActionTypes.EROR_ANY_ENTITY;
@@ -111,6 +117,7 @@ export type anyEntityActions =
   | GetTemplateRowSeed
   | GetTemplateSuccess<any>
   | SetRowSeed<any>
+  | ChangeRowSeed<any>
   | ErrorAnyEntity
   | Jab
   ;

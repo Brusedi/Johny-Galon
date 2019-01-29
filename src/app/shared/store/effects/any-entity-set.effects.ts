@@ -8,7 +8,7 @@ import { Observable } from "rxjs/Observable";
 
 import { DataProvService } from "app/shared/services/data-prov.service";
 import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem, PartLoadByLoc } from "@appStore/actions/any-entity-set.actions";
-import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart, SetRowSeed  } from "@appStore/actions/any-entity.actions";
+import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart, SetRowSeed, AddItemSuccess  } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
@@ -95,6 +95,15 @@ export class anyEntytySetEffects {
     // proceccing child items effects            
     private procSubAction$ = ( action : anyEntityActions, options: anyEntityOptions<any>  ): Observable<any> => {
         switch(action.type){
+
+            case ( AnyEntityActionTypes.ADD_ITEM) :
+                return this.dataService.insert( options.location, action.payload )
+                    .pipe(
+                        tap( x=>  console.log(x) ),
+                        map( x => new AddItemSuccess(x) ),
+                        catchError(error => of(new ErrorAnyEntity(error)))    
+                        //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
+                    ); 
 
             case ( AnyEntityActionTypes.GET_ITEMS_PART) :
                 return this.foreignService.getItemsPart$( action.payload )

@@ -47,7 +47,7 @@ export class MetadataAdaptService {
    */
   public toFieldDescribe = ( source:any, tag:any = undefined, toDefault:defFooType = defFoo )  =>{
     const md = source as IMetadata;
-    console.log(md);
+    //console.log(md);
     return md ? this.toFieldDescribeFunc(md, toDefault(md,tag)):undefined ;
   }  
   
