@@ -13,3 +13,11 @@ export const SdIncomingOption:anyEntityOptions<AnyEntityId> = {
     selectId: (x) => x.id,
     selBack: (x:string) => ("?ID=" + x )
   };  
+
+
+  export const NvaPlanPurchaseLine:anyEntityOptions<AnyEntityId> = {
+    name: "NvaPlanPurchaseLine", 
+    location:"/NvaAx/NvaPlanPurchaseLine", 
+    selectId: (x) => x.RECID,
+    selBack: (x:string) => ("?RECID=" + x )
+  };    

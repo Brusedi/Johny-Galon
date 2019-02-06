@@ -40,13 +40,14 @@ import { JnNewItemComponent } from './jn-galon/jn-entity/jn-new-item/jn-new-item
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { JnItemQuestionComponent } from './jn-galon/jn-entity/jn-item-question/jn-item-question.component';
 import { ReactiveFormsModule ,FormsModule } from '@angular/forms';
-import { JgMockTableOption, SdIncomingOption } from '@appModels/entity-options';
+import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine } from '@appModels/entity-options';
 import { AppResolverService } from './shared/services/app-resolver.service';
 
 const appRoutes: Routes = [
   { path: '',               component: JnRootComponent, pathMatch: 'full' ,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  }  },
   { path: 'tutoral/mock',   component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
   { path: 'tutoral/sd',     component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
+  { path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } },   
   { path: '**',             component: JnNotFoundComponent }
 ];
 // const appRoutes: Routes = [

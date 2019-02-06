@@ -26,7 +26,7 @@ import * as fromSelectors from '@appStore/selectors/index';
 })
 export class JnNewItemComponent implements OnInit {
 
-  private controls$:                      Observable<{ questions:any, formGroup:FormGroup} >;
+  public controls$:                       Observable<{ questions:any, formGroup:FormGroup} >;
   private dispChangeRequestForeignData$ : Observable<string> ;  // Triger for load foreign data (Not loaded location with resolved macros)    
   private dispPrimaryRequestForeignData$: Observable<any> ;  // Triger for primaryload foreign data 
   private subscriptions:                  Subscription[] = [];

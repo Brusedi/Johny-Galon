@@ -20,8 +20,8 @@ const SUB_SOURCE_PARAM_DATA_KEY = 'ServiceLocation';
 })
 export class JnRootPageComponent implements OnInit {
 
-  private subCaption$ : Observable<string>; 
-  private spiner$ : Observable<boolean>; 
+  public subCaption$ : Observable<string>; 
+  public spiner$ : Observable<boolean>; 
 
   constructor(private store: Store<fromStore.State>
     ) {
