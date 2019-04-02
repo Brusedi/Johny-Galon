@@ -1,0 +1,29 @@
+<mat-card>
+    <mat-card-title>Добровольное сообщение</mat-card-title>
+    <mat-card-subtitle>
+      Если вы зашли в этот раздел, значит, у Вас есть добровольное сообщение, касающееся непосредственно безопасности полетов. Если Вы хотите оставить сообщение о качестве оказанных услуг службами аэропорта, то перейдите, пожалуйста, в раздел
+      <a href="https://www.nvavia.ru/Home/Show?_id=24">Обратная связь</a>
+      и оставте там свое сообщение.  
+    </mat-card-subtitle>
+
+
+    <div *ngIf="controls$ | async as ctrls ; else loading;">
+        <form (ngSubmit)="onSubmit()" [formGroup]="ctrls.formGroup"> 
+            <div *ngFor="let question of ctrls.questions" class="form-row">
+                <app-jn-item-question [question]="question" [form]="ctrls.formGroup" ></app-jn-item-question> 
+            </div>
+            <div class="form-row">
+               <button mat-raised-button type="submit" [disabled]="!ctrls.formGroup.valid">Добавить запись</button>
+            </div> 
+            <div *ngIf="payLoad" class="form-row">
+                <strong>Saved the following values</strong><br>{{payLoad}}
+            </div>
+        </form>
+    </div>  
+
+    <ng-template #loading >
+        <mat-spinner class = "spinner"> </mat-spinner>
+    </ng-template>
+</mat-card>
+
+

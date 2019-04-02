@@ -134,14 +134,18 @@ export class anyEntytySetEffects {
             }
             
             case ( AnyEntityActionTypes.GET_ITEMS ) :
+                {
+                console.log('22');                       
+                console.log(options.location);   
+                console.log(action.payload);
                 return this.dataService.items$( options.location, options.selBack(action.payload) )
                     .pipe(
-                        //tap( x=>  console.log(x) ),
+                        tap( x=>  console.log(x) ),
                         map( x => new GetItemsSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
                     ); 
-                        
+                    }        
             default:
                 return of(null);
         }

@@ -42,11 +42,13 @@ import { JnItemQuestionComponent } from './jn-galon/jn-entity/jn-item-question/j
 import { ReactiveFormsModule ,FormsModule } from '@angular/forms';
 import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine } from '@appModels/entity-options';
 import { AppResolverService } from './shared/services/app-resolver.service';
+import { SdNewUserMessageComponent } from './serv-desc/sd-new-user-message/sd-new-user-message.component';
 
 const appRoutes: Routes = [
   { path: '',               component: JnRootComponent, pathMatch: 'full' ,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  }  },
   { path: 'tutoral/mock',   component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
   { path: 'tutoral/sd',     component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
+  { path: 'tutoral/sduser', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
   { path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } },   
   { path: '**',             component: JnNotFoundComponent }
 ];
@@ -63,7 +65,8 @@ const appRoutes: Routes = [
     JnRootComponent,
     JnNotFoundComponent,
     JnNewItemComponent,
-    JnItemQuestionComponent
+    JnItemQuestionComponent,
+    SdNewUserMessageComponent
   ],
   imports: [
     HttpModule,
