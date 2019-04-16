@@ -32,6 +32,7 @@ export interface AnyEntytyState<T> extends EntityState<T> {
     template?:T;
     rowSeed?:T;
     error: any;
+    insertedId?:any;
     jab:        boolean;
     
 }
@@ -48,6 +49,7 @@ export const initialSubState = {
     template:null,
     rowSeed:null,
     error: null,
+    insertedId:null,
     jab: true
 }
 
@@ -88,14 +90,13 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                  return { ...state, uploading: true };    
 
             case AnyEntityActionTypes.ADD_ITEM_SUCCESS:
-                 return { ...state, uploading: false, uploaded:true };    
+                 return { ...state, uploading: false, uploaded:true, insertedId:action.payload};    
 
             case AnyEntityActionTypes.GET_ITEMS_PART:
                 return { ...state, loading: true };    
 
             case AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS:{
                 //console.log('GET_ITEMS_PART_SUCCESS');
-
                 var r = adapt.addMany( 
                         action.payload.entites,
                         { ...state , loading: false , partLoaded:  { ...state.partLoaded , [action.payload.request]:action.payload.ids  }  }
@@ -118,6 +119,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             }
 
             case AnyEntityActionTypes.GET_ITEMS_META:
+                action.reduserData = state.metaLoading;
                 return { ...state, metaLoading: true, metaLoaded: false  };    
 
             case AnyEntityActionTypes.GET_ITEMS_META_SUCCESS:{
@@ -141,9 +143,12 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                 return { ...state, rowSeed:(state.rowSeed? ({...state.rowSeed, ...action.payload }): action.payload ) };    
             }    
 
-
+            /// uploaded
             case AnyEntityActionTypes.EROR_ANY_ENTITY:
-                return { ...state, loaded: false, loading: false, error:  action.payload};            
+                return { ...state, loading: false, uploading:false, metaLoading:false ,error: action.payload};        //loaded: false     
+
+            case AnyEntityActionTypes.EROR_ANY_ENTITY_RESET:
+                return { ...state, error:null};            
 
             case AnyEntityActionTypes.JAB_STATE:
                 return { ...state, jab:!state.jab};            

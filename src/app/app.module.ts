@@ -18,7 +18,9 @@ import {
   MatSelectModule,
   MatInputModule,
   MatDatepickerModule,
-  MatProgressSpinnerModule
+  MatProgressSpinnerModule,
+  MatIconModule,
+  MatDialogModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -43,6 +45,7 @@ import { ReactiveFormsModule ,FormsModule } from '@angular/forms';
 import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine } from '@appModels/entity-options';
 import { AppResolverService } from './shared/services/app-resolver.service';
 import { SdNewUserMessageComponent } from './serv-desc/sd-new-user-message/sd-new-user-message.component';
+import { JnInfoBoxComponent, JnInfoBoxDialogComponent} from './jn-galon/jn-info-box/jn-info-box.component';
 
 const appRoutes: Routes = [
   { path: '',               component: JnRootComponent, pathMatch: 'full' ,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  }  },
@@ -66,8 +69,11 @@ const appRoutes: Routes = [
     JnNotFoundComponent,
     JnNewItemComponent,
     JnItemQuestionComponent,
-    SdNewUserMessageComponent
+    SdNewUserMessageComponent,
+    JnInfoBoxComponent,
+    JnInfoBoxDialogComponent
   ],
+
   imports: [
     HttpModule,
     BrowserModule,
@@ -103,16 +109,20 @@ const appRoutes: Routes = [
     MatSelectModule,
     MatInputModule,
     MatDatepickerModule,
-    MatProgressSpinnerModule
-    
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatDialogModule
   ],
   providers: [
     {provide: RouterStateSerializer,   useClass: CustomRouterStateSerializer },
+    //{provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}},
     AppSettingsService,
     DataProvService,
     AppResolverService
 
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+
+  entryComponents: [JnInfoBoxDialogComponent]
 })
 export class AppModule { }

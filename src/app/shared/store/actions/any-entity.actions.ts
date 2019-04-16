@@ -26,6 +26,7 @@ export enum AnyEntityActionTypes {
     CHANGE_ROW_SEED         = '[Entity] Applay data to rowseed set (changed)',  
 
     EROR_ANY_ENTITY         = '[Entity] Error',
+    EROR_ANY_ENTITY_RESET   = '[Entity] Error reset',
 
     JAB_STATE               = '[Entity] Jab (pure state change)' 
 }
@@ -65,6 +66,7 @@ export class AddItemSuccess<T> implements Action {
 
 export class GetItemsMeta implements Action {
     readonly type = AnyEntityActionTypes.GET_ITEMS_META;
+    reduserData: boolean;
     constructor() {}
 }
 export class GetItemsMetaSuccess implements Action {
@@ -98,10 +100,14 @@ export class ChangeRowSeed<T> implements Action {
     constructor(public payload: T  ) {}  
 }
 
-
 export class ErrorAnyEntity implements Action {
     readonly type = AnyEntityActionTypes.EROR_ANY_ENTITY;
     constructor(public payload: any) {}
+}  
+
+export class ErrorAnyEntityReset implements Action {
+    readonly type = AnyEntityActionTypes.EROR_ANY_ENTITY_RESET;
+    constructor() {}
 }  
 
 export type anyEntityActions =
@@ -119,5 +125,6 @@ export type anyEntityActions =
   | SetRowSeed<any>
   | ChangeRowSeed<any>
   | ErrorAnyEntity
+  | ErrorAnyEntityReset  
   | Jab
   ;

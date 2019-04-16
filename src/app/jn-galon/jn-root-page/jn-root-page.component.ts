@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {MatIconRegistry} from '@angular/material';
 
 import * as fromSelectors from '@appStore/selectors/index';
 import * as fromStore     from '@appStore/index';
 import { Observable, of } from 'rxjs';
-import { delay, startWith, take, map } from 'rxjs/operators';
-import { PrepareByLoc } from '@appStore/actions/any-entity-set.actions';
+import { map } from 'rxjs/operators';
+
 
 
 
@@ -31,6 +30,8 @@ export class JnRootPageComponent implements OnInit {
   ngOnInit() {
     this.subCaption$ = this.store.select( fromSelectors.selCurItemMetaNote() ); 
     this.spiner$ = this.store.select(  fromSelectors.selIsBuzy() ).pipe( map(x => !x)  );
+
+    this.store.select(  fromSelectors.selectErrors()).subscribe(x=>console.log(x));
 
     //this.spiner$.subscribe(x=>console.log(x));
    

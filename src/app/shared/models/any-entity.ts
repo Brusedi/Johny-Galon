@@ -16,3 +16,12 @@ export class AnyEntityId
      id:any   
      [key: string]: any 
 }  
+
+// Backend error message
+export interface BackICommonError{
+     name:string 
+     message:string
+     code:number
+     statusCode:number
+     data:any 
+} 

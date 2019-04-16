@@ -3,16 +3,24 @@ import { AnyEntytySetItemState, State } from "@appStore/reducers/any-entity-set.
 import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
-import { _Start } from "@angular/cdk/scrolling";
+//import { _Start } from "@angular/cdk/scrolling";
 import { getLocationMacros, locationToName, locationInfo, fillLocationMacros, isFullIndepended } from "app/shared/services/foregin/foreign-key.helper";
 import { getMdOptons, getMdOptonsFromDict } from "app/shared/services/metadata/metadata.helper";
 import { EntityAdapter } from "@ngrx/entity";
+
 
 export const dataStore = createFeatureSelector<State>('data');
 
 export const selectDatas = createSelector(
     dataStore,
     (x:State) => x 
+); 
+
+
+export const selectErrors = ()=> 
+    createSelector(
+        dataStore,
+        (x:State) => x.error 
 ); 
 
 // MANAGEMENT 
@@ -37,6 +45,8 @@ export const selectIsMetadataLoaded = ( id: string ) =>
 //         dt =>  (id in dt.items && dt.items[id].state.metaLoaded)
 // );
 
+// Error stream
+
 
 // пукалка
 export const selectJab = () => 
@@ -50,7 +60,7 @@ export const selectJab = () =>
 export const selectData = ( id: string ) => 
     createSelector(
         selectDatas,
-        dt =>  dt.items[id]
+        dt =>  id in dt.items ?  dt.items[id] : null
 );
 
 export const selectDataOptions = ( id: string ) => 
@@ -78,26 +88,34 @@ export const selectFieldDescribes = ( id: string ) =>
         (items) =>  Object.keys(items).map(x=>items[x] )
 );
 
-// Questions seet
-export const selectQuestions = ( id: string, rowSeed:Observable<{}> ) => 
+//Error of entity
+export const selectEntityError = ( id: string ) => 
     createSelector(
-        selectFieldDescribes(id),
-        (items) =>  fldDescsToQuestions( items, rowSeed )        
-        
+        selectData(id),
+        (items:AnyEntytySetItemState<any>) => items.state.error
 );
 
-export const selectFormGroup = ( id: string, rowSeed:Observable<{}> ) => 
-    createSelector(
-        selectQuestions(id,rowSeed),
-        (items) =>  toFormGroup( items, rowSeed )        
-);
+
+// Questions seet
+// export const selectQuestions = ( id: string, rowSeed:Observable<{}> ) => 
+//     createSelector(
+//         selectFieldDescribes(id),
+//         (items) =>  fldDescsToQuestions( items, rowSeed )        
+        
+// );
+
+// export const selectFormGroup = ( id: string, rowSeed:Observable<{}> ) => 
+//     createSelector(
+//         selectQuestions(id,rowSeed),
+//         (items) =>  toFormGroup( items, rowSeed )        
+// );
 
 // Controls data for form
-export const selectFormControls = (id: string, rowSeed:Observable<{}>) =>
-    createSelector( 
-        selectQuestions(id,rowSeed),
-        (items) =>  ({ questions:items, formGroup:toFormGroup( items, rowSeed ) })       
-);    
+// export const selectFormControls = (id: string, rowSeed:Observable<{}>) =>
+//     createSelector( 
+//         selectQuestions(id,rowSeed),
+//         (items) =>  ({ questions:items, formGroup:toFormGroup( items, rowSeed ) })       
+// );    
     
 export const selectTemplate = (id: string) =>
     createSelector( 
@@ -115,6 +133,15 @@ export const selectIsLoading = (id: string) =>
         (x:AnyEntytySetItemState<any>) => x.state.loading || x.state.metaLoading
 );    
 
+/**
+ *  item is Prepared
+ */
+export const selectIsPrepared = (id: string) =>
+    createSelector( 
+        selectData(id),
+        (x:AnyEntytySetItemState<any>) => (x && x.state.metaLoaded )
+);    
+
 
 
 // ANONIMUS SELECTOR --------------------------------------------------------------------------
@@ -122,7 +149,19 @@ export const selCurName = () =>
     createSelector( selectDatas, x => x.currentId ) ;
 
 export const selCurItem = () => 
-    createSelector(selectDatas, x => x.items[x.currentId] );  //x.currentId ? x.items[x.currentId] : null ); 
+     createSelector(selectDatas, x => x.items[x.currentId] );  //x.currentId ? x.items[x.currentId] : null ); 
+
+export const selCurItemData = () => 
+    createSelector(selectDatas, x => 
+         !x.currentId ? undefined :
+             x.items[x.currentId].state.entities
+     ); 
+
+export const selCurItemIds = () => 
+     createSelector(selectDatas, x => 
+          !x.currentId ? undefined :
+              x.items[x.currentId].state.ids
+      );  
 
 export const selCurItemMeta = () => 
     createSelector(selectDatas, x => 
@@ -145,7 +184,8 @@ export const selCurRowTemplate = () =>
                 x.items[x.currentId].state.template 
     );        
 
-export const selCurIsMetaLoaded = () =>  createSelector(selectDatas, x => x.currentId ? x.items[x.currentId].state.loaded : false);  
+export const selCurIsDataLoaded = () =>  createSelector(selectDatas, x => x.currentId ? x.items[x.currentId].state.loaded : false);  
+export const selCurIsMetaLoaded = () =>  createSelector(selectDatas, x => x.currentId ? x.items[x.currentId].state.metaLoaded : false);  
 
 export const selCurRowSeed = () =>
     createSelector( selectDatas, x => 
@@ -154,6 +194,18 @@ export const selCurRowSeed = () =>
                 x.items[x.currentId].state.rowSeed 
     );        
 
+// cur entity error    
+export const selCurError = () => 
+    createSelector( selectDatas, x => 
+        ! x.currentId ? null : x.items[x.currentId].state.error
+    );        
+    
+
+//item    
+export const selCurItemById = (id:any) => 
+    createSelector(selCurItemData(), 
+        x => x && (id in x) ?  x[id] : undefined 
+    ); 
 
 //Question Current------------------------------------------------------------------------------------------------------------------
 // FieldDescribes[]
@@ -169,8 +221,8 @@ export const selCurQuestions = () =>
     createSelector( 
         selCurFieldDescribes(), 
         selCurRowTemplate(),
-        (x, t) => !x ? undefined : 
-            fldDescsToQuestions( Object.keys(x).map(y => x[y]) , t ) 
+        (x, t) => !x ? undefined : fldDescsToQuestions( Object.keys(x).map(y => x[y]) , t ) 
+        
     );     
 
 export const selCurFormGroup = ( ) => 
@@ -187,6 +239,30 @@ export const selCurFormControls = () =>
         selCurFormGroup(),
         (x,y) =>  ({ questions:x, formGroup:y})       
     );    
+
+// Ex vith filter 020419
+export const selCurQuestionsEx = (flds:string[] , rowSeed:{} ) =>  
+    createSelector( 
+        selCurFieldDescribes(), 
+        selCurRowTemplate(),
+        (x, t) => !x ? undefined :  
+            fldDescsToQuestions(  flds.map( y => x.find( (e,i,a)=> (e.id == y)  )), {...t, ...rowSeed}) 
+    );    
+
+export const selCurFormGroupEx = ( flds:string[] , rowSeed:{} ) => 
+    createSelector(
+        selCurQuestionsEx(flds,rowSeed),
+        selCurRowTemplate(),
+        (x, t) =>  toFormGroup( x, {...t, ...rowSeed})        
+    );
+
+export const selCurFormControlsEx = (flds:string[] , rowSeed:{}) =>
+    createSelector( 
+        selCurQuestionsEx(flds,rowSeed),
+        selCurFormGroupEx(flds,rowSeed),
+        (x,y) =>  ({ questions:x, formGroup:y})       
+    );    
+
 
 
 
@@ -317,6 +393,8 @@ export const selectDataAndPartLoadedIfExist = ( id: string ) =>
     );
 
 
+
+
 export const selectIsExistByLoc = ( loc: string ) => selectIsExist( locationToName(loc) ) ;
 
 export const selectIsPreparedByLoc = ( loc: string ) => selectIsMetadataLoaded( locationToName(loc) ) ;
@@ -343,7 +421,7 @@ export const selectOptionsByLoc = ( loc: string ) => selectOptions( locationToNa
 export const selPartIndOptions = ( resolvedLoc: string ) => 
     createSelector(
         selectDataAndPartLoadedIfExist(locationToName(resolvedLoc)),
-        (cntr) => !(resolvedLoc in cntr.parts)? null: 
+        (cntr) => !cntr || !(resolvedLoc in cntr.parts) ? null: 
             cntr.parts[resolvedLoc].reduce( (a,x) => ({...a, [x]:cntr.data[x]}) , {} )
     );  
 
@@ -394,8 +472,26 @@ export const selectForeignOptionsByLoc = ( loc: string ) =>
             //console.log(ret);
             return ret;
         }
-    );  
+    );
 
+    export const selectForeignDataByLoc = ( loc: string ) => 
+    createSelector(
+        selectStateIfExist(locationToName(loc)),
+        selectResolvedLoc(loc),
+        (x,l) => {
+            const dap = x ? ({ data: (x.state.entities), parts: ( Object.keys(x.state.partLoaded).length > 0) ? (x.state.partLoaded):null, meta:x.state.metadata }) : null ;
+
+            const selData = !x ? null:(
+                isFullIndepended(loc) ? dap.data :(
+                    !dap || !dap.parts ? null :(
+                            !(l in dap.parts)? null: 
+                            dap.parts[l].reduce( (a,x) => ({...a, [x]:dap.data[x]}) , {} )
+            )));
+                       
+            return selData;
+           
+        }
+    ); 
 /**
  * Select selected partLocation
  */

@@ -108,15 +108,14 @@ export class JnNewItemComponent implements OnInit {
     // 
     this.subscriptions.push( 
       this.dispPrimaryRequestForeignData$.subscribe(
-         x=> this.store.dispatch(new PartLoadByLoc( x ) )
-         //x=>console.log(x)
+         x=> this.store.dispatch(new PartLoadByLoc( x ) ) 
       ) 
     );
 
     // если требуются не подгруженные вторичны данные диспатчим частичную загрузку
     this.subscriptions.push( 
       this.dispChangeRequestForeignData$.subscribe(
-         x=> this.store.dispatch(new PartLoadByLoc( x ) )
+         x=>  this.store.dispatch(new PartLoadByLoc( x ) ) 
       ) 
     );
   } 

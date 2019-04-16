@@ -1,23 +1,31 @@
 import { Injectable } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
 
-import { of, from } from "rxjs";
+import { of, from, Observable } from "rxjs";
 
-import { map, mergeMap, catchError, tap, switchMap, filter } from "rxjs/operators";
-import { Observable } from "rxjs/Observable";
+import { map, mergeMap, catchError, tap, switchMap, filter, delayWhen, last, take } from "rxjs/operators";
 
-import { DataProvService } from "app/shared/services/data-prov.service";
+
 import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem, PartLoadByLoc } from "@appStore/actions/any-entity-set.actions";
 import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart, SetRowSeed, AddItemSuccess  } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
+
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
+import { DataProvService } from "app/shared/services/data-prov.service";
 
 //import { AnyEntityLazySetActionTypes, ExecItemAction,  CompleteItemAction, Exec } from "@appStore/actions/any-entity-lazy-set.actions";
 //import { AnyEntityLazyActionTypes, anyEntityLazyActions, GetItemSuccess, GetItemNotFound } from "@appStore/actions/any-entity-lazy.actions";
 //import { anyEntityOptions } from "@appModels/any-entity";
 //import { anyEntityOptions } from "@appStore/reducers/any-entity-lazy-set.reduser";
 
+const IERROR_OBJ_PROP_NAME = '_body';
+const isJSONStr = (x) =>  
+    (typeof x === 'string'|| x instanceof String)
+     && /^[\],:{}\s]*$/.test(x.replace(/\\["\\\/bfnrtu]/g, '@')
+                                .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                                .replace(/(?:^|:|,)(?:\s*\[)+/g, ''));
+const prepareError = (er) =>   er.hasOwnProperty(IERROR_OBJ_PROP_NAME) && isJSONStr(er[IERROR_OBJ_PROP_NAME]) ? JSON.parse(er[IERROR_OBJ_PROP_NAME]) : er ;  
 
 @Injectable()
 export class anyEntytySetEffects {
@@ -31,20 +39,66 @@ export class anyEntytySetEffects {
     //const PrepareByLocBranch$ = ( loc:string  )   
 
     @Effect()   
-    PartLoadByLoc$ = this.actions$.pipe(
+    PartLoadByLoc1$ = this.actions$.pipe(
         ofType(AnyEntitySetActionTypes.PART_LOAD_BY_LOC),
-        map( (x:PartLoadByLoc) => new Exec(  {name:this.foreignService.locToName(x.payload) , itemAction: new GetItemsPart( x.payload)} ) )  
+        //tap(x=> console.log('awwwwwwwwwwwwwwwwwaaaaaaaa')),
+        delayWhen( (x:PartLoadByLoc) =>  
+                this.foreignService.isPrepared$( x.payload ).pipe( filter(y=>!!y) )           //tap(x=>console.log(x))
+        ),
+        map( (x:PartLoadByLoc) => new Exec(  {name:this.foreignService.locToName(x.payload) , itemAction: new GetItemsPart( x.payload)} ) ),
+        tap(x=> console.log('part load act'))
     ) ;        
 
+    @Effect()   // Если нет инфраструктуры для подгрузки то PrepareByLoc 
+    PartLoadByLocPre$ = this.actions$.pipe(
+        ofType(AnyEntitySetActionTypes.PART_LOAD_BY_LOC),
+        //tap(x=> console.log('PART_LOAD_BY_LOC')),
+        mergeMap( (x:PartLoadByLoc) => 
+            this.foreignService.isPrepared$( x.payload ).pipe( take(1),
+             //tap(x=> console.log(x)),
+              map( y => y ? null: (new PrepareByLoc(x.payload))))
+        ),
+        //tap(x=> console.log('aaaaaaaaaaaaaaaaa')),
+        //tap(x=> console.log(x)),
+        filter(x=>!!x),
+        tap(x=> console.log('prepare act'))
+        
+    ) ; 
+
+    // @Effect()   
+    // PrepareByLocPre$ = this.actions$.pipe(
+    //     ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+    //     tap(x=> console.log('PREPARE_BY_LOC_PRE')),
+    //     mergeMap( (x:PrepareByLoc) => x.reduserData.isExistEntyty ? of(null) : this.foreignService.buildOptions$(x.payload)  ),
+    //     filter(x=>!!x),
+    //     map( x => new AddItem(x)),
+    //     tap(x=> console.log('add act'))
+    // ) ;      
+
+    // PrepareByLocPre$ = this.actions$.pipe(
+    //     ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+    //     tap(x=> console.log('PREPARE_BY_LOC_PRE')),
+    //     mergeMap( (x:PrepareByLoc) => x.reduserData.isExistEntyty ? of(null) : this.foreignService.buildOptions$(x.payload)  ),
+    //     filter(x=>!!x),
+    //     map( x => new AddItem(x)),
+    //     tap(x=> console.log('add act'))
+    // ) ;   
 
     @Effect()   
     PrepareByLoc1$ = this.actions$.pipe(
         ofType(AnyEntitySetActionTypes.PREPARE_BY_LOC),
+        //tap(x=> console.log('PREPARE_BY_LOC')),
+        filter( (x:PrepareByLoc)=> !x.reduserData.isDbl),
+        //tap(x=> console.log('PREPARE_BY_LOC cut dbls')),
         map( (x:PrepareByLoc) => x.payload),
         mergeMap( (loc:string) =>  this.foreignService.prepareForeignData$(loc)),
+        //tap(x=> console.log('PEPARE_BY_LOC_COMPL:'+x)),
         filter( x => x),
+        //tap(x=> console.log('PEPARE_BY_LOC_COMPL')),
         map( x => new PrepareByLocComplete(true) )   
-    ) ;        
+    ) ;       
+    
+    
 
 
     // @Effect()   
@@ -100,11 +154,22 @@ export class anyEntytySetEffects {
                 return this.dataService.insert( options.location, action.payload )
                     .pipe(
                         tap( x=>  console.log(x) ),
-                        map( x => new AddItemSuccess(x) ),
-                        catchError(error => of(new ErrorAnyEntity(error)))    
+                        map( x =>  x.hasOwnProperty('_body')?JSON.parse(x['_body']):x ),
+                        tap( x=>  console.log(x) ),
+                        mergeMap( x => from( 
+                                    x.hasOwnProperty('Data')&&x['Data'].hasOwnProperty('id')
+                                        && Array.isArray(x['Data']['id'])&&(x['Data']['id'][0])  
+                                        && x['Data'].hasOwnProperty('Location')&& Array.isArray(x['Data']['Location'])&&(x['Data']['Location'][0]) 
+                                        ? [ new AddItemSuccess( x['Data']['id'][0] ) , new  GetItemsPart(x['Data']['Location'][0]) ]  //x['Data']['id'][0]
+                                        : [new AddItemSuccess(null)] 
+                                )
+                        ),
+                        tap( x=>  console.log(x) ),
+                        //map( x => new AddItemSuccess(x) ),
+                        catchError(error => { console.log(isJSONStr(error ))  ; return of(new ErrorAnyEntity(prepareError(error))) } )   
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
                     ); 
-
+                    
             case ( AnyEntityActionTypes.GET_ITEMS_PART) :
                 return this.foreignService.getItemsPart$( action.payload )
                     .pipe(
@@ -114,13 +179,23 @@ export class anyEntytySetEffects {
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
                     ); 
 
-            case ( AnyEntityActionTypes.GET_ITEMS_META ) :
-                return this.metadataService.metadata$( options.location ) // options.selBack(action.payload)
-                    .pipe(
+            case ( AnyEntityActionTypes.GET_ITEMS_META ) :{
+                return of(action.reduserData).pipe(
+                        //tap( x=>  console.log(x) ),
+                        filter(x=>!x),
+                        //tap( x=>  console.log(x) ),
+                        switchMap(()=>this.metadataService.metadata$( options.location ) )
+                    ).pipe(
                         map(x => new GetItemsMetaSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))
                     ); 
 
+                // return this.metadataService.metadata$( options.location ) // options.selBack(action.payload)
+                //     .pipe(
+                //         map(x => new GetItemsMetaSuccess(x) ),
+                //         catchError(error => of(new ErrorAnyEntity(error)))
+                //     ); 
+                }
             case ( AnyEntityActionTypes.GET_TEMPLATE_ROWSEED ) :        
             case ( AnyEntityActionTypes.GET_TEMPLATE ) :{
                 //console.log('ssssssssssssss');
@@ -134,18 +209,16 @@ export class anyEntytySetEffects {
             }
             
             case ( AnyEntityActionTypes.GET_ITEMS ) :
-                {
-                console.log('22');                       
-                console.log(options.location);   
-                console.log(action.payload);
-                return this.dataService.items$( options.location, options.selBack(action.payload) )
-                    .pipe(
-                        tap( x=>  console.log(x) ),
+                return this.dataService.items$( 
+                        options.location, 
+                        action.payload ? options.selBack(action.payload) : undefined // 060219 this.dataService.items$( options.location, options.selBack(action.payload) )
+                    ).pipe(
+                        //tap( x=>  console.log(x) ),
                         map( x => new GetItemsSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
                     ); 
-                    }        
+                        
             default:
                 return of(null);
         }
