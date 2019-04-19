@@ -31,21 +31,25 @@ export class JnInfoBoxComponent implements OnInit {
   ngOnInit() {
     console.log('eeee');
     this.error$ = this.store.select(  fromSelectors.selCurError()).pipe( 
-      //filter( x => !!x)
-      tap(x=>x)
+       tap(x=>x)
     );
 
-    this.error$.subscribe(x=>console.log(x)); 
+    //this.error$.subscribe(x=>console.log(x)); 
     this.error$.pipe(filter( x => !!x)).subscribe(x=>this.onErrorDialog(x)); 
   }
 
-  onErrorDialog(error:BackICommonError){
+  onErrorDialog(error){  //:BackICommonError
+    const prepErrM =(e) => (e.hasOwnProperty('Message') && e['Message']) ? e : ({...e , ...{ Message: e.toString() }});    
+    const prepErrN =(e) => (e.hasOwnProperty('Name') && e['Name']) ? e : ({...e , ...{ Name: 'Неизвестная Ошибка' }});    
+    const prepErr = (e) =>  e.hasOwnProperty('data') ? e : prepErrM(prepErrN(e));
+
     const dialogRef = this.dialog.open(JnInfoBoxDialogComponent, {
       //height: '400px',
-       width: '600px',
-      data: error
+      width: '600px',
+      data: prepErr(error)
     });
-
+    console.log(error );
+    console.log( prepErr(error) );
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );

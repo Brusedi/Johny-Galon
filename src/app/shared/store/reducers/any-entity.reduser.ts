@@ -87,7 +87,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
         switch (action.type) {
 
             case AnyEntityActionTypes.ADD_ITEM:
-                 return { ...state, uploading: true };    
+                 return { ...state, uploading: true , insertedId:null  };    
 
             case AnyEntityActionTypes.ADD_ITEM_SUCCESS:
                  return { ...state, uploading: false, uploaded:true, insertedId:action.payload};    

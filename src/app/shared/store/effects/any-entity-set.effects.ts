@@ -161,7 +161,7 @@ export class anyEntytySetEffects {
                                         && Array.isArray(x['Data']['id'])&&(x['Data']['id'][0])  
                                         && x['Data'].hasOwnProperty('Location')&& Array.isArray(x['Data']['Location'])&&(x['Data']['Location'][0]) 
                                         ? [ new AddItemSuccess( x['Data']['id'][0] ) , new  GetItemsPart(x['Data']['Location'][0]) ]  //x['Data']['id'][0]
-                                        : [new AddItemSuccess(null)] 
+                                        : [ new AddItemSuccess(null)] 
                                 )
                         ),
                         tap( x=>  console.log(x) ),

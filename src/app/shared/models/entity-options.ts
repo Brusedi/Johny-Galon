@@ -8,9 +8,9 @@ export const JgMockTableOption:anyEntityOptions<AnyEntityId> = {
   };
 
 export const SdIncomingOption:anyEntityOptions<AnyEntityId> = {
-    name: "SdIncoming", 
+    name: "NvaSdIncoming", 
     location:"/NvaSd2/NvaSdIncoming", 
-    selectId: (x) => x.id,
+    selectId: (x) => x.ID,
     selBack: (x:string) => ("?ID=" + x )
   };  
 

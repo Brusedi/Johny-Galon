@@ -66,7 +66,8 @@ export const selectData = ( id: string ) =>
 export const selectDataOptions = ( id: string ) => 
     createSelector(
         selectData(id),
-        (items:AnyEntytySetItemState<any>) =>   items.option
+        (items:AnyEntytySetItemState<any>) => items&&items.hasOwnProperty('option') ? items.option : null
+        //{  console.log(id);return items&&items.hasOwnProperty('option') ? items.option : null }//console.log(id)}
 );
 
 export const selectDataMetadata = ( id: string ) => 
@@ -206,6 +207,21 @@ export const selCurItemById = (id:any) =>
     createSelector(selCurItemData(), 
         x => x && (id in x) ?  x[id] : undefined 
     ); 
+
+//---------
+// 180419 Susses Insert completed InsertedId
+export const selCurInsertedId = () => 
+    createSelector(selCurItem(), 
+        x => x ?  x.state.insertedId : undefined 
+    ); 
+    
+export const selCurInsertedRec = () => 
+    createSelector(selCurItem(), 
+        x => x && x.state.insertedId && x.state.entities[x.state.insertedId]
+            ? x.state.entities[x.state.insertedId]
+            : undefined 
+); 
+
 
 //Question Current------------------------------------------------------------------------------------------------------------------
 // FieldDescribes[]
