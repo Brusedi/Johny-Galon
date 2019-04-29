@@ -28,7 +28,7 @@ export class DataProvService {
     private http: Http,
     private settings: AppSettingsService
   ) { 
-      settings.getSettings().subscribe( x =>log( "Service activated with location: "+ x.svcFasadeUri  ));
+      settings.getSettings().subscribe( x =>log( "Service activated with location :) "+ x.svcFasadeUri  ));
   }
 
   private getDataFromUri = (uri: string) =>  this.http.get(uri).pipe(map(rsp => rsp.text()));

@@ -11,7 +11,7 @@ import { GetTemplateRowSeed, ChangeRowSeed, AddItem } from '@appStore/actions/an
 
 
 const flds = ['RecipientId','EventText','SenderContact','IsConfidential'];
-const rowSeedExtFoo = () => ({ EventTypeID:"VoluntaryReportsInfo", CreatedDateTime:new Date() });
+const rowSeedExtFoo = () => ({ EventTypeID:"VoluntaryReportsInfo", CreatedDateTime:new Date(),IsImportInSD:0 });
 
 @Component({
   selector: 'app-sd-new-user-message',
@@ -24,12 +24,17 @@ export class SdNewUserMessageComponent implements OnInit {
   public controls$: Observable<{ questions:any, formGroup:FormGroup} >;
   private buzy$:Observable<boolean>;
   private complete$ :Observable<boolean>;
-  private isComplete: boolean; 
-  private fGroup:FormGroup; 
-  private fQuestions:FormGroup; 
+  //private completeRec$ :Observable<any>;
+  public controls: { questions:any, formGroup:FormGroup}; 
+  
+  //private fGroup:FormGroup; 
+  //private fQuestions:FormGroup; 
+
+  //selCurInsertedRec
 
   private subscriptions:Subscription[] = [];
-
+  public isComplete: boolean; 
+  public newRecId:   any; 
 
   constructor(private store: Store<fromStore.State>) { }
 
@@ -60,6 +65,11 @@ export class SdNewUserMessageComponent implements OnInit {
         skipWhile( x => !!x ),
         filter( x => !!x ),
       )
+
+    //this.completeRec$ =  this.store.select( fromSelectors.selCurInsertedRec());
+
+    //this.completeRec$.subscribe(x=>console.log(x))   
+    //this.complete$.subscribe(x=>console.log(x))   ;
   } 
 
   buildSubscriptions(){
@@ -71,25 +81,24 @@ export class SdNewUserMessageComponent implements OnInit {
         .subscribe( x=> this.store.dispatch(new ExecCurrent( new ChangeRowSeed({...x, ...rowSeedExtFoo()})  ) ))   ///new SetRowSeed(x)
     );
 
-    // formGroup to loc var  
+    // formGroup to loc var  (controls)
     this.subscriptions.push(
-       this.controls$.pipe( filter (x => !!x.formGroup )).subscribe( x => { this.fGroup = x.formGroup; this.fQuestions = x.questions } )
+       this.controls$.pipe( filter (x => !!x.formGroup&&x.questions ), take(1))
+        .subscribe( x => { console.log(x); this.controls = x }) //{ this.fGroup = x.formGroup; this.fQuestions = x.questions } )
     );
 
     // formGroup disabled while inserting
     this.subscriptions.push(  
       this.buzy$.subscribe( x => 
-        !this.fGroup 
-          ? null  
-          : x && this.fGroup.enabled 
-              ?  this.fGroup.disable() 
-              :  !x &&  this.fGroup.disabled ?  this.fGroup.enable() : null 
+        !this.controls || !this.controls.formGroup
+          ? null   
+          : x && this.controls.formGroup.enabled 
+              ?  this.controls.formGroup.disable() 
+              :  !x &&  this.controls.formGroup.disabled ?  this.controls.formGroup.enable() : null 
     ));
 
     //Complete flag
-    this.complete$.subscribe(x => this.isComplete = true ); //TODO
-    //this.store.select( fromSelectors.selCurInsertedRec() ).subscribe( x => this.isComplete = true );
-
+    this.subscriptions.push( this.complete$.subscribe(x => { this.isComplete = true; this.newRecId = x})); //TODO
   } 
 
   ngOnDestroy(){ 
@@ -110,6 +119,7 @@ export class SdNewUserMessageComponent implements OnInit {
 
   onAddNextMessageClick(){
     this.isComplete = false;
+
   }
 
 }

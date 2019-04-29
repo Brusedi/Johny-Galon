@@ -1,11 +1,11 @@
-import { createFeatureSelector, createSelector, MemoizedSelector } from "@ngrx/store";
+import { createFeatureSelector, createSelector, MemoizedSelector, select } from "@ngrx/store";
 import { AnyEntytySetItemState, State } from "@appStore/reducers/any-entity-set.reduser";
 import { of, Observable } from "rxjs";
 
 import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
 //import { _Start } from "@angular/cdk/scrolling";
 import { getLocationMacros, locationToName, locationInfo, fillLocationMacros, isFullIndepended } from "app/shared/services/foregin/foreign-key.helper";
-import { getMdOptons, getMdOptonsFromDict } from "app/shared/services/metadata/metadata.helper";
+import { getMdOptons, getMdOptonsFromDict, getRowVal } from "app/shared/services/metadata/metadata.helper";
 import { EntityAdapter } from "@ngrx/entity";
 
 
@@ -30,6 +30,7 @@ export const selectIsExist = ( id: string ) =>
         dt =>  (id in dt.items)
 );
 
+
 // Загруженны ли метаданные
 export const selectIsMetadataLoaded = ( id: string ) => 
     createSelector(
@@ -37,15 +38,6 @@ export const selectIsMetadataLoaded = ( id: string ) =>
         selectIsExist(id),
         (dt, is) =>  is && dt.items[id].state.metaLoaded
 );
-
-// Загруженны ли метаданные
-// export const selectIsMetadataLoaded = ( id: string ) => 
-//     createSelector(
-//         selectDatas,
-//         dt =>  (id in dt.items && dt.items[id].state.metaLoaded)
-// );
-
-// Error stream
 
 
 // пукалка
@@ -62,6 +54,18 @@ export const selectData = ( id: string ) =>
         selectDatas,
         dt =>  id in dt.items ?  dt.items[id] : null
 );
+
+export const selectById = ( id: string, idRow: any ) => 
+    createSelector(
+        selectData(id),
+        dt => dt&&dt.hasOwnProperty(idRow)?dt[idRow]:undefined        
+);
+
+// export const selectByIdAsName = ( id: string, idRow: any ) => 
+//     createSelector(
+//         selectById(id,idRow),
+//         dt => 
+// );
 
 export const selectDataOptions = ( id: string ) => 
     createSelector(
@@ -471,26 +475,19 @@ export const selectForeignOptionsByLoc = ( loc: string ) =>
         selectStateIfExist(locationToName(loc)),
         selectResolvedLoc(loc),
         (x,l) => {
-            //console.log(loc);
-            //console.log(x);
-            //console.log(l);
             const dap = x ? ({ data: (x.state.entities), parts: ( Object.keys(x.state.partLoaded).length > 0) ? (x.state.partLoaded):null, meta:x.state.metadata }) : null ;
-
             const selData = !x ? null:(
                 isFullIndepended(loc) ? dap.data :(
                     !dap || !dap.parts ? null :(
                             !(l in dap.parts)? null: 
                             dap.parts[l].reduce( (a,x) => ({...a, [x]:dap.data[x]}) , {} )
             )));
-            //console.log(selData);
-            //console.log(dap);
             const ret = selData && dap && dap.meta && dap.meta.table ? getMdOptonsFromDict(selData, dap.meta.table ):null;             
-            //console.log(ret);
             return ret;
         }
     );
 
-    export const selectForeignDataByLoc = ( loc: string ) => 
+export const selectForeignDataByLoc = ( loc: string ) => 
     createSelector(
         selectStateIfExist(locationToName(loc)),
         selectResolvedLoc(loc),
@@ -503,11 +500,30 @@ export const selectForeignOptionsByLoc = ( loc: string ) =>
                             !(l in dap.parts)? null: 
                             dap.parts[l].reduce( (a,x) => ({...a, [x]:dap.data[x]}) , {} )
             )));
-                       
             return selData;
-           
         }
     ); 
+
+
+/**
+ * Select frendly row value
+ */
+export const selectCurRowVal = ( key:string , rowId:any ) =>
+    createSelector(
+        selCurItem(),
+        selectDatas,
+        (x,d) => { 
+            const selData = (l) =>  locationToName(l);
+            const getFrgn = (l) => d.items[selData(l)];
+            const fk = x&&x.hasOwnProperty('state')&&x.state.metaLoaded? x.state.metadata.fieldsDesc[key].foreignKey : undefined ;
+            const vl = x.state.entities.hasOwnProperty(rowId) ? x.state.entities[rowId][key]:undefined;
+            return !x ? undefined
+                : !fk
+                    ? vl 
+                    : getRowVal(vl, getFrgn(fk).state.entities, getFrgn(fk).state.metadata )
+        }                
+    )    
+        
 /**
  * Select selected partLocation
  */
@@ -525,3 +541,4 @@ export const selectPartLocationIfNotExist = ( loc: string ) =>
         selectPartLocationByLoc(loc),
         x => x.indexOf(loc) >= 0 ?  null : loc
     );    
+

@@ -1,0 +1,23 @@
+<div [ngSwitch]="type$ | async ">
+    
+    <mat-form-field  *ngSwitchDefault class="example-full-width"  >
+            <input [readonly]="true" matInput placeholder="{{label$  | async }}" value="{{value$ | async}}"> 
+    </mat-form-field>
+
+    <h5 *ngSwitchCase="'Text'" class="example-full-width" > {{value$ | async}} </h5>
+    
+    <div  *ngSwitchCase="'boolean?'"  class="with-icon" > 
+        <mat-icon *ngIf=" value$ | async"> check_box </mat-icon>
+        <mat-icon *ngIf="!(value$ | async)" > check_box_outline_blank </mat-icon>
+        <span class="aligned-with-icon">{{label$ | async }}</span>
+        
+        
+         <!-- <mat-checkbox   [(ngModel)]="checked" [checked]="checked"  >      {{label$ | async }} </mat-checkbox> - -->
+    </div>
+
+</div>
+ 
+<!-- <p>
+        {{ type$ | async }}
+</p>     
+     -->

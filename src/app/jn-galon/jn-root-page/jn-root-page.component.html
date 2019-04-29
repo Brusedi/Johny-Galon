@@ -1,33 +1,49 @@
-<nav>
-  <mat-toolbar color="primary">
-    <button mat-button  [routerLink]="['']">
-      <img src="assets/images/JG2.png">
-        Johny Galon
-    </button> 
+    <nav >
+      <mat-toolbar color="primary" class = "mat-elevation-z6 jg-header">
+      <button mat-button  [routerLink]="['']">
+          <img src="assets/images/nva24.png">
+            AO НИЖНЕВАРТОВСКАВИА
+        </button> 
 
-    <button mat-button [matMenuTriggerFor]="menu">Tootoral</button>
-    <mat-menu #menu="matMenu">
-        <button mat-menu-item [routerLink]="['/tutoral/mock']" >Mock table</button>
-        <button mat-menu-item [routerLink]="['/tutoral/sd']" >Sd table</button>
-        <button mat-menu-item [routerLink]="['/tutoral/sduser']" >Sd user message</button>
-        <button mat-menu-item [routerLink]="['/tutoral/flight']" >flight table</button>
-    </mat-menu> 
-    <div class="flex-spacer" ></div>
+        <button mat-button [matMenuTriggerFor]="menu">Формы</button>
+        <mat-menu #menu="matMenu">
+            <!-- <button mat-menu-item [routerLink]="['/tutoral/mock']" >Mock table</button>
+            <button mat-menu-item [routerLink]="['/tutoral/sd']" >Sd table</button> -->
+            <button mat-menu-item [routerLink]="['forms/sd/incoming']" >Добровольное сообщение </button>
+            <!-- <button mat-menu-item [routerLink]="['/tutoral/flight']" >flight table</button> -->
+        </mat-menu> 
+        <div class="flex-spacer" ></div>
 
-    <div class="tb-ntf" >
-        <app-jn-info-box></app-jn-info-box>
-    </div>
+        <div class="tb-ntf" >
+            <app-jn-info-box></app-jn-info-box>
+        </div>
 
-    <div class="tb-note" >
-      <p> {{ subCaption$ | async }} </p>
-    </div>
-    <mat-spinner *ngIf="!(spiner$ |async)"  color="accent" diameter="36"> </mat-spinner>
-  </mat-toolbar>
-</nav> 
+        <div class="tb-note" >
+          <p> {{ subCaption$ | async }} </p>
+        </div>
+        <mat-spinner *ngIf="!(spiner$ |async)"  color="accent" diameter="36"> </mat-spinner>
+      </mat-toolbar>
+    </nav> 
 
-<!-- <h1 class="mat-display-1">Jackdaws love my big sphinx of quartz.</h1> -->
-<router-outlet></router-outlet> 
+    <main class="content" fxFlex fxFlexFill > 
+      <router-outlet></router-outlet>
+    </main>
 
-<!--Message box-->
+    <div class="jg-fill-spaceer" > </div>
+
+    <footer >
+        <mat-toolbar color="primary" class="jg-footer" >
+            <div ></div>
+            <!-- <div class="flex-spacer"></div> -->
+
+
+            <div class="jg-footer-copyright" >
+                <span>AO "Нижневартовскавиа" ©2018-2019. </span>
+                <span><img class="jg-smal-img"  src="assets/images/JG2.png"> Johny Galon application 2018-2019. </span>
+                <span><img class="jg-smal-img"  src="assets/images/isp.ico"> Ispolin project 2017-2019. </span>
+            </div>
+            
+        </mat-toolbar> 
+    </footer>
 
 

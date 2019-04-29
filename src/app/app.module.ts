@@ -46,14 +46,16 @@ import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine } from '@appMo
 import { AppResolverService } from './shared/services/app-resolver.service';
 import { SdNewUserMessageComponent } from './serv-desc/sd-new-user-message/sd-new-user-message.component';
 import { JnInfoBoxComponent, JnInfoBoxDialogComponent} from './jn-galon/jn-info-box/jn-info-box.component';
+import { JnItemLabelComponent } from './jn-galon/jn-entity/jn-item-label/jn-item-label.component';
+import { JgHomeComponent } from './jn-galon/jg-home/jg-home.component';
 
 const appRoutes: Routes = [
-  { path: '',               component: JnRootComponent, pathMatch: 'full' ,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  }  },
-  { path: 'tutoral/mock',   component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
-  { path: 'tutoral/sd',     component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
-  { path: 'tutoral/sduser', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
-  { path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } },   
-  { path: '**',             component: JnNotFoundComponent }
+  { path: '',                 component: JgHomeComponent, pathMatch: 'full'  }, //,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  } 
+  //{ path: 'tutoral/mock',   component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
+  //{ path: 'tutoral/sd',     component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
+  { path: 'forms/sd/incoming',component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
+  //{ path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } },   
+  { path: '**',               component: JnNotFoundComponent }
 ];
 // const appRoutes: Routes = [
 //   { path: '',               component: JnRootComponent, pathMatch: 'full'   },
@@ -71,7 +73,9 @@ const appRoutes: Routes = [
     JnItemQuestionComponent,
     SdNewUserMessageComponent,
     JnInfoBoxComponent,
-    JnInfoBoxDialogComponent
+    JnInfoBoxDialogComponent,
+    JnItemLabelComponent,
+    JgHomeComponent
   ],
 
   imports: [

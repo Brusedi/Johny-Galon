@@ -19,9 +19,9 @@ export class AnyEntityId
 
 // Backend error message
 export interface BackICommonError{
-     name:string 
-     message:string
-     code:number
-     statusCode:number
-     data:any 
+     Name:string 
+     Message:string
+     Code:number
+     StatusCode:number
+     Data:any 
 } 
