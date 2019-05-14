@@ -4,7 +4,7 @@
                    
                 <div mat-card-avatar >
                         <!-- <mat-icon  color="accent" class="material-icons.md-36"> highlight_off </mat-icon> -->
-                        <mat-icon class="icon-disp" color="primary" > edit </mat-icon>
+                        <mat-icon class="icon-disp" color="primary" > email </mat-icon>
                 </div> 
                 <mat-card-title>Добровольное сообщение</mat-card-title>
                 <mat-card-subtitle>
@@ -12,6 +12,7 @@
                     <a href="https://www.nvavia.ru/Home/Show?_id=24">Обратная связь</a>
                     и оставте там свое сообщение.  
                 </mat-card-subtitle>
+
             </mat-card-header> 
 
             <mat-card-content>
@@ -24,21 +25,26 @@
 
                         <mat-card-actions >
                             <div class="form-row" align="end">
-                                <button mat-stroked-button  type="submit" [disabled]="!ctrls.formGroup.valid">Добавить запись</button>
+                                <button mat-raised-button color="accent"  type="submit" [disabled]="!ctrls.formGroup.valid">Добавить запись</button>
+                        
                             </div> 
                         </mat-card-actions>
                     </form>
                 </div>  
+
+                <mat-card-subtitle>
+                        Так же Вы можете передать добровольное сообщение письменно или устно по следующим каналам:
+                        <ul>
+                            <li>По почте: ул.Авиаторов 2, г. Нижневартовск, ХМАО-Югра, 628613, Аэропорт; </li>
+                            <li>На адрес электронной почты: vashenko@nvavia.ru;</li>
+                            <li>В специальный почтовый ящик: здание СПЗ авиапредприятия, КТОиР, Терминал №1 и наземный комплекс;</li>
+                            <li>По телефону: 8(3466)49-20-62 ; 8(982)535-97-07;   </li>
+                            <li>При личном обращении в инспекции по безопасности полетов Ващенко Сергею Александровичу</li>
+                        </ul>
+                </mat-card-subtitle>                   
+
             </mat-card-content>
 
-            <mat-card-subtitle>
-                Так же Вы можете передать добровольное сообщение письменно или устно по следующим каналам:
-                По почте: ул.Авиаторов 2, г. Нижневартовск, ХМАО-Югра, 628613, Аэропорт; 
-                На адрес электронной почты: vashenko@nvavia.ru;
-                В специальный почтовый ящик: здание СПЗ авиапредприятия, КТОиР, Терминал №1 и наземный комплекс;
-                По телефону: 8(3466)49-20-62 ; 8(982)535-97-07;   
-                При личном обращении в инспекции по безопасности полетов Ващенко Сергею Александровичу
-            </mat-card-subtitle>   
 
             <ng-template #loading >
                     <mat-spinner class = "spinner"> </mat-spinner>
@@ -52,19 +58,32 @@
             <mat-card-header  >
                 <div mat-card-avatar >
                         <!-- <mat-icon  color="accent" class="material-icons.md-36"> highlight_off </mat-icon> -->
-                        <mat-icon class="icon-disp" color="primary" > check_circle_outline </mat-icon>
+                        <mat-icon class="icon-disp" color="primary" > verified_user </mat-icon>
                 </div> 
                 <mat-card-title>Ваше сообщение успешно принято!</mat-card-title>
-                <mat-card-subtitle>Бла-бла, будет передано и рассмотрено. С вами свяжутся, разъяснят, утешат... </mat-card-subtitle>
+                <mat-card-subtitle>
+                        Так же Вы можете передать добровольное сообщение письменно или устно по следующим каналам:
+                        <ul>
+                            <li>По почте: ул.Авиаторов 2, г. Нижневартовск, ХМАО-Югра, 628613, Аэропорт; </li>
+                            <li>На адрес электронной почты: vashenko@nvavia.ru;</li>
+                            <li>В специальный почтовый ящик: здание СПЗ авиапредприятия, КТОиР, Терминал №1 и наземный комплекс;</li>
+                            <li>По телефону: 8(3466)49-20-62 ; 8(982)535-97-07;   </li>
+                            <li>При личном обращении в инспекции по безопасности полетов Ващенко Сергею Александровичу</li>
+                        </ul>
+                </mat-card-subtitle>
             </mat-card-header>
                 
             <!-- <mat-card-subtitle>{{ rec.EventText}}</mat-card-subtitle> -->
 
             <mat-card-content>
-                <div *ngFor="let question of controls.questions" class="form-row">
-                        <app-jn-item-label [key]="question.key" [recId]="newRecId" >      </app-jn-item-label>
 
-                </div>
+                <mat-card class="example-card" >     
+                    <!-- <mat-card-content> -->
+                        <div *ngFor="let question of controls.questions" class="form-row">
+                            <app-jn-item-label [key]="question.key" [recId]="newRecId" >      </app-jn-item-label>
+                        </div>
+                    <!-- <mat-card-content> -->
+                </mat-card>        
             </mat-card-content>
             
 

@@ -43,8 +43,8 @@ export class JnItemLabelComponent implements OnInit {
     }
 
   ngOnInit() {
-    console.log(this.key)
-    console.log(this.recId)
+    //console.log(this.key)
+    //console.log(this.recId)
     this.value$ = this.store.select( fromSelectors.selectCurRowVal(this.key, this.recId ))
     this.label$ = this.store.select( fromSelectors.selCurFieldDescribes( )).pipe(
       map(x => x.find( (e) => e.id == this.key )),

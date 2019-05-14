@@ -1,0 +1,15 @@
+
+<h6 mat-dialog-title >Загрузка...</h6> 
+<mat-dialog-content  class="jn-onerow" > 
+    <mat-spinner  color="accent" diameter="36"> </mat-spinner> 
+    <div class="jn-cnt">   
+            {{ (data | async)?.act }}
+           [{{ (data | async)?.obj }}]...
+     </div>    
+     
+</mat-dialog-content>
+
+<!-- class="jn-onerow"  -->
+<!-- 
+<h2 mat-dialog-title>Delete all</h2>
+<mat-dialog-content>Are you sure?</mat-dialog-content> -->

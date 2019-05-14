@@ -84,7 +84,7 @@ export class SdNewUserMessageComponent implements OnInit {
     // formGroup to loc var  (controls)
     this.subscriptions.push(
        this.controls$.pipe( filter (x => !!x.formGroup&&x.questions ), take(1))
-        .subscribe( x => { console.log(x); this.controls = x }) //{ this.fGroup = x.formGroup; this.fQuestions = x.questions } )
+        .subscribe( x => this.controls = x ) //{ this.fGroup = x.formGroup; this.fQuestions = x.questions } )
     );
 
     // formGroup disabled while inserting
@@ -113,7 +113,7 @@ export class SdNewUserMessageComponent implements OnInit {
 
     //по дурацки пока...
      this.store.select(fromSelectors.selCurRowSeed()).pipe(take(1)).subscribe( 
-       x => {console.log(x) ;this.store.dispatch(new ExecCurrent( new AddItem(x) ))}
+       x => { this.store.dispatch(new ExecCurrent( new AddItem(x) ))}                    //console.log(x) ;
      ).unsubscribe();
   }
 

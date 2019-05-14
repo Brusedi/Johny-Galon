@@ -48,6 +48,14 @@ import { SdNewUserMessageComponent } from './serv-desc/sd-new-user-message/sd-ne
 import { JnInfoBoxComponent, JnInfoBoxDialogComponent} from './jn-galon/jn-info-box/jn-info-box.component';
 import { JnItemLabelComponent } from './jn-galon/jn-entity/jn-item-label/jn-item-label.component';
 import { JgHomeComponent } from './jn-galon/jg-home/jg-home.component';
+import { DrochIconComponent } from './shared/graphics/droch-icon/droch-icon.component';
+import { DrochIconSvgComponent } from './shared/graphics/droch-icon-svg/droch-icon-svg.component';
+import { HttpClientModule } from '@angular/common/http';
+import { DrochIconSvgRegComponent } from './shared/graphics/droch-icon-svg-reg/droch-icon-svg-reg.component';
+import { JnBusyBoxComponent, JgBusyDialog } from './jn-galon/jn-busy-box/jn-busy-box.component';
+import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component';
+
+
 
 const appRoutes: Routes = [
   { path: '',                 component: JgHomeComponent, pathMatch: 'full'  }, //,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  } 
@@ -75,7 +83,13 @@ const appRoutes: Routes = [
     JnInfoBoxComponent,
     JnInfoBoxDialogComponent,
     JnItemLabelComponent,
-    JgHomeComponent
+    JgHomeComponent,
+    DrochIconComponent,
+    DrochIconSvgComponent,
+    DrochIconSvgRegComponent,
+    JnBusyBoxComponent,
+    JgBusyDialog,
+    JnBusyBarComponent
   ],
 
   imports: [
@@ -115,7 +129,9 @@ const appRoutes: Routes = [
     MatDatepickerModule,
     MatProgressSpinnerModule,
     MatIconModule,
-    MatDialogModule
+    MatDialogModule,
+    HttpClientModule
+    
   ],
   providers: [
     {provide: RouterStateSerializer,   useClass: CustomRouterStateSerializer },
@@ -127,6 +143,7 @@ const appRoutes: Routes = [
   ],
   bootstrap: [AppComponent],
 
-  entryComponents: [JnInfoBoxDialogComponent]
+  entryComponents: [JnInfoBoxDialogComponent,JgBusyDialog]
 })
+
 export class AppModule { }

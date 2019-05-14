@@ -67,8 +67,8 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
             }
         }    
         case AnyEntitySetActionTypes.ADD_ANY_ENTITY:{
-            console.log('ADD_ANY_ENTITY');
-            console.log(action.payload);
+            //console.log('ADD_ANY_ENTITY');
+            //console.log(action.payload);
             
             return { 
                 ...state, 

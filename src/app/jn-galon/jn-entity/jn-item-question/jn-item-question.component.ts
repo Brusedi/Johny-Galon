@@ -52,9 +52,7 @@ export class JnItemQuestionComponent implements OnInit{
     !this.question.hasOwnProperty(REF_LOC_PROP) ? null:
         this.store.dispatch( new PrepareByLoc( this.question[REF_LOC_PROP] ));
 
-    !this.question.hasOwnProperty(REF_LOC_PROP) ? null: console.log(this.question[REF_LOC_PROP]);
-        
-            
+    //!this.question.hasOwnProperty(REF_LOC_PROP) ? null: console.log(this.question[REF_LOC_PROP]);
     
     // еуыештп 
     // !this.question.hasOwnProperty(REF_LOC_PROP) ? null:

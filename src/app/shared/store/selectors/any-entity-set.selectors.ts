@@ -345,7 +345,6 @@ export const selForeignIsPreparing = () =>
         (dt) => dt.prepareQueue.length > 0 && dt.preparing != null    
     )        
 
-
 /**
  *  items is Loading (buzy)
  */
@@ -372,6 +371,56 @@ export const selIsBuzy = () =>
         selItemsIsUploading(),
         (x,y,z) => x || y || z
 );    
+
+export interface BusyInfo{
+    act:string,
+    obj:string
+}
+
+// BUSY INFO
+// 
+export const selBusyPreparingInfo = () =>
+    createSelector( 
+        selectDatas,
+        (dt) => 
+            dt.prepareQueue.length > 0 && dt.preparing != null 
+                ? ({act:"Подготавливаю вторичные данные", obj:dt.preparing?dt.preparing: dt.prepareQueue[0]})
+                : null   
+    )        
+
+export const selBusyLoadingInfo = () =>
+    createSelector( 
+        selectDatas,
+        (dt) => Object.keys(dt.items)
+            .reduce( (a,i) => 
+                a?a:dt.items[i].state.loading 
+                       ? {act:"Загружаю данные", obj:i}
+                       :  dt.items[i].state.metaLoading 
+                            ? {act:"Загружаю метаданные", obj:i}
+                            : null
+                ,null                        
+            ) 
+); 
+
+export const selBusyUploadingInfo = () =>
+    createSelector( 
+        selectDatas,
+        (dt) => Object.keys(dt.items)
+            .reduce( (a,i) => 
+                a?a: dt.items[i].state.uploading 
+                    ? {act:"Выгружаю данные", obj:i}
+                    : null
+                ,null 
+            ) 
+);    
+
+export const selBuzyInfo = () =>
+    createSelector( 
+        selBusyPreparingInfo(),
+        selBusyLoadingInfo(),
+        selBusyUploadingInfo(),
+        (x,y,z) => x?x:y?y:z?z:null
+);  
 
 
 /// FOREIGN DATA SELECTORS ========================================================================================================

@@ -153,9 +153,9 @@ export class anyEntytySetEffects {
             case ( AnyEntityActionTypes.ADD_ITEM) :
                 return this.dataService.insert( options.location, action.payload )
                     .pipe(
-                        tap( x=>  console.log(x) ),
+                        //tap( x=>  console.log(x) ),
                         map( x =>  x.hasOwnProperty('_body')?JSON.parse(x['_body']):x ),
-                        tap( x=>  console.log(x) ),
+                        //tap( x=>  console.log(x) ),
                         mergeMap( x => from( 
                                     x.hasOwnProperty('Data')&&x['Data'].hasOwnProperty('id')
                                         && Array.isArray(x['Data']['id'])&&(x['Data']['id'][0])  
@@ -164,7 +164,7 @@ export class anyEntytySetEffects {
                                         : [ new AddItemSuccess(null)] 
                                 )
                         ),
-                        tap( x=>  console.log(x) ),
+                        //tap( x=>  console.log(x) ),
                         //map( x => new AddItemSuccess(x) ),
                         catchError(error => { console.log(isJSONStr(error ))  ; return of(new ErrorAnyEntity(prepareError(error))) } )   
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
