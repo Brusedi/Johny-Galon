@@ -1,3 +1,12 @@
-<p>
-  jn-busy-bar works!
-</p>
+
+<div #jgbar class="jg-busy-bar-cnt  mat-elevation-z6"  >
+    <mat-toolbar  class="jg-busy-bar" >
+        <div class="flex-spacer" ></div>
+        <div >
+            <p>{{ (descr$ | async) }}  </p>
+        </div>
+        <mat-spinner *ngIf="!!(spiner$ |async)"  color="accent" diameter="16"> </mat-spinner>    
+    </mat-toolbar> 
+</div>
+  
+  

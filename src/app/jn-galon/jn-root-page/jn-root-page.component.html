@@ -1,12 +1,14 @@
+<app-jn-busy-bar></app-jn-busy-bar>
+
 <nav class="jg-nav">
-    <mat-toolbar class = "jg-i-header mat-elevation-z8" > 
+    <!-- <mat-toolbar class = "jg-i-header mat-elevation-z8" > 
             <div class="flex-spacer" ></div>
             <mat-spinner *ngIf="!(spiner$ |async)"  color="accent" diameter="16"> </mat-spinner>    
     
             <div class="tb-note" >
                 <p> {{ subCaption$ | async }} </p>
             </div>
-    </mat-toolbar>
+    </mat-toolbar> -->
 
     <mat-toolbar  color="primary" class="mat-elevation-z6"  >
 
@@ -23,27 +25,28 @@
     </mat-toolbar >
 </nav>
     
-<app-jn-busy-box></app-jn-busy-box>
+<!-- <app-jn-busy-box></app-jn-busy-box> -->
 
 <main class="jn-content jg-layout"> 
     <div class="jn-content-col" >
 
         <div class="jn-content-p"> 
             <router-outlet></router-outlet>
-            
         </div>     
+
         <div class="jg-fill-spacer"></div>
 
         <footer class="mat-elevation-z6" >
-                <mat-toolbar color="primary"  >
-                    <div ></div>
-                    <div class="jg-footer-copyright" >
-                        <span style="color:white">AO "Нижневартовскавиа" ©2018-2019. </span>
-                        <span><img class="jg-smal-img"  src="assets/images/JG2.png"> Johny Galon application 2018-2019. </span>
-                        <span><img class="jg-smal-img"  src="assets/images/isp.ico"> Ispolin project 2017-2019. </span>
-                    </div>
-                </mat-toolbar> 
+            <mat-toolbar color="primary">
+                <div ></div>
+                <div class="jg-footer-copyright" >
+                    <span style="color:white">AO "Нижневартовскавиа" ©2018-2019. </span>
+                    <span><img class="jg-smal-img"  src="assets/images/JG2.png"> Johny Galon application 2018-2019. </span>
+                    <span><img class="jg-smal-img"  src="assets/images/isp.ico"> Ispolin project 2017-2019. </span>
+                </div>
+            </mat-toolbar> 
         </footer>
+        
     </div>
 </main>
 

@@ -27,7 +27,7 @@ $candy-app-theme: mat-light-theme($candy-app-primary, $candy-app-accent, $candy-
 
 
 
-.jg-i-header {
+.jg-i-header, .jg-busy-bar{
     background-color:  mat-color($candy-app-primary ,  900);
     color:  mat-color(mat-palette($mat-grey,400));
 }
