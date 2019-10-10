@@ -8,6 +8,7 @@ import { SetCurrent, Exec, AddItem } from '@appStore/actions/any-entity-set.acti
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 import { ForeignKeyService } from './foregin/foreign-key.service';
+import { ErrorEnvironment } from '@appStore/actions/environment.actions';
 
 const OPTION_PARAM_DATA_KEY = 'option';
 
@@ -27,6 +28,14 @@ export class AppResolverService implements Resolve<any> {
    */
   resolve(route: ActivatedRouteSnapshot, state:RouterStateSnapshot) {
     const opt:anyEntityOptions<AnyEntity> = route.data[OPTION_PARAM_DATA_KEY];
+
+    //101019
+    
+
+    this.store.select(fromSelectors.selEnvError).subscribe(x=>console.log(x))
+
+    this.store.dispatch( new ErrorEnvironment('3'))
+
 
     return this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
         tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),

@@ -15,9 +15,19 @@ export const SdIncomingOption:anyEntityOptions<AnyEntityId> = {
   };  
 
 
-  export const NvaPlanPurchaseLine:anyEntityOptions<AnyEntityId> = {
+export const NvaPlanPurchaseLine:anyEntityOptions<AnyEntityId> = {
     name: "NvaPlanPurchaseLine", 
     location:"/NvaAx/NvaPlanPurchaseLine", 
+    selectId: (x) => x.RECID,
+    selBack: (x:string) => ("?RECID=" + x )
+  };    
+
+
+// Testing handling access to Auth back service 
+// 091019 
+export const AuthTestDataOption:anyEntityOptions<AnyEntityId> = {
+    name: "AuthTestData", 
+    location:"/values", 
     selectId: (x) => x.RECID,
     selBack: (x:string) => ("?RECID=" + x )
   };    

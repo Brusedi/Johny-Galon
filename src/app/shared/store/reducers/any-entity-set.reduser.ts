@@ -112,7 +112,7 @@ export function reducer(state :State  = initialState, action: AnyEntitySetAction
         };    
 
         case AnyEntitySetActionTypes.EROR_ANY_ENTITY_SET:{        
-                //console.log(action);
+                console.log(action);
                 return { ...state, error:action.payload };    
             }    
 
