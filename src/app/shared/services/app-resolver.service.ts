@@ -30,11 +30,8 @@ export class AppResolverService implements Resolve<any> {
     const opt:anyEntityOptions<AnyEntity> = route.data[OPTION_PARAM_DATA_KEY];
 
     //101019
-    
-
-    this.store.select(fromSelectors.selEnvError).subscribe(x=>console.log(x))
-
-    this.store.dispatch( new ErrorEnvironment('3'))
+    //this.store.select(fromSelectors.selectEnvironment).subscribe(x=>console.log(x))
+    //this.store.dispatch( new ErrorEnvironment('3'))
 
 
     return this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(

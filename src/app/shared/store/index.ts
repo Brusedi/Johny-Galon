@@ -6,6 +6,7 @@ import { RouterReducerState, routerReducer }       from '@ngrx/router-store';
 import { RouterEffects }            from './effects/router.effects';
 import { RouterStateUrl }           from './router';
 import { anyEntytySetEffects }      from './effects/any-entity-set.effects';
+import { EnvironmentEffects } from './effects/environment.effects';
 
 
 export interface State {
@@ -21,4 +22,4 @@ export const reducers: ActionReducerMap<State> = {
 };
   
 
-export const effects = [ anyEntytySetEffects ,RouterEffects];
+export const effects = [ anyEntytySetEffects ,RouterEffects, EnvironmentEffects];

@@ -101,7 +101,6 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
                         action.payload.entites,
                         { ...state , loading: false , partLoaded:  { ...state.partLoaded , [action.payload.request]:action.payload.ids  }  }
                     );  
-
                 return r;                    
             }
 
@@ -145,7 +144,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
 
             /// uploaded
             case AnyEntityActionTypes.EROR_ANY_ENTITY:{
-                console.log(action);
+              //  console.log(action);
                 return { ...state, loading: false, uploading:false, metaLoading:false ,error: action.payload};        //loaded: false     
             }
                 

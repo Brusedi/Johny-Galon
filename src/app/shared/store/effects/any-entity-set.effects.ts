@@ -6,13 +6,14 @@ import { of, from, Observable } from "rxjs";
 import { map, mergeMap, catchError, tap, switchMap, filter, delayWhen, last, take } from "rxjs/operators";
 
 
-import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem, PartLoadByLoc } from "@appStore/actions/any-entity-set.actions";
+import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem, PartLoadByLoc, ErrorAnyEntitySet } from "@appStore/actions/any-entity-set.actions";
 import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart, SetRowSeed, AddItemSuccess  } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
 import { DataProvService } from "app/shared/services/data-prov.service";
+import { ErrorEnvironment, AuthStart } from "@appStore/actions/environment.actions";
 
 //import { AnyEntityLazySetActionTypes, ExecItemAction,  CompleteItemAction, Exec } from "@appStore/actions/any-entity-lazy-set.actions";
 //import { AnyEntityLazyActionTypes, anyEntityLazyActions, GetItemSuccess, GetItemNotFound } from "@appStore/actions/any-entity-lazy.actions";
@@ -37,6 +38,14 @@ export class anyEntytySetEffects {
 ) {}
 
     //const PrepareByLocBranch$ = ( loc:string  )   
+    // 151019 error handler
+    @Effect()   
+    ErrorHandler$ = this.actions$.pipe( 
+        ofType(AnyEntitySetActionTypes.EROR_ANY_ENTITY_SET),
+        tap(x=>console.log(x)),
+        map(x=> new ErrorAnyEntitySet(null))
+    );
+
 
     @Effect()   
     PartLoadByLoc1$ = this.actions$.pipe(
@@ -218,7 +227,17 @@ export class anyEntytySetEffects {
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
                     ); 
-                        
+
+            case ( AnyEntityActionTypes.EROR_ANY_ENTITY ) :{
+                return of({
+                    fromError: action.payload&&action.payload.status?action.payload.status:undefined,
+                    fromSource: action.payload&&action.payload.url?action.payload.url:undefined
+                }).pipe( 
+                        tap( x=>  console.log(x) ),
+                        map(x => x.fromError && x.fromError == 401 ? { freeAction: new AuthStart(x) } : null) //new AuthStart(x) :  new AuthStart(x))   
+                    )
+            }    
+                    
             default:
                 return of(null);
         }
@@ -226,10 +245,15 @@ export class anyEntytySetEffects {
     
     private procNextSubAction$ = ( options: anyEntityOptions<any>,  act$: Observable<any> ): Observable<any> => 
         act$.pipe( 
+            tap( x=>  console.log(x) ),
+            
             map(x  =>  x != null ? 
-                    new ExecItemAction( { itemOption:options, itemAction: x } ) : 
-                    new CompleteItemAction({ name: options.name } ) 
-            )
+                    ( x.freeAction ? 
+                        x.freeAction :  
+                        new ExecItemAction( { itemOption:options, itemAction: x } )  ) :
+                    new CompleteItemAction({ name: options.name } )                                                               // null 
+            ),
+            tap( x=>  console.log(x) )
         );       
 
 
