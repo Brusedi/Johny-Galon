@@ -12,13 +12,13 @@ import { EnvironmentEffects } from './effects/environment.effects';
 export interface State {
     data:fromReducers.anyEntitySet.State;
     router: RouterReducerState<RouterStateUrl>;
-    environmen:fromReducers.environment.State;
+    environment:fromReducers.environment.State;
 }
   
 export const reducers: ActionReducerMap<State> = {
     data:fromReducers.anyEntitySet.reducer,
     router: routerReducer,
-    environmen:fromReducers.environment.reducer
+    environment:fromReducers.environment.reducer
 };
   
 

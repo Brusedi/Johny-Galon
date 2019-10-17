@@ -5,7 +5,9 @@ export class AppSettings {
     svcRestMetadataSuffix: string ="/Md" ;
     svcRestRecTemplateSuffix: string ="/!Template" ;
 
-    auth2AuthEndPoint: string   =  "https://adfs.nvavia.ru/adfs/oauth2/authorize";
-    auth2ClientId:string        = 'ab762716-544d-4aeb-a526-687b73838a33'
+    auth2AuthEndPoint: string   = "https://adfs.nvavia.ru/adfs/oauth2/authorize";
+    auth2ClientId:string        = "TESTFRONTID";
+
+    //http://webgate.nvavia.ru:8080/api/NvaAx/NvaSdVoluntaryMessageRecipients/Md
  }
    

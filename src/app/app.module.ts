@@ -1,5 +1,5 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { NgModule, InjectionToken } from '@angular/core';
+import { Routes, RouterModule, ActivatedRouteSnapshot } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -54,8 +54,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { DrochIconSvgRegComponent } from './shared/graphics/droch-icon-svg-reg/droch-icon-svg-reg.component';
 import { JnBusyBoxComponent, JgBusyDialog } from './jn-galon/jn-busy-box/jn-busy-box.component';
 import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component';
+import { AppExUriProvider } from './shared/services/app-exUriProv.service';
+import { JnAuthComponent } from './jn-galon/jn-auth/jn-auth.component';
 
-
+//const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
 
 const appRoutes: Routes = [
   { path: '',                 component: JgHomeComponent, pathMatch: 'full'  }, //,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  } 
@@ -64,13 +66,18 @@ const appRoutes: Routes = [
 
   { path: 'tutoral/values',   component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
   { path: 'forms/sd/incoming',component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
-  //{ path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } },   
+  //{ path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } }, 
+  { path: 'Login',            component: JnNotFoundComponent,                          resolve: { isLoad:AppExUriProvider  }   }, //resolve: {url: externalUrlProvider }
+  { path: 'Auth',             component: JnAuthComponent,                           }, //resolve: {url: externalUrlProvider }
+
   { path: '**',               component: JnNotFoundComponent }
 ];
 // const appRoutes: Routes = [
 //   { path: '',               component: JnRootComponent, pathMatch: 'full'   },
 //   { path: '**',             component: JnNotFoundComponent }
 // ];
+
+
 
 
 @NgModule({
@@ -91,11 +98,13 @@ const appRoutes: Routes = [
     DrochIconSvgRegComponent,
     JnBusyBoxComponent,
     JgBusyDialog,
-    JnBusyBarComponent
+    JnBusyBarComponent,
+    JnAuthComponent
   ],
 
   imports: [
     HttpModule,
+    //HttpClientModule,
     BrowserModule,
     BrowserAnimationsModule,
     StoreModule.forRoot( fromStore.reducers ),
@@ -141,6 +150,13 @@ const appRoutes: Routes = [
     AppSettingsService,
     DataProvService,
     AppResolverService
+    // {
+    //   provide: externalUrlProvider,
+    //   useValue: (route: ActivatedRouteSnapshot ) => {
+    //       const externalUrl = route.paramMap.get('externalUrl');
+    //       window.open('https://ya.ru', '_self');
+    //   },
+    //},
 
   ],
   bootstrap: [AppComponent],

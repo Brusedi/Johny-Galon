@@ -1,10 +1,18 @@
 import { EnvironmentAction, EnvironmentActionTypes } from "@appStore/actions/environment.actions";
 
+
 // 
-export interface authingData {
+export interface authingReqData {
     fromError:string; 
     fromSource:string; 
 }
+
+export interface authingData {
+    request:authingReqData;
+    authCode:string;        
+}
+
+
 
 export interface State  {
     authenticated: boolean;
@@ -30,7 +38,12 @@ export function reducer(state :State  = initialState, action: EnvironmentAction)
 
         case EnvironmentActionTypes.AUTH_START:{      
             console.log(action.payload);
-            return { ...state , authenticated:true,  authgData:action.payload};    
+            return { ...state , authenticating:true,  authenticated:false ,  authgData: { ...state.authgData, request: action.payload}  } ;    
+        } 
+
+        case EnvironmentActionTypes.AUTH_SUCCESS:{      
+            console.log(action.payload);
+            return { ...state ,  authenticating:false,  authenticated:true ,  authgData: { ...state.authgData, authCode: action.payload}  } ;    
         } 
 
         default:

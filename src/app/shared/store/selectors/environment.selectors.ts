@@ -12,3 +12,9 @@ export const selEnvError = createSelector(
     environmentStore,
     (x:State) => x.error 
 ); 
+
+export const selEnvIsAuthed = createSelector(
+    environmentStore,
+    (x:State) => x&&x.authenticated ?  x.authenticated : false
+); 
+

@@ -1,5 +1,5 @@
 import { Action } from '@ngrx/store';
-import { authingData } from '@appStore/reducers/environment.reduser';
+import { authingData, authingReqData } from '@appStore/reducers/environment.reduser';
 
 export enum EnvironmentActionTypes {
     AUTH_START              = '[Environment] Start authentication',
@@ -15,11 +15,17 @@ export class ErrorEnvironment implements Action {
 
 export class AuthStart implements Action {
     readonly type = EnvironmentActionTypes.AUTH_START
-    constructor(public payload: authingData) {}
+    constructor(public payload: authingReqData ) {}
+}  
+
+export class AuthSuccess implements Action {
+    readonly type = EnvironmentActionTypes.AUTH_SUCCESS
+    constructor(public payload: string) {}
 }  
 
 
 export type EnvironmentAction =
     | ErrorEnvironment
     | AuthStart
+    | AuthSuccess
 ;

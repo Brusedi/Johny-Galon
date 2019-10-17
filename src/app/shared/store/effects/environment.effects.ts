@@ -13,11 +13,12 @@ export class EnvironmentEffects {
   ) {}
   
     //const PrepareByLocBranch$ = ( loc:string  )   
-    // 151019 error handler
+    //151019 error handler
     @Effect()  
     AuthHandler$ = this.actions$.pipe( 
         ofType(EnvironmentActionTypes.AUTH_START),
         tap( x => console.log(x) ),
+        map( x => this.authService.getFSAuthCode().subscribe(x=>console.log(x))),
         map( x => new ErrorEnvironment('q') )    
     );
 }  

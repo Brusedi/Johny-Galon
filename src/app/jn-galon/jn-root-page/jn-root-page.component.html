@@ -21,6 +21,10 @@
         <mat-menu #menu="matMenu">
             <button mat-menu-item [routerLink]="['forms/sd/incoming']" >Добровольное сообщение </button>
         </mat-menu> 
+        <span class="flex-spacer"></span>
+        <button mat-stroked-button  [routerLink]="['Login']" class="but-title" >
+            {{ (isAuthButCaption$| async) }}  
+        </button>
 
     </mat-toolbar >
 </nav>
