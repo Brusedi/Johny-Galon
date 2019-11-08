@@ -54,9 +54,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { DrochIconSvgRegComponent } from './shared/graphics/droch-icon-svg-reg/droch-icon-svg-reg.component';
 import { JnBusyBoxComponent, JgBusyDialog } from './jn-galon/jn-busy-box/jn-busy-box.component';
 import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component';
-import { AppExUriProvider } from './shared/services/app-exUriProv.service';
-import { JnAuthComponent } from './jn-galon/jn-auth/jn-auth.component';
-import { AppAuthResolverService } from './shared/services/app-auth-resolver.service';
 
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
@@ -68,16 +65,6 @@ const appRoutes: Routes = [
 
   { path: 'tutoral/values',    component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
   { path: 'forms/sd/incoming', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
-
-
-  //{ path: 'tutoral/plan',    component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } }, 
-
-  //{ path: 'Login',           component: JnNotFoundComponent,                  resolve: { isLoad:AppExUriProvider  }   }, //resolve: {url: externalUrlProvider }
-
-  //{ path: 'LoginBack',       component: JnNotFoundComponent,                resolve: { isLoad:AppExUriProvider  }   }, //resolve: {url: externalUrlProvider }
-
-  //{ path: 'AuthBack',          component: JnAuthComponent,                    }, //resolve: {url: externalUrlProvider }
- // { path: 'Login',             component: JnAuthComponent,                    resolve: {url: AppAuthResolverService }},
 
   { path: '**',                component: JnNotFoundComponent }
 ];
@@ -108,7 +95,7 @@ const appRoutes: Routes = [
     JnBusyBoxComponent,
     JgBusyDialog,
     JnBusyBarComponent,
-    JnAuthComponent
+    
   ],
 
   imports: [

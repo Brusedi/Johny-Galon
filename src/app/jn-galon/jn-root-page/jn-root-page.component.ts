@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import * as fromSelectors from '@appStore/selectors/index';
 import * as fromStore     from '@appStore/index';
 import { Observable, of } from 'rxjs';
-import { map, startWith, tap, takeLast } from 'rxjs/operators';
+import { map, startWith, tap, takeLast, take } from 'rxjs/operators';
 import { last } from '@angular/router/src/utils/collection';
 import { AuthStart, AuthLogout } from '@appStore/actions/environment.actions';
 
@@ -41,9 +41,8 @@ export class JnRootPageComponent implements OnInit {
   public Login() {
     
     this.store.select(  fromSelectors.selEnvIsAuthed ).pipe(
-      //startWith(false),
-      //takeLast(1),
-      //tap(console.log)
+      take(1),
+      tap(console.log)
     ).subscribe( 
         x=>!x  
           ? this.store.dispatch( new AuthStart( { fromError:null, fromSource:"login button"})) 
