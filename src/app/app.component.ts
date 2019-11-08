@@ -4,6 +4,8 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { drochIcons } from './shared/graphics/corel-droch/corel-droch-data';
 import { toHtml } from './shared/graphics/corel-droch/corel-droch-base';
 
+
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -21,8 +23,5 @@ export class AppComponent {
         this.matIconRegistry.addSvgIconLiteral( 
           x , sanitized.bypassSecurityTrustHtml( toHtml(drochIcons[x]) ) 
       ))
-
   }    
-  
-
 }

@@ -28,7 +28,7 @@ export class JnBusyBarComponent implements OnInit {
 
     this.descr$ = this.spiner$.pipe(
       combineLatest( this.store.select( fromSelectors.selCurItemMetaNote()).pipe(distinctUntilChanged() )  , (x,y) => ({...x, curent:y })   ) ,
-      tap( (x)=>console.log(x) ),
+      //tap( (x)=>console.log(x) ),
       map( (x) => 
         (x && x.act) ? x.act + '['+x.obj+']... ' 
           : x.curent ? x.curent : ''

@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http'; 
-import { map, mergeMap, tap } from 'rxjs/operators';
+
+import { Http,  RequestOptions , Headers} from '@angular/http';
+import { map, mergeMap, tap, combineLatest, last, take, takeLast } from 'rxjs/operators';
 
 import { AppSettingsService } from './app-setting.service';
 import { AppSettings } from '../app-setting';
 import { of } from 'rxjs';
+
+import * as fromStore from '@appStore/index';
+import * as fromSelectors from '@appStore/selectors/index';
+import { Store } from '@ngrx/store';
 
 /**
  *  Low level data provider (Very oldest)
@@ -26,13 +31,14 @@ enum RequestType { Ordinary, Metadata, Template } ;
 export class DataProvService {
   constructor(
     private http: Http,
-    private settings: AppSettingsService
+    private settings: AppSettingsService,
+    private store: Store<fromStore.State>,    // Add interseption auth header
+
   ) { 
       settings.getSettings().subscribe( x =>log( "Service activated with location :) "+ x.svcFasadeUri  ));
   }
 
-  private getDataFromUri = (uri: string) =>  this.http.get(uri).pipe(map(rsp => rsp.text()));
-
+ 
   //FASADE
   /**
    *  Return main data as iterable by http-service sublocation
@@ -59,7 +65,7 @@ export class DataProvService {
             map(x  => x.trim()===""? {}: JSON.parse(x) )
         );    
   }
- 
+   
   /**
   *  New Fasade.   Above Legasy.
   */ 
@@ -67,19 +73,55 @@ export class DataProvService {
   public template$ = (loc:string , subloc:string = undefined ) => this.get(loc, subloc, RequestType.Template );
   public item$     = (loc:string , subloc:string = undefined ) => this.get(loc, subloc);
   public items$    = (loc:string , subloc:string = undefined ) => this.get(loc, subloc).pipe(map(x => ( <any[]>x === null) ? [] :<any[]>x ));
-  
-  
+    
   public insert   = (loc:string , data:any ) => this.post(loc, undefined, data); //.subscribe(x => console.log(x) );
+
+  
+
 
   //FASADE END
 
+  // Build Auth Options                                          //ToDO:
+  private buildOption = (authKey:string ) =>  new RequestOptions({headers:new Headers( authKey?{'Authorization':authKey }:{}  ) })
+
+  /// Rebuild 211019 with Auth
+   /**
+  *  301018    
+  *  Get  data from http-service as JSON (new release data method)
+  */ 
+  private getDataFromUriLegasy = (uri: string) =>  this.http.get(uri).pipe(map(rsp => rsp.text()));        
+
+  private getDataFromUri = (uri: string) =>  this.store.select( fromSelectors.selEnvAuthHeader ).pipe( 
+    take(1),
+    tap(console.log),
+    map(this.buildOption),
+    tap(console.log) ,
+    mergeMap( x => this.http.get(uri,x).pipe(map(rsp => rsp.text()))));        
+
+  
    /**
   *  301018    
   *  Send any data to http-service as JSON (new release data method)
   */ 
   private post = ( loc:string , subloc:string = undefined , data:any ) =>
+    this.store.select( fromSelectors.selEnvAuthHeader ).pipe( 
+        take(1),
+        tap(x=>console.log('w :'+x)) ,
+        map(this.buildOption),
+        combineLatest( this.buildDataUri_v2(loc, subloc, RequestType.Ordinary ), (o,u) => ({opt:o, uri:u}) ),
+        //tap(x=>console.log('w')) ,
+        //tap(console.log) ,
+        mergeMap( x => this.http.post( x.uri, data, x.opt ) ) 
+    )        
+    // this.buildDataUri_v2(loc, subloc, RequestType.Ordinary )
+    //  .pipe(  mergeMap( x => this.http.post( x, data ) ) );  
+
+  private postLegasy = ( loc:string , subloc:string = undefined , data:any ) =>
     this.buildDataUri_v2(loc, subloc, RequestType.Ordinary )
-        .pipe(  mergeMap( x => this.http.post( x, data ) ) );
+        .pipe(  mergeMap( x => this.http.post( x, data ) ) );  
+        
+
+        //ToDO:
 
   /**
   *  Return any data from http-service as JSON (new release data method)

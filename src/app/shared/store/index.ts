@@ -1,12 +1,12 @@
 import { ActionReducerMap }         from '@ngrx/store';
 import * as fromReducers            from './reducers';
 
-import { RouterReducerState, routerReducer }       from '@ngrx/router-store';
-//import { RouterStateUrl }           from './router';
+import { RouterReducerState, routerReducer }  from '@ngrx/router-store';
+//import { RouterStateUrl }         from './router';
 import { RouterEffects }            from './effects/router.effects';
 import { RouterStateUrl }           from './router';
 import { anyEntytySetEffects }      from './effects/any-entity-set.effects';
-import { EnvironmentEffects } from './effects/environment.effects';
+import { EnvironmentEffects }       from './effects/environment.effects';
 
 
 export interface State {

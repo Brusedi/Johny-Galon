@@ -18,11 +18,20 @@
         </button>
 
         <button mat-button [matMenuTriggerFor]="menu">Формы</button>
+
         <mat-menu #menu="matMenu">
             <button mat-menu-item [routerLink]="['forms/sd/incoming']" >Добровольное сообщение </button>
+            <button mat-menu-item [routerLink]="['tutoral/values']" > === </button>
         </mat-menu> 
+
+        <!-- <mat-menu #menu="matMenu1">
+            <button mat-menu-item [routerLink]="['tutoral/values']" > === </button>
+        </mat-menu>  -->
+
         <span class="flex-spacer"></span>
-        <button mat-stroked-button  [routerLink]="['Login']" class="but-title" >
+        <button mat-stroked-button (click) = "Login()" class="but-title" >
+             <!-- [routerLink]="['Login']" -->
+             <!-- (click) = "Login()"  -->
             {{ (isAuthButCaption$| async) }}  
         </button>
 

@@ -56,21 +56,30 @@ import { JnBusyBoxComponent, JgBusyDialog } from './jn-galon/jn-busy-box/jn-busy
 import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component';
 import { AppExUriProvider } from './shared/services/app-exUriProv.service';
 import { JnAuthComponent } from './jn-galon/jn-auth/jn-auth.component';
+import { AppAuthResolverService } from './shared/services/app-auth-resolver.service';
+
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
 
 const appRoutes: Routes = [
-  { path: '',                 component: JgHomeComponent, pathMatch: 'full'  }, //,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  } 
-  //{ path: 'tutoral/mock',   component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
-  //{ path: 'tutoral/sd',     component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
+  { path: '',                  component: JgHomeComponent, pathMatch: 'full'  }, //,data: {  option: JgMockTableOption }, resolve: { isLoad:AppResolverService  } 
+  //{ path: 'tutoral/mock',    component: JnRootComponent,                    data: {  option: JgMockTableOption} , resolve: { isLoad:AppResolverService  } },  
+  //{ path: 'tutoral/sd',      component: JnRootComponent,                    data: {  option: SdIncomingOption } , resolve: { isLoad:AppResolverService  } },  
 
-  { path: 'tutoral/values',   component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
-  { path: 'forms/sd/incoming',component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
-  //{ path: 'tutoral/plan',   component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } }, 
-  { path: 'Login',            component: JnNotFoundComponent,                          resolve: { isLoad:AppExUriProvider  }   }, //resolve: {url: externalUrlProvider }
-  { path: 'Auth',             component: JnAuthComponent,                           }, //resolve: {url: externalUrlProvider }
+  { path: 'tutoral/values',    component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
+  { path: 'forms/sd/incoming', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
 
-  { path: '**',               component: JnNotFoundComponent }
+
+  //{ path: 'tutoral/plan',    component: JnRootComponent,                    data: {  option: NvaPlanPurchaseLine } , resolve: { isLoad:AppResolverService  } }, 
+
+  //{ path: 'Login',           component: JnNotFoundComponent,                  resolve: { isLoad:AppExUriProvider  }   }, //resolve: {url: externalUrlProvider }
+
+  //{ path: 'LoginBack',       component: JnNotFoundComponent,                resolve: { isLoad:AppExUriProvider  }   }, //resolve: {url: externalUrlProvider }
+
+  //{ path: 'AuthBack',          component: JnAuthComponent,                    }, //resolve: {url: externalUrlProvider }
+ // { path: 'Login',             component: JnAuthComponent,                    resolve: {url: AppAuthResolverService }},
+
+  { path: '**',                component: JnNotFoundComponent }
 ];
 // const appRoutes: Routes = [
 //   { path: '',               component: JnRootComponent, pathMatch: 'full'   },
@@ -141,7 +150,7 @@ const appRoutes: Routes = [
     MatProgressSpinnerModule,
     MatIconModule,
     MatDialogModule,
-    HttpClientModule
+    HttpClientModule,
     
   ],
   providers: [
@@ -149,7 +158,8 @@ const appRoutes: Routes = [
     //{provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}},
     AppSettingsService,
     DataProvService,
-    AppResolverService
+    AppResolverService,
+    { provide: "windowObject", useValue: window}   // window Object injection
     // {
     //   provide: externalUrlProvider,
     //   useValue: (route: ActivatedRouteSnapshot ) => {

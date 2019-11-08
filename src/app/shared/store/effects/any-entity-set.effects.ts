@@ -245,7 +245,7 @@ export class anyEntytySetEffects {
     
     private procNextSubAction$ = ( options: anyEntityOptions<any>,  act$: Observable<any> ): Observable<any> => 
         act$.pipe( 
-            tap( x=>  console.log(x) ),
+            //tap( x=>  console.log(x) ),
             
             map(x  =>  x != null ? 
                     ( x.freeAction ? 
@@ -253,7 +253,7 @@ export class anyEntytySetEffects {
                         new ExecItemAction( { itemOption:options, itemAction: x } )  ) :
                     new CompleteItemAction({ name: options.name } )                                                               // null 
             ),
-            tap( x=>  console.log(x) )
+            //tap( x=>  console.log(x) )
         );       
 
 

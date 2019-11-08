@@ -39,6 +39,7 @@ export class JnAuthComponent implements OnInit {
     this.code$.pipe(
       filter( x => !!x )
     ).subscribe( x =>  this.store.dispatch( new  AuthSuccess( x )) );
+    
 
   }
 
