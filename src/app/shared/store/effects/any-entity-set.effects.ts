@@ -231,7 +231,8 @@ export class anyEntytySetEffects {
             case ( AnyEntityActionTypes.EROR_ANY_ENTITY ) :{
                 return of({
                     fromError: action.payload&&action.payload.status?action.payload.status:undefined,
-                    fromSource: action.payload&&action.payload.url?action.payload.url:undefined
+                    fromSource: action.payload&&action.payload.url?action.payload.url:undefined,
+                    tag:'NVAVIA'
                 }).pipe( 
                         tap( x=>  console.log(x) ),
                         map(x => x.fromError && x.fromError == 401 ? { freeAction: new AuthStart(x) } : null) //new AuthStart(x) :  new AuthStart(x))   

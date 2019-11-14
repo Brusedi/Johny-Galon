@@ -29,11 +29,37 @@
         </mat-menu>  -->
 
         <span class="flex-spacer"></span>
-        <button mat-stroked-button (click) = "Login()" class="but-title" >
+        <!--<mat-icon *ngIf="(isAuth$ | async)" >account_circle</mat-icon>
+
+        <button mat-stroked-button (click) = "Login()" class="but-title" > -->
              <!-- [routerLink]="['Login']" -->
              <!-- (click) = "Login()"  -->
-            {{ (isAuthButCaption$| async) }}  
-        </button>
+            <!-- {{ (isAuthButCaption$| async) }}  
+        </button>  -->
+
+        <button *ngIf="(isAuth$|async)" mat-icon-button [matMenuTriggerFor]="menuLogout" >
+                <mat-icon>account_circle</mat-icon>
+              </button>
+              <mat-menu #menuLogout="matMenu">
+                <button mat-menu-item (click) = "Login()" >
+                  <mat-icon>account_balance</mat-icon>
+                  <span>Выйти</span>
+                </button>
+              </mat-menu> 
+
+        <button *ngIf="!( isAuth$ | async)" mat-icon-button [matMenuTriggerFor]="menuLogin" >
+                <mat-icon>perm_identity</mat-icon>
+              </button>
+              <mat-menu #menuLogin="matMenu">
+                <button mat-menu-item (click) = "Login()" >
+                  <mat-icon>account_balance</mat-icon>
+                  <span>Nvavia</span>
+                </button>
+                <button mat-menu-item (click) = "Login('GOOGLE')">
+                  <mat-icon>language</mat-icon>
+                  <span>Google +</span>
+                </button>
+              </mat-menu> 
 
     </mat-toolbar >
 </nav>

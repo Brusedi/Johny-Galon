@@ -32,12 +32,30 @@ export const selEnvAuthCode = createSelector(
 export const selEnvAuthHeader = createSelector(
      environmentStore,
      (x:State) => x&&x.authenticated 
-        ? ( x.authgData && x.authgData.authToken 
+        ? x.authgData && x.authgData.idToken
+            ? AUTH_HEADER_TOKEN_PREFIX +" "+ x.authgData.idToken
+            : x.authgData && x.authgData.authToken 
                 ? AUTH_HEADER_TOKEN_PREFIX +" "+ x.authgData.authToken 
-                : ( x.authgData && x.authgData.authCode 
+                : x.authgData && x.authgData.authCode 
                     ? AUTH_HEADER_CODE_PREFIX +" "+ x.authgData.authCode 
                     :undefined
-                )  
-        ) 
         : undefined 
+);
+
+/**
+ *  Select Authentificate Tag
+ */
+export const selEnvAuthTag = createSelector(
+    environmentStore,
+    (x:State) => x && x.authgData && x.authgData.request && x.authgData.request.tag 
+                    ? x.authgData.request.tag 
+                    : undefined
 ); 
+
+/**
+*  Authentificate Tag is ...
+*/
+export const authIsTag = ( tag: string ) => createSelector(
+    selEnvAuthTag,
+    (x) => !!(x && x == tag) 
+);

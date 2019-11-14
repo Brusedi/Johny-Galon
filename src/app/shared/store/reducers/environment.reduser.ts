@@ -2,19 +2,18 @@ import { EnvironmentAction, EnvironmentActionTypes } from "@appStore/actions/env
 
 // 
 //
-//
-// 
-// 
 
 export interface authingReqData {
     fromError:string; 
-    fromSource:string; 
+    fromSource:string;
+    tag:string;  
 }
 
 export interface authingData {
     request:authingReqData;
     authCode:string;        
-    authToken:string;      
+    authToken:string;    
+    idToken:string;    
     authTokenRequesting:boolean;
 }
 
@@ -59,14 +58,14 @@ export function reducer(state :State  = initialState, action: EnvironmentAction)
             return { ...state ,  logoutind:true } ;    
         } 
 
-        // case EnvironmentActionTypes.AUTH_SUCCESS:{      
-        //     //console.log(action.payload);
-        //     return { ...state ,  authenticating:false,  authenticated:false , logoutind:false,  authgData: null  } ;    
-        // } 
+        case EnvironmentActionTypes.AUTH_LOGOUT_SUCCESS:{      
+             //console.log(action.payload);
+             return { ...state ,  authenticating:false,  authenticated:false , logoutind:false,  authgData: null  } ;    
+        } 
 
         case EnvironmentActionTypes.AUTH_TOKEN_RECIVED:{      
             //console.log(action.payload);
-            return { ...state ,  authgData:  { ...state.authgData, authTokenRequesting:false, authToken: action.payload}   } ;    
+            return { ...state ,  authgData:  { ...state.authgData, authTokenRequesting:false, authToken: action.authToken, idToken: action.idToken }   } ;    
         } 
 
         default:

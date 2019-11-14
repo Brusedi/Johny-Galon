@@ -95,7 +95,7 @@ export class DataProvService {
     take(1),
     tap(console.log),
     map(this.buildOption),
-    tap(console.log) ,
+    //tap(console.log) ,
     mergeMap( x => this.http.get(uri,x).pipe(map(rsp => rsp.text()))));        
 
   

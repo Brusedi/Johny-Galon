@@ -17,16 +17,23 @@ import * as fromStore from '@appStore/index';
 import { Http,  RequestOptions , Headers} from '@angular/http';
 import { AppSettingsService } from './app-setting.service';
 import { map, mergeMap, tap, take, combineLatest, takeLast, filter  } from 'rxjs/operators';
-import { CodeNode } from 'source-list-map';
-import { HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { of, timer } from 'rxjs';
+import { of, timer, Observable } from 'rxjs';
 import * as fromSelectors from '@appStore/selectors/index';
-import { AuthSuccess, ErrorEnvironment, AuthTokenReceived } from '@appStore/actions/environment.actions';
+import { AuthSuccess, ErrorEnvironment, AuthTokenReceived, AuthLogoutSucess } from '@appStore/actions/environment.actions';
+
+export const TAG_NVA                   = "ADFS"
+export const TAG_GOOGLE                = "GOOGLE"
+
 
 const A_PAR_RESPONSE_TYPE       =  "code" ;   
 const A_PAR_RESPONSE_GRANT_TYPE =  "authorization_code" ; 
+
 const A_ACCES_TOKEN_KEY         =  "access_token";
+const A_ID_TOKEN_KEY            =  "id_token";
+
+const A_PAR_WA                  =  "wsignout1.0" ;
+
 
 //kill
 //const A_PAR_RES           =  "https://sqlback-win12.nvavia.ru/FsCsweb" ;
@@ -53,36 +60,98 @@ export class AuthService {
       ) {  }
 
 
-    //071119   
-    //Clear release method ////////////////////////////////////////////////////////////////////////////  
+    // 071119   
+    //Clear release method //////////////////////////////////////////////////////////////////////////// 
+    
     /*
-    * Build parameters for Login on ADFS (OAuth2)
-    */  
-    private  LoginFS3RequestParams$ =   
-        of(this.window.location.href).pipe(
-            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
-            map( x =>  new  URLSearchParams([
-                         ["response_type",A_PAR_RESPONSE_TYPE],
-                         ["client_id"    ,x.setting.auth2ClientId],
-                         ["resource"     ,x.setting.auth2resource],
-                         ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]]))  
-        )
+    * Login to ..
+    * return action for dispatching  
+    */ 
+    public  Login = (timeOutSec:number) =>
+        this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe(
+            tap(x=>console.log('e1')),
+            mergeMap( x => x ? this.LoginGoogle$(timeOutSec) : this.LoginFS3$(timeOutSec)  ),
+            tap( x => console.log(x) )
+        );    
+    
 
-    /*
-    * Build Login URI with parameters on ADFS (OAuth2)
-    */      
-    private LoginFS3RequestUri$ = 
-        this.LoginFS3RequestParams$.pipe(        
-            combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint + '?' + pars.toString() )
-        )     
-            
-   
+
+
     /*
     * Login to ADFS 3.0 (OAuth2) and wait responce
     * return action for dispatching  
     */ 
     public LoginFS3$(timeOutSec:number){
+        const uriAndParams$ =  of(this.window.location.href).pipe(
+            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
+            map( x =>  new  URLSearchParams([
+                ["response_type",A_PAR_RESPONSE_TYPE],
+                ["client_id"    ,x.setting.auth2ClientId],
+                ["resource"     ,x.setting.auth2resource],
+                ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]])) , 
+                combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint + '?' + pars.toString() )                               
+        );
+        return this.loginProcess$( uriAndParams$, timeOutSec  ) ;
+    }        
 
+    /*
+    * Login to Google+
+    * return action for dispatching  
+    */ 
+    public LoginGoogle$(timeOutSec:number){
+        const uriAndParams$ =  of(this.window.location.href).pipe(
+            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
+            map( x =>  new  URLSearchParams([
+                        ["response_type",A_PAR_RESPONSE_TYPE    ],
+                        ["client_id"    ,x.setting.auth2ClientId_Google],
+                        ["scope"        ,x.setting.auth2Scope_Google],
+                        ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]])),  
+            combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint_Google + '?' + pars.toString() )                                
+        );
+        return this.loginProcess$( uriAndParams$, timeOutSec  ) ;
+    }
+    //------------------------------------------------------------
+    //request token     
+
+    public authToken$() {
+        const pars$ = this.store.select( fromSelectors.selEnvAuthCode ).pipe(
+            combineLatest( this.settings.getSettings()   , (aCode,s) => ({ code:aCode , setting :s }) ),
+            combineLatest( of(this.window.location.href) , (x ,loc) =>  ({...x , myLoc:loc })),
+            combineLatest( this.store.select( fromSelectors.selEnvAuthTag ) , (x , tag) =>  ({...x , tag: tag ? tag :TAG_NVA  })),
+            map( x =>  new  URLSearchParams([
+                ["grant_type"   ,A_PAR_RESPONSE_GRANT_TYPE ],
+                ["client_id"    ,x.tag==TAG_GOOGLE ? x.setting.auth2ClientId_Google : x.setting.auth2ClientId],
+                ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix],
+                ["code"         ,x.code],
+                ["tag"          ,x.tag ]]))  
+        )
+
+        const myHeaders = new Headers();
+        myHeaders.append('Content-Type', 'application/x-www-form-urlencoded') ;
+        const myOption = new RequestOptions(  {headers:myHeaders } )   
+
+        return pars$.pipe(
+            combineLatest( this.settings.getSettings(), ( x, y ) => ({ bodyPars:x , uri: ( y.svcFasadeUri +'/' + y.auth2RequestTokenSuffix) }) ),
+            mergeMap( x => this.http.post( x.uri, x.bodyPars.toString() , myOption )),
+            map(x =>  x.text()),
+            map(x  => x.trim()===""? {}: JSON.parse(x) ),
+            map(x => x && ( x.hasOwnProperty(A_ACCES_TOKEN_KEY) || x.hasOwnProperty(A_ID_TOKEN_KEY ))
+                        ?  new AuthTokenReceived(  
+                                x.hasOwnProperty(A_ACCES_TOKEN_KEY) ? x[A_ACCES_TOKEN_KEY]  : undefined ,  
+                                x.hasOwnProperty(A_ID_TOKEN_KEY)    ? x[A_ID_TOKEN_KEY]     : undefined 
+                            )
+                        :  new  ErrorEnvironment("Не смог получить JWT")   )
+        )
+    }          
+
+
+
+    
+    /*
+    * Proccess code request
+    */  
+    private loginProcess$( uri$ :Observable<string>  , timeOutSec:number) {
+        // try-catch wraps
         const isHerfReadingAndstartsWith = ( w:Window, herf:string ) => { try { return w.location.href.startsWith(herf) } catch (e) { return false } }
         const isHerfReadingAndClosed  = ( w:Window) => { try { return w.closed } catch (e) { return false } }
 
@@ -97,8 +166,10 @@ export class AuthService {
             closeIf(w) ;                           
             return retAct;
         }       
+
         return of(this.window).pipe(
-            combineLatest( this.LoginFS3RequestUri$ , (w,u)=> ({ 
+            tap(x=>console.log('eeeeeeeeeee')),
+            combineLatest( uri$ , (w,u)=> ({ 
                 popup: w.open( u, 'hoy' , "width=400,height=400" ), 
                 myLoc: w.location.href
             })),
@@ -108,10 +179,96 @@ export class AuthService {
             filter(  x => ! x.popup || isHerfReadingAndClosed(x.popup) || isHerfReadingAndstartsWith(x.popup, x.myLoc) ), 
             take(1),
             map( x => parseLoginResult(x.popup, x.myLoc)  )
-        )      
-    }
+        );    
+    }     
+
+
+
+
+    // /*
+    // * Build parameters for Login on ADFS (OAuth2)
+    // */  
+    // private  LoginFS3RequestParams$ =   
+    //     of(this.window.location.href).pipe(
+    //         combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
+    //         map( x =>  new  URLSearchParams([
+    //                      ["response_type",A_PAR_RESPONSE_TYPE],
+    //                      ["client_id"    ,x.setting.auth2ClientId],
+    //                      ["resource"     ,x.setting.auth2resource],
+    //                      ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]]))  
+    //     )
+
+    // /*
+    // * Build Login URI with parameters on ADFS (OAuth2)
+    // */      
+    // private LoginFS3RequestUri$ = 
+    //     this.LoginFS3RequestParams$.pipe(        
+    //         combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint + '?' + pars.toString() )
+    //     )     
+            
+   
+    // /*
+    // * Login to ADFS 3.0 (OAuth2) and wait responce
+    // * return action for dispatching  
+    // */ 
+    // public LoginFS3Old$(timeOutSec:number){
+
+    //     const isHerfReadingAndstartsWith = ( w:Window, herf:string ) => { try { return w.location.href.startsWith(herf) } catch (e) { return false } }
+    //     const isHerfReadingAndClosed  = ( w:Window) => { try { return w.closed } catch (e) { return false } }
+
+    //     const parseLoginResult = (w:Window, herf:string ) =>{
+    //         const rPar = ( url:string, par:string ) =>   new URL(url).searchParams.get(par) ;   
+    //         const closeIf =  ( x:Window) => { try { x.close() ; return true } catch (e) { return false ; } }
+    //         var retAct = isHerfReadingAndstartsWith(w,herf) 
+    //             ?  rPar( w.location.href ,'code') 
+    //                 ? new AuthSuccess( rPar( w.location.href ,'code') )  
+    //                 : new ErrorEnvironment(  rPar( w.location.href ,'error') ? rPar( w.location.href ,'error'): "Unknown error" )
+    //             : new ErrorEnvironment( "Unknown error" )
+    //         closeIf(w) ;                           
+    //         return retAct;
+    //     }       
+    //     return of(this.window).pipe(
+    //         combineLatest( this.LoginFS3RequestUri$ , (w,u)=> ({ 
+    //             popup: w.open( u, 'hoy' , "width=400,height=400" ), 
+    //             myLoc: w.location.href
+    //         })),
+    //         combineLatest( timer (1000, 1000) , (x,y) => x ), 
+    //         take(timeOutSec) ,                                              // timeout sec
+    //         //tap(console.log),
+    //         filter(  x => ! x.popup || isHerfReadingAndClosed(x.popup) || isHerfReadingAndstartsWith(x.popup, x.myLoc) ), 
+    //         take(1),
+    //         map( x => parseLoginResult(x.popup, x.myLoc)  )
+    //     )      
+    // }
+    
          
-    /// request auth token from backend proxy  -----------------------------
+     /*
+    * Logout to ADFS 3.0 (OAuth2) and wait responce
+    * return action for dispatching  
+    */ 
+    public LogoutFS3$(timeOutSec:number){    
+        const uri$ =  of(this.window.location.href).pipe(
+            combineLatest(this.settings.getSettings() , (l,s) => ({ 
+                    set:s,
+                    pars: new  URLSearchParams([    
+                        ["wa"       ,   A_PAR_WA],
+                        ["wtrealm"  ,   l ],
+                        ["wreply"   ,   l+s.auth2LoginRedirectSuffix] ] )
+                    })
+            ),
+            map( x => x.set.auth2LogoutEndPoint + '?' + x.pars.toString())  
+        ); 
+
+        //const isHerfReadingAndClosed  = ( w:Window) => { try { return w.closed } catch (e) { return false } }
+
+        return of(this.window).pipe(
+           combineLatest( uri$ , (w,uri) => w.open( uri, 'hoy' , "width=400,height=400" )),
+           //combineLatest( timer (1000, 1000) , (x,y) => x ), 
+           //take(timeOutSec)
+           //tap(console.log),
+           map( x => new AuthLogoutSucess() )
+        )    
+    }    
 
     /*
     * Build parameters for request JWT token from bakend proxy 
@@ -124,7 +281,7 @@ export class AuthService {
                 ["grant_type"   ,A_PAR_RESPONSE_GRANT_TYPE ],
                 ["client_id"    ,x.setting.auth2ClientId],
                 ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix],
-                ["code"         ,x.code]]))  
+                ["code"         ,x.code] ]))  
         )
                 
 
@@ -132,23 +289,24 @@ export class AuthService {
     * Request JWT token from bakend proxy
     * return action for dispatching  
     */ 
-    public authTokenRequest$() {
+    // public authTokenRequest$() {
 
-        const myHeaders = new Headers();
-        myHeaders.append('Content-Type', 'application/x-www-form-urlencoded') ;
-        const myOption = new RequestOptions(  {headers:myHeaders } )   
+    //     const myHeaders = new Headers();
+    //     myHeaders.append('Content-Type', 'application/x-www-form-urlencoded') ;
+    //     const myOption = new RequestOptions(  {headers:myHeaders } )   
 
-        return this.authTokenRequestParams$.pipe(
-            combineLatest( this.settings.getSettings(), ( x, y ) => ({ bodyPars:x , uri: ( y.svcFasadeUri +'/' + y.auth2RequestTokenSuffix) }) ),
-            mergeMap( x => this.http.post( x.uri, x.bodyPars.toString() , myOption )),
-            map(x =>  x.text()),
-            map(x  => x.trim()===""? {}: JSON.parse(x) ),
-            map(x => x && x.hasOwnProperty(A_ACCES_TOKEN_KEY) ? new AuthTokenReceived(x[A_ACCES_TOKEN_KEY]) : new  ErrorEnvironment("Не смог получить JWT")   )
-        )
-    }          
+    //     return this.authTokenRequestParams$.pipe(
+    //         combineLatest( this.settings.getSettings(), ( x, y ) => ({ bodyPars:x , uri: ( y.svcFasadeUri +'/' + y.auth2RequestTokenSuffix) }) ),
+    //         mergeMap( x => this.http.post( x.uri, x.bodyPars.toString() , myOption )),
+    //         map(x =>  x.text()),
+    //         map(x  => x.trim()===""? {}: JSON.parse(x) ),
+    //         map(x => x && x.hasOwnProperty(A_ACCES_TOKEN_KEY) ? new AuthTokenReceived(x[A_ACCES_TOKEN_KEY]) : new  ErrorEnvironment("Не смог получить JWT")   )
+    //     )
+    // }          
+
+    /// logout  -----------------------------
 
 
- 
     ///////////////////////////////////////////////////////////////////////////////////////////////////  
     // public FsLogin = () =>
     //     of(this.window).pipe(

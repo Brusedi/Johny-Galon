@@ -24,7 +24,7 @@ export class AuthStart implements Action {
 
 export class AuthTokenReceived implements Action {
     readonly type = EnvironmentActionTypes.AUTH_TOKEN_RECIVED
-    constructor(public payload: string) {}
+    constructor(public authToken: string ,  public idToken: string) {}
 }  
 
 export class AuthSuccess implements Action {
@@ -50,4 +50,5 @@ export type EnvironmentAction =
     | AuthLogout
     | AuthLogoutSucess
     | AuthTokenReceived
+    | AuthLogoutSucess
 ;

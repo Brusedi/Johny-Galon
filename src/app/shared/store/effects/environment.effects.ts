@@ -18,30 +18,29 @@ export class EnvironmentEffects {
      @Effect()  
     AuthHandler$ = this.actions$.pipe( 
          ofType(EnvironmentActionTypes.AUTH_START),
-         mergeMap( x => this.authService.LoginFS3$(300)),
+         //mergeMap( x => this.authService.LoginFS3$(300)),
+         mergeMap( x => this.authService.Login(300)),
          catchError(error => of(new ErrorEnvironment(error)))
          
      );
 
-    // @Effect()  
-    // AuthLogOut$ = this.actions$.pipe( 
-    //     ofType(EnvironmentActionTypes.AUTH_LOGOUT),
-    //     tap( x => console.log(x) ),
-    //     map( x => this.authService.getFSLogoutUri().subscribe(x=>console.log(x))),
-    //     map( x => new ErrorEnvironment('q') )    
-    // );
+    @Effect()  
+    AuthLogOut$ = this.actions$.pipe( 
+        ofType(EnvironmentActionTypes.AUTH_LOGOUT),
+        //tap( x => console.log(x) ),
+        mergeMap( x => this.authService.LogoutFS3$(0)),
+        catchError(error => of(new ErrorEnvironment(error)))
+        //map( x => this.authService.getFSLogoutUri().subscribe(x=>console.log(x))),
+        
+    );
 
     // Request JWT Token from special Backend Auth Service
     @Effect()  
     AuthLogIn$ = this.actions$.pipe( 
         ofType(EnvironmentActionTypes.AUTH_SUCCESS),
-        mergeMap( x => this.authService.authTokenRequest$()),
+        mergeMap( x => this.authService.authToken$()),
+        //mergeMap( x => this.authService.authTokenRequest$()),
         catchError(error => of(new ErrorEnvironment(error)))
-        //tap( x => console.log(x) ),
-        //mergeMap( x => this.authService.authTokenRequest() ),
-        // tap( x => console.log(x)),
-        //map( x =>  new AuthTokenReceived(x)),
-        
     );
 
 }  
