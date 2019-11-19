@@ -27,8 +27,8 @@ export class EnvironmentEffects {
     @Effect()  
     AuthLogOut$ = this.actions$.pipe( 
         ofType(EnvironmentActionTypes.AUTH_LOGOUT),
-        //tap( x => console.log(x) ),
-        mergeMap( x => this.authService.LogoutFS3$(0)),
+        tap( x => console.log(x) ),
+        mergeMap( x => this.authService.Logout(0)),
         catchError(error => of(new ErrorEnvironment(error)))
         //map( x => this.authService.getFSLogoutUri().subscribe(x=>console.log(x))),
         

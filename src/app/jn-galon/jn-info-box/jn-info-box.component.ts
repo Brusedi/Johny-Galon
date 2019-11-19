@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import * as fromSelectors from '@appStore/selectors/index';
 import * as fromStore from '@appStore/index';
-import { map, filter, tap } from 'rxjs/operators';
+import { map, filter, tap , merge } from 'rxjs/operators';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { BackICommonError } from '@appModels/any-entity';
 import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
@@ -30,9 +30,15 @@ export class JnInfoBoxComponent implements OnInit {
 
   ngOnInit() {
     console.log('eeee');
-    this.error$ = this.store.select(  fromSelectors.selCurError()).pipe( 
-       tap(x=>x)
+
+    this.error$ =  this.store.select(  fromSelectors.selCurError()).pipe( 
+       merge( this.store.select(  fromSelectors.selEnvError )  ),                 //Add env stream
+       
+       tap(x=>x),
+       tap(console.log)
     );
+
+    
 
     //this.error$.subscribe(x=>console.log(x)); 
     this.error$.pipe(filter( x => !!x)).subscribe(x=>this.onErrorDialog(x)); 

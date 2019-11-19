@@ -37,17 +37,41 @@
             <!-- {{ (isAuthButCaption$| async) }}  
         </button>  -->
 
-        <button *ngIf="(isAuth$|async)" mat-icon-button [matMenuTriggerFor]="menuLogout" >
-                <mat-icon>account_circle</mat-icon>
+
+        <!-- <div mat-card-avatar style=" background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg')"  class="example-header-image"></div>
+        <div mat-card-avatar style=" background-image: url(' https://lh3.googleusercontent.com/a-/AAuE7mB1HZZ0MueTBNacG6E3W78Zk_2Lkexs92TXDEa8=s96-c')"  class="example-header-image"></div>
+        <div  mat-card-avatar [style.background-image] = "'url('+(loginPicUri$|async)+')'" class="example-header-image" > </div>  -->
+
+        
+
+        <!-- <div mat-card-avatar [style.background-image] = "https://lh3.googleusercontent.com/a-/AAuE7mB1HZZ0MueTBNacG6E3W78Zk_2Lkexs92TXDEa8=s96-c"  class="example-header-image"></div>
+        
+        <div mat-card-avatar  class="example-header-image"> -->
+          
+          
+        
+       
+        <!-- <div [ngStyle]="{'background-image': 'url(https://lh3.googleusercontent.com/a-/AAuE7mB1HZZ0MueTBNacG6E3W78Zk_2Lkexs92TXDEa8=s96-c)'}"></div> -->
+        
+       
+              
+        <button *ngIf="(isAuth$|async)"  matTooltip="{{ loginName$|async}}" mat-icon-button [matMenuTriggerFor]="menuLogout" >
+          
+                <div *ngIf="(loginPicUri$|async)"  mat-card-avatar [style.background-image] = "'url('+(loginPicUri$|async)+')'" class="example-header-image" > </div>
+                <mat-icon *ngIf="!(loginPicUri$|async)" >account_circle</mat-icon>  
+                
               </button>
               <mat-menu #menuLogout="matMenu">
-                <button mat-menu-item (click) = "Login()" >
-                  <mat-icon>account_balance</mat-icon>
+                <button mat-menu-item   (click) = "Login()" >
+
+                  
+
+                   <mat-icon >account_balance</mat-icon> 
                   <span>Выйти</span>
                 </button>
               </mat-menu> 
 
-        <button *ngIf="!( isAuth$ | async)" mat-icon-button [matMenuTriggerFor]="menuLogin" >
+        <button  matTooltip="Войти"  *ngIf="!( isAuth$ | async)" mat-icon-button [matMenuTriggerFor]="menuLogin" >
                 <mat-icon>perm_identity</mat-icon>
               </button>
               <mat-menu #menuLogin="matMenu">
@@ -63,7 +87,8 @@
 
     </mat-toolbar >
 </nav>
-    
+
+
 <!-- <app-jn-busy-box></app-jn-busy-box> -->
 
 <main class="jn-content jg-layout"> 

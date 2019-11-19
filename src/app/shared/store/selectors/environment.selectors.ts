@@ -43,6 +43,42 @@ export const selEnvAuthHeader = createSelector(
 );
 
 /**
+ *  Select JWT Body BASE 64
+ */
+export const selEnvAuthHeaderBodyB64 = createSelector(
+    selEnvAuthHeader,
+    x => !x ? undefined
+            : x.split('.')[1] 
+)
+
+/**
+ *  Select  Select JWT Body
+ */
+export const selEnvAuthHeaderBody = createSelector(
+    selEnvAuthHeaderBodyB64,
+    x => { try{ return JSON.parse( decodeURIComponent(escape(window.atob( x ))));} catch{ return undefined; } }
+)        
+
+/**
+ *  Select  Select JWT Body
+ */
+export const selEnvAuthHeaderName = createSelector(
+     selEnvAuthHeaderBody,
+     x => x && x["name"] 
+        ? x["name"] 
+        : x && x["email"] ? x["email"] :undefined
+)        
+
+/**
+ *  Select  Select JWT Body
+ */
+export const selEnvAuthHeaderPicUri = createSelector(
+    selEnvAuthHeaderBody,
+    x => x && x["picture"] ? x["picture"] : undefined
+)        
+
+
+/**
  *  Select Authentificate Tag
  */
 export const selEnvAuthTag = createSelector(
@@ -59,3 +95,5 @@ export const authIsTag = ( tag: string ) => createSelector(
     selEnvAuthTag,
     (x) => !!(x && x == tag) 
 );
+
+

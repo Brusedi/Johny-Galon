@@ -34,6 +34,9 @@ const A_ID_TOKEN_KEY            =  "id_token";
 
 const A_PAR_WA                  =  "wsignout1.0" ;
 
+const POPUP_WIN_PARS            =  "location=no,width=600,height=600,scrollbars=yes,top=100,left=700,resizable = no";
+const POPUP_WIN_NAME            =  "LoginPopUp";
+
 
 //kill
 //const A_PAR_RES           =  "https://sqlback-win12.nvavia.ru/FsCsweb" ;
@@ -51,13 +54,17 @@ const A_PAR_WA                  =  "wsignout1.0" ;
 })
 export class AuthService {
 
-      constructor(
+    private myLocation: string ; 
+
+    constructor(
         private store: Store<fromStore.State>,
         private http: Http,
         private settings: AppSettingsService,
         private router:Router,
         @Inject("windowObject") private  window: Window
-      ) {  }
+      ) {  
+            this.myLocation = window.location.origin+'/' ; 
+      }
 
 
     // 071119   
@@ -69,71 +76,37 @@ export class AuthService {
     */ 
     public  Login = (timeOutSec:number) =>
         this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe(
-            tap(x=>console.log('e1')),
-            mergeMap( x => x ? this.LoginGoogle$(timeOutSec) : this.LoginFS3$(timeOutSec)  ),
-            tap( x => console.log(x) )
+            take(1),
+            mergeMap( x => x ? this.LoginGoogle$(timeOutSec) : this.LoginFS3$(timeOutSec)  )
         );    
+
     
-
-
-
     /*
-    * Login to ADFS 3.0 (OAuth2) and wait responce
+    * Request Auth token after auth-code request from back (ADFS AND GOOGLE) 
     * return action for dispatching  
     */ 
-    public LoginFS3$(timeOutSec:number){
-        const uriAndParams$ =  of(this.window.location.href).pipe(
-            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
-            map( x =>  new  URLSearchParams([
-                ["response_type",A_PAR_RESPONSE_TYPE],
-                ["client_id"    ,x.setting.auth2ClientId],
-                ["resource"     ,x.setting.auth2resource],
-                ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]])) , 
-                combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint + '?' + pars.toString() )                               
-        );
-        return this.loginProcess$( uriAndParams$, timeOutSec  ) ;
-    }        
-
-    /*
-    * Login to Google+
-    * return action for dispatching  
-    */ 
-    public LoginGoogle$(timeOutSec:number){
-        const uriAndParams$ =  of(this.window.location.href).pipe(
-            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
-            map( x =>  new  URLSearchParams([
-                        ["response_type",A_PAR_RESPONSE_TYPE    ],
-                        ["client_id"    ,x.setting.auth2ClientId_Google],
-                        ["scope"        ,x.setting.auth2Scope_Google],
-                        ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]])),  
-            combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint_Google + '?' + pars.toString() )                                
-        );
-        return this.loginProcess$( uriAndParams$, timeOutSec  ) ;
-    }
-    //------------------------------------------------------------
-    //request token     
-
     public authToken$() {
         const pars$ = this.store.select( fromSelectors.selEnvAuthCode ).pipe(
             combineLatest( this.settings.getSettings()   , (aCode,s) => ({ code:aCode , setting :s }) ),
-            combineLatest( of(this.window.location.href) , (x ,loc) =>  ({...x , myLoc:loc })),
+            combineLatest( of(this.myLocation) , (x ,loc) =>  ({...x , myLoc:loc })),
             combineLatest( this.store.select( fromSelectors.selEnvAuthTag ) , (x , tag) =>  ({...x , tag: tag ? tag :TAG_NVA  })),
             map( x =>  new  URLSearchParams([
                 ["grant_type"   ,A_PAR_RESPONSE_GRANT_TYPE ],
                 ["client_id"    ,x.tag==TAG_GOOGLE ? x.setting.auth2ClientId_Google : x.setting.auth2ClientId],
                 ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix],
                 ["code"         ,x.code],
-                ["tag"          ,x.tag ]]))  
+                ["tag"          ,x.tag ]])),  
+            take(1)                
         )
 
         const myHeaders = new Headers();
         myHeaders.append('Content-Type', 'application/x-www-form-urlencoded') ;
         const myOption = new RequestOptions(  {headers:myHeaders } )   
-
+        
         return pars$.pipe(
             combineLatest( this.settings.getSettings(), ( x, y ) => ({ bodyPars:x , uri: ( y.svcFasadeUri +'/' + y.auth2RequestTokenSuffix) }) ),
             mergeMap( x => this.http.post( x.uri, x.bodyPars.toString() , myOption )),
-            map(x =>  x.text()),
+            map(x => x.text()),
             map(x  => x.trim()===""? {}: JSON.parse(x) ),
             map(x => x && ( x.hasOwnProperty(A_ACCES_TOKEN_KEY) || x.hasOwnProperty(A_ID_TOKEN_KEY ))
                         ?  new AuthTokenReceived(  
@@ -144,11 +117,107 @@ export class AuthService {
         )
     }          
 
-
-
-    
     /*
-    * Proccess code request
+    * Login to ..
+    * return action for dispatching  
+    */ 
+    public  Logout = (timeOutSec:number) => 
+        this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe(
+            take(1),
+            //tap(x => console.log( ' ig G ' + x  )),
+            //mergeMap( x => x ? this.LogoutGoogleUri$() : this.LogoutFS3Uri$()  ),
+            mergeMap( x => x ? of(new AuthLogoutSucess()) : this.LogoutProcess$( this.LogoutFS3Uri$(), timeOutSec ) )
+        );
+        //loUri$.subscribe(console.log);            
+        //return this.LogoutProcess$( loUri$, timeOutSec );
+    
+
+    /* 
+    * get uri with pars Logout from ADFS 3.0 (OAuth2) and wait responce
+    * return action for dispatching  
+    */ 
+    private LogoutFS3Uri$ = () =>     
+        of(this.myLocation).pipe(
+            combineLatest(this.settings.getSettings() , (l,s) => ({ 
+                set:s,
+                pars: (new  URLSearchParams([    
+                    ["wa"       ,   A_PAR_WA],
+                    ["wtrealm"  ,   l ],
+                    ["wreply"   ,   l+s.auth2LoginRedirectSuffix] ] ))
+                })
+            ),
+            map( x => x.set.auth2LogoutEndPoint + '?' + x.pars.toString()) , 
+            take(1),
+            tap(console.log),
+        );     
+
+    /* 
+    * get uri with pars Logout from ADFS 3.0 (OAuth2) and wait responce
+    * return action for dispatching  
+    */ 
+    private LogoutGoogleUri$ = () =>    
+        this.settings.getSettings().pipe(
+            map(x=>x.auth2LogoutEndPoint_Google)                
+        );       
+
+    /* 
+    * Logout process
+    * return action for dispatching  
+    */ 
+    private LogoutProcess$ ( uri$:Observable<string>, timeOutSec:number) {
+        const closeIf =  ( x:Window) => { try { x.close() ; return true } catch (e) { return false ; } };
+        return of(this.window).pipe(
+            combineLatest( uri$ , (w,uri) => w.open( uri, POPUP_WIN_NAME , POPUP_WIN_PARS )),
+            //tap(x=>console.log('wwww')),
+            combineLatest( timer (1000, 1000) , (x,y) => x ),
+            take(1),
+            //take(timeOutSec?1:timeOutSec),
+            tap( closeIf ),
+            //tap(x=>console.log('wwwww')),
+            map( x => new AuthLogoutSucess() )
+        );                    
+    }        
+
+    /*
+    * Login to ADFS 3.0 (OAuth2) and wait responce
+    * return action for dispatching  
+    */ 
+    private LoginFS3$(timeOutSec:number){
+        const uriAndParams$ =  of(this.myLocation).pipe(
+            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
+            map( x =>  new  URLSearchParams([
+                ["response_type",A_PAR_RESPONSE_TYPE],
+                ["client_id"    ,x.setting.auth2ClientId],
+                ["resource"     ,x.setting.auth2resource],
+                ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]])) , 
+                combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint + '?' + pars.toString() )                               
+        );
+        //console.log('call FS !');        
+        return this.loginProcess$( uriAndParams$, timeOutSec  ) ;
+    }        
+
+    /*
+    * Login to Google+
+    * return action for dispatching  
+    */ 
+    private LoginGoogle$(timeOutSec:number){
+        //const uriAndParams$ =  of(this.myLocation).pipe(
+        const uriAndParams$ =  of(this.window.location.origin+'/').pipe(
+            tap(console.log),
+            combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
+            map( x =>  new  URLSearchParams([
+                        ["response_type",A_PAR_RESPONSE_TYPE    ],
+                        ["client_id"    ,x.setting.auth2ClientId_Google],
+                        ["scope"        ,x.setting.auth2Scope_Google],
+                        ["redirect_uri" ,x.myLoc+x.setting.auth2LoginRedirectSuffix]])),  
+            combineLatest( this.settings.getSettings() , (pars,st) => st.auth2AuthEndPoint_Google + '?' + pars.toString() )                                
+        );
+        //console.log('call G !');
+        return this.loginProcess$( uriAndParams$, timeOutSec  ) ;
+    }
+
+    /*
+    * Proccess auth-code request
     */  
     private loginProcess$( uri$ :Observable<string>  , timeOutSec:number) {
         // try-catch wraps
@@ -166,11 +235,11 @@ export class AuthService {
             closeIf(w) ;                           
             return retAct;
         }       
-
+        //console.log('call!');
         return of(this.window).pipe(
-            tap(x=>console.log('eeeeeeeeeee')),
+            //tap(x=>console.log("lg"+x)),    
             combineLatest( uri$ , (w,u)=> ({ 
-                popup: w.open( u, 'hoy' , "width=400,height=400" ), 
+                popup: w.open( u, POPUP_WIN_NAME , POPUP_WIN_PARS ), 
                 myLoc: w.location.href
             })),
             combineLatest( timer (1000, 1000) , (x,y) => x ), 
@@ -183,7 +252,33 @@ export class AuthService {
     }     
 
 
+    /* 
+    * Logout to ADFS 3.0 (OAuth2) and wait responce
+    * return action for dispatching  
+    */ 
+    // public LogoutFS3$(timeOutSec:number){    
+    //     const uri$ =  of(this.window.location.href).pipe(
+    //         combineLatest(this.settings.getSettings() , (l,s) => ({ 
+    //                 set:s,
+    //                 pars: new  URLSearchParams([    
+    //                     ["wa"       ,   A_PAR_WA],
+    //                     ["wtrealm"  ,   l ],
+    //                     ["wreply"   ,   l+s.auth2LoginRedirectSuffix] ] )
+    //                 })
+    //         ),
+    //         map( x => x.set.auth2LogoutEndPoint + '?' + x.pars.toString())  
+    //     ); 
 
+    //     //const isHerfReadingAndClosed  = ( w:Window) => { try { return w.closed } catch (e) { return false } }
+
+    //     return of(this.window).pipe(
+    //        combineLatest( uri$ , (w,uri) => w.open( uri, POPUP_WIN_NAME , POPUP_WIN_PARS )),
+    //        //combineLatest( timer (1000, 1000) , (x,y) => x ), 
+    //        //take(timeOutSec)
+    //        //tap(console.log),
+    //        map( x => new AuthLogoutSucess() )
+    //     )    
+    // }    
 
     // /*
     // * Build parameters for Login on ADFS (OAuth2)
@@ -242,33 +337,7 @@ export class AuthService {
     // }
     
          
-     /*
-    * Logout to ADFS 3.0 (OAuth2) and wait responce
-    * return action for dispatching  
-    */ 
-    public LogoutFS3$(timeOutSec:number){    
-        const uri$ =  of(this.window.location.href).pipe(
-            combineLatest(this.settings.getSettings() , (l,s) => ({ 
-                    set:s,
-                    pars: new  URLSearchParams([    
-                        ["wa"       ,   A_PAR_WA],
-                        ["wtrealm"  ,   l ],
-                        ["wreply"   ,   l+s.auth2LoginRedirectSuffix] ] )
-                    })
-            ),
-            map( x => x.set.auth2LogoutEndPoint + '?' + x.pars.toString())  
-        ); 
-
-        //const isHerfReadingAndClosed  = ( w:Window) => { try { return w.closed } catch (e) { return false } }
-
-        return of(this.window).pipe(
-           combineLatest( uri$ , (w,uri) => w.open( uri, 'hoy' , "width=400,height=400" )),
-           //combineLatest( timer (1000, 1000) , (x,y) => x ), 
-           //take(timeOutSec)
-           //tap(console.log),
-           map( x => new AuthLogoutSucess() )
-        )    
-    }    
+        
 
     /*
     * Build parameters for request JWT token from bakend proxy 
@@ -276,7 +345,7 @@ export class AuthService {
    private  authTokenRequestParams$ =   
         this.store.select( fromSelectors.selEnvAuthCode ).pipe(
             combineLatest( this.settings.getSettings()   , (aCode,s) => ({ code:aCode , setting :s }) ),
-            combineLatest( of(this.window.location.href) , (x ,loc) =>  ({...x , myLoc:loc })),
+            combineLatest( of(this.myLocation) , (x ,loc) =>  ({...x , myLoc:loc })),
             map( x =>  new  URLSearchParams([
                 ["grant_type"   ,A_PAR_RESPONSE_GRANT_TYPE ],
                 ["client_id"    ,x.setting.auth2ClientId],

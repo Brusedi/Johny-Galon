@@ -20,7 +20,8 @@ import {
   MatDatepickerModule,
   MatProgressSpinnerModule,
   MatIconModule,
-  MatDialogModule
+  MatDialogModule,
+  MatTooltipModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -138,6 +139,7 @@ const appRoutes: Routes = [
     MatIconModule,
     MatDialogModule,
     HttpClientModule,
+    MatTooltipModule
     
   ],
   providers: [
