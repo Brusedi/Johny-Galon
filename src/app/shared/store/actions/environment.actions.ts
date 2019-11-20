@@ -8,7 +8,8 @@ export enum EnvironmentActionTypes {
     AUTH_LOGOUT             = '[Environment] Authentication Log out begin',
     AUTH_LOGOUT_SUCCESS     = '[Environment] Authentication Log out success',
     AUTH_TOKEN_RECIVED      = '[Environment] Authentication token received',
-    ERROR_ENVIRONMENT       = '[Environment] Error'
+    ERROR_ENVIRONMENT       = '[Environment] Error',
+    ERROR_ENVIRONMENT_RESET = '[Environment] Error reset'
 }
 
 
@@ -42,6 +43,11 @@ export class AuthLogoutSucess implements Action {
         constructor() {}
 }  
 
+export class ErrorEnvironmentReset implements Action {
+    readonly type = EnvironmentActionTypes.ERROR_ENVIRONMENT_RESET
+    constructor() {}
+}  
+
 
 export type EnvironmentAction =
     | ErrorEnvironment
@@ -51,4 +57,5 @@ export type EnvironmentAction =
     | AuthLogoutSucess
     | AuthTokenReceived
     | AuthLogoutSucess
+    | ErrorEnvironmentReset
 ;

@@ -8,6 +8,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { BackICommonError } from '@appModels/any-entity';
 import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
 import { ErrorAnyEntityReset } from '@appStore/actions/any-entity.actions';
+import { ErrorEnvironment, ErrorEnvironmentReset } from '@appStore/actions/environment.actions';
 
 // export interface DialogData {
 //   animal: string;
@@ -22,32 +23,38 @@ import { ErrorAnyEntityReset } from '@appStore/actions/any-entity.actions';
 
 export class JnInfoBoxComponent implements OnInit {
 
-  public error$ : Observable<any>; 
+  public errorEntity$ : Observable<any>; 
+  public errorEnvironment$ : Observable<any>; 
 
   constructor(private store: Store<fromStore.State>, public dialog: MatDialog){
   
   }
 
   ngOnInit() {
-    console.log('eeee');
 
-    this.error$ =  this.store.select(  fromSelectors.selCurError()).pipe( 
-       merge( this.store.select(  fromSelectors.selEnvError )  ),                 //Add env stream
-       
-       tap(x=>x),
-       tap(console.log)
-    );
+     
+    this.errorEntity$ = this.store.select( fromSelectors.selCurError() ) ; 
+    this.errorEntity$.pipe(
+        filter( x => !!x)
+      ).subscribe(x=>this.onErrorDialog(x, new ExecCurrent( new ErrorAnyEntityReset() ))); 
 
-    
 
-    //this.error$.subscribe(x=>console.log(x)); 
-    this.error$.pipe(filter( x => !!x)).subscribe(x=>this.onErrorDialog(x)); 
+    this.errorEnvironment$ = this.store.select( fromSelectors.selEnvError)    ; 
+    this.errorEnvironment$.pipe( 
+        filter( x => !!x)
+      ).subscribe(x=>this.onErrorDialog(x, new ErrorEnvironmentReset())); 
+
   }
 
-  onErrorDialog(error){  //:BackICommonError
-    const prepErrM =(e) => (e.hasOwnProperty('Message') && e['Message']) ? e : ({...e , ...{ Message: e.toString() }});    
-    const prepErrN =(e) => (e.hasOwnProperty('Name') && e['Name']) ? e : ({...e , ...{ Name: 'Неизвестная Ошибка' }});    
-    const prepErr = (e) =>  e.hasOwnProperty('data') ? e : prepErrM(prepErrN(e));
+  onErrorDialog(error, resetDispatch  ){  //:BackICommonError
+
+    const prepErrM = (e) => (e.hasOwnProperty('Message') && e['Message']) ? e : ({...e , ...{ Message: e.toString() }});    
+    const prepErrN = (e) => (e.hasOwnProperty('Name') && e['Name']) ? e : ({...e , ...{ Name: 'Неизвестная Ошибка' }});    
+    const prepErr = (e) =>  e.hasOwnProperty('data') 
+                                ? e 
+                                : typeof e === 'string'
+                                    ? ({ Message: e, Name: 'Ошибка'  })   
+                                    : prepErrM( prepErrN(e) );
 
     const dialogRef = this.dialog.open(JnInfoBoxDialogComponent, {
       //height: '400px',
@@ -58,12 +65,14 @@ export class JnInfoBoxComponent implements OnInit {
     console.log( prepErr(error) );
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );
+      resetDispatch ? this.store.dispatch( resetDispatch ) : null ;
+      //this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );
 
     });
 
   }
 }
+
 
 @Component({
   selector:    'app-jn-info-box-dialog',

@@ -43,9 +43,9 @@ export class JnRootPageComponent implements OnInit {
       this.loginName$ = this.store.select(fromSelectors.selEnvAuthHeaderName );
       this.loginPicUri$ = this.store.select(fromSelectors.selEnvAuthHeaderPicUri );
       
-       this.store.select(  
-        fromSelectors.selEnvAuthHeaderName 
-         ).subscribe(x=>console.log(x));
+      //  this.store.select(  
+      //   fromSelectors.selEnvAuthHeaderName 
+      //    ).subscribe(x=>console.log(x));
       
       // this.store.select(  
       //     fromSelectors.selEnvAuthHeaderBody 
@@ -67,8 +67,7 @@ export class JnRootPageComponent implements OnInit {
     ).subscribe( 
         x=>!x  
           ? this.store.dispatch( new AuthStart( { fromError:null, fromSource:"login button", tag:serviceId })) 
-          : this.store.dispatch( new ErrorEnvironment("33333333333333333333333" )  )
-          //: this.store.dispatch( new AuthLogout( )  )
+          : this.store.dispatch( new AuthLogout( )  )
      );
     
   }

@@ -148,7 +148,7 @@ export class AuthService {
             ),
             map( x => x.set.auth2LogoutEndPoint + '?' + x.pars.toString()) , 
             take(1),
-            tap(console.log),
+            //tap(console.log),
         );     
 
     /* 
@@ -203,7 +203,7 @@ export class AuthService {
     private LoginGoogle$(timeOutSec:number){
         //const uriAndParams$ =  of(this.myLocation).pipe(
         const uriAndParams$ =  of(this.window.location.origin+'/').pipe(
-            tap(console.log),
+            //tap(console.log),
             combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
             map( x =>  new  URLSearchParams([
                         ["response_type",A_PAR_RESPONSE_TYPE    ],

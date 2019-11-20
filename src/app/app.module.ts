@@ -55,6 +55,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { DrochIconSvgRegComponent } from './shared/graphics/droch-icon-svg-reg/droch-icon-svg-reg.component';
 import { JnBusyBoxComponent, JgBusyDialog } from './jn-galon/jn-busy-box/jn-busy-box.component';
 import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component';
+import { JnpFlightItemComponent } from './jn-ispolin/jn-polin-flight/jnp-flight-item/jnp-flight-item.component';
 
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
@@ -96,6 +97,7 @@ const appRoutes: Routes = [
     JnBusyBoxComponent,
     JgBusyDialog,
     JnBusyBarComponent,
+    JnpFlightItemComponent,
     
   ],
 

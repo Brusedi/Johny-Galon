@@ -43,6 +43,11 @@ export function reducer(state :State  = initialState, action: EnvironmentAction)
             return { ...state , error:action.payload};    
         } 
 
+        case EnvironmentActionTypes.ERROR_ENVIRONMENT_RESET:{    
+            //console.log(action.payload);
+            return { ...state , error:null};    
+        } 
+
         case EnvironmentActionTypes.AUTH_START:{      
             //console.log(action.payload);
             return { ...state , authenticating:true,  authenticated:false ,  authgData: { ...state.authgData, request: action.payload}  } ;    
