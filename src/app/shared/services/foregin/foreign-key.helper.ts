@@ -1,3 +1,6 @@
+import { of } from "rxjs";
+import { map } from "rxjs/operators";
+
 /**
  *  Helper 
  *      
@@ -50,6 +53,7 @@ export const isLocationUndepended = (x:string) => !(isLocationContainsMacros(x))
  */
 export const isLocationParameterized = (location: string) => ( location.indexOf(FK_PARS_PATR_DEVIDER) > 0);
 
+
 /**
  *  Cut native name from location
  */
@@ -58,9 +62,28 @@ export const locationToName = (loc: string) => {
     const e = loc.indexOf(FK_PARS_PATR_DEVIDER);
     const l = e > 0 ?  loc.substring(0,e) : loc;
     const b = l.lastIndexOf(FK_NAME_PATR_DEVIDER);
-    
     return b>0 ? l.substring(b+1): l;
 }
+
+/**
+ *  Cut native name from location с учетом конструкции .. XXX/Name/NNNNN 
+ */
+export const locationToNameEx$ = (loc: string) =>{ 
+    const isDig = (x) => (x && x >= '0' && x <= '9');
+    const cutEnd = (x) => x.substring(x.lastIndexOf(FK_NAME_PATR_DEVIDER ));
+
+    return of(loc).pipe(
+        map( x => x.indexOf(FK_PARS_PATR_DEVIDER) > 0  ?   x.substring(0,x.indexOf(FK_PARS_PATR_DEVIDER)) : x  ),
+
+        map( x => x.lastIndexOf(FK_NAME_PATR_DEVIDER ) > 0
+                ?  isDig( x.substring(x.lastIndexOf(FK_NAME_PATR_DEVIDER ) +1 )[0]) 
+                   ? cutEnd( x.substring(0,x.lastIndexOf(FK_NAME_PATR_DEVIDER )))
+                   : x.substring(x.lastIndexOf(FK_NAME_PATR_DEVIDER ) + 1 )                
+                :  x
+        )
+    ) 
+}        
+
     
 /**
  *  location to simple option

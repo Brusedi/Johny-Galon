@@ -1,5 +1,6 @@
 import { anyEntityOptions, AnyEntityId } from "./any-entity";
 
+
 export const JgMockTableOption:anyEntityOptions<AnyEntityId> = {
     name: "JgMockTable", 
     location:"/NvaSd2/JgMockTable", 
@@ -31,3 +32,18 @@ export const AuthTestDataOption:anyEntityOptions<AnyEntityId> = {
     selectId: (x) => x.RECID,
     selBack: (x:string) => ("?RECID=" + x )
   };    
+
+//
+export const FlightFidsOption:anyEntityOptions<AnyEntityId> = {
+  name: "FlightFids", 
+  location:"/NvaAx/FlightFids", 
+  selectId: (x) => x.ID,
+  selBack: (x:string) => ("/" + x )
+};      
+
+export const NvaOmaCustLogo:anyEntityOptions<AnyEntityId> = {
+  name: "NvaOmaCustLogo", 
+  location:"/NvaAx/NvaOmaCustLogo", 
+  selectId: (x) => x.CUSTACCOUNT,
+  selBack: (x:string) => ("?CUSTACCOUNT=" + x )
+};      

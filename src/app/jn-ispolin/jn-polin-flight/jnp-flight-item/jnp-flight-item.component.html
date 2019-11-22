@@ -1,3 +1,52 @@
-<p>
-  jnp-flight-item works!
-</p>
+  
+  
+  
+  
+  <!-- <div *ngIf="( isLoaded$ | async);  then thenBlock else elseBlock">    -->
+
+ <div *ngIf = "( dataSubj$ | async) as data ;  else elseBlock" class="jn-scard" >    
+    
+      <mat-card class="example-card">
+          <mat-card-header>
+              <div mat-card-avatar >
+                  <mat-icon *ngIf = "!!data.Direction ; else notdir" class="icon-disp" color="primary" >flight_land</mat-icon>
+                  <ng-template #notdir>
+                      <mat-icon class="icon-disp" color="primary" >flight_takeoff</mat-icon>
+                  </ng-template>
+                  
+                  <!-- <mat-icon *ngIf = "!!data.Direction; else depIcon" class="icon-disp" color="primary" >flight_land</mat-icon> -->
+                  <!-- <mat-icon  #depIcon class="icon-disp" color="primary" >flight_takeoff</mat-icon> 
+                  <mat-icon  class="icon-disp" color="primary" >flight_land</mat-icon> -->
+              </div> 
+            
+            <!-- <img  mat-card-avatar [src]="( imgSubj$|async )" class = "example-header-image"/> -->
+            <mat-card-title>{{data.Company +' '+ data.Flight }} </mat-card-title>
+            <mat-card-subtitle>{{data.Dest }}</mat-card-subtitle>
+          </mat-card-header>
+          <!-- <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg" alt="Photo of a Shiba Inu"> -->
+          <!-- <img mat-card-image class = "example-header-image"/> -->
+          <mat-card-content>
+
+              <div class="jnp-info-main">
+                <div> <img [src]="( imgSubj$|async )" /> </div>  
+                <div> <app-jnp-cmp-bar [jncap]="'прилет'" [jnval]= "data.Time| date:'hh:mm'" ></app-jnp-cmp-bar> </div>  
+              </div>
+             
+              <!-- <img [src]="( imgSubj$|async )" />
+               <app-jnp-cmp-bar [jncap]="'прилет'" [jnval]= "data.Time| date:'hh:mm'" ></app-jnp-cmp-bar>
+                <div> 
+                  <i class="material-icons"> query_builder </i>  
+                  <span class ="jnp-info-main" >{{data.Time | date:'hh:mm'}}</span>
+                  <span></span>
+                </div> -->
+          </mat-card-content>
+          
+        </mat-card>
+
+  </div> 
+
+
+  <ng-template #elseBlock>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  </ng-template> 
+

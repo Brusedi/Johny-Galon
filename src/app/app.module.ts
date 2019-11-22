@@ -21,7 +21,9 @@ import {
   MatProgressSpinnerModule,
   MatIconModule,
   MatDialogModule,
-  MatTooltipModule
+  MatTooltipModule,
+  MatProgressBarModule,
+  MatGridListModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -56,6 +58,8 @@ import { DrochIconSvgRegComponent } from './shared/graphics/droch-icon-svg-reg/d
 import { JnBusyBoxComponent, JgBusyDialog } from './jn-galon/jn-busy-box/jn-busy-box.component';
 import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component';
 import { JnpFlightItemComponent } from './jn-ispolin/jn-polin-flight/jnp-flight-item/jnp-flight-item.component';
+import { EntityProvService } from './shared/services/entity-prov.service';
+import { JnpCmpBarComponent } from './jn-ispolin/jnp-cmp-bar/jnp-cmp-bar.component';
 
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
@@ -98,6 +102,7 @@ const appRoutes: Routes = [
     JgBusyDialog,
     JnBusyBarComponent,
     JnpFlightItemComponent,
+    JnpCmpBarComponent,
     
   ],
 
@@ -141,7 +146,9 @@ const appRoutes: Routes = [
     MatIconModule,
     MatDialogModule,
     HttpClientModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressBarModule,
+    MatGridListModule
     
   ],
   providers: [
@@ -150,6 +157,7 @@ const appRoutes: Routes = [
     AppSettingsService,
     DataProvService,
     AppResolverService,
+    EntityProvService,
     { provide: "windowObject", useValue: window}   // window Object injection
     // {
     //   provide: externalUrlProvider,

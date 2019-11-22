@@ -180,9 +180,9 @@ export class anyEntytySetEffects {
                     ); 
                     
             case ( AnyEntityActionTypes.GET_ITEMS_PART) :
-                return this.foreignService.getItemsPart$( action.payload )
+                return this.foreignService.getItemsPart$( action.payload, options )  // 201119 add options
                     .pipe(
-                        //tap( x=>  console.log(x) ),
+                        tap( x=>  console.log(x) ),
                         map( x => new GetItemsPartSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
@@ -247,12 +247,11 @@ export class anyEntytySetEffects {
     private procNextSubAction$ = ( options: anyEntityOptions<any>,  act$: Observable<any> ): Observable<any> => 
         act$.pipe( 
             //tap( x=>  console.log(x) ),
-            
-            map(x  =>  x != null ? 
-                    ( x.freeAction ? 
-                        x.freeAction :  
-                        new ExecItemAction( { itemOption:options, itemAction: x } )  ) :
-                    new CompleteItemAction({ name: options.name } )                                                               // null 
+            map(x  =>  x != null 
+                        ? x.freeAction 
+                              ? x.freeAction 
+                              : new ExecItemAction( { itemOption:options, itemAction: x } )  
+                        : new CompleteItemAction({ name: options.name } )                                                               // null 
             ),
             //tap( x=>  console.log(x) )
         );       

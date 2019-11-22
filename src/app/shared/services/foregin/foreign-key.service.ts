@@ -9,6 +9,8 @@ import { DataProvService } from '../data-prov.service';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
+import { anyEntityOptions } from '@appModels/any-entity';
+import { of } from 'rxjs';
 
 //import { of, combineLatest } from 'rxjs';
 
@@ -138,17 +140,24 @@ export class ForeignKeyService {
   /**
    *  Загружает таргетированную часть данных в стор
    */
-  public getItemsPart$ = (loc:string) =>{
-    // this.dataService.items$(loc)
-    return this.store.select( fromSelectors.selectDataOptionsByLoc(loc)).pipe(
+  public getItemsPart$ = (loc:string, options :anyEntityOptions<any> = undefined) =>{
+    
+    return of(options).pipe(
+      mergeMap( x => !!x ? of(x) : this.store.select( fromSelectors.selectDataOptionsByLoc(loc)) ),
       filter( x => !!x ),
-      combineLatest(  this.dataService.items$(loc) , (o,d) => ({opt:o, data:d})),
-      //tap( x=> console.log(x) ),
+      combineLatest(  this.dataService.items$(loc) , (o,d) => ({opt:o, data: Array.isArray(d) ? d : [d]  })  ),  // 201119 Array.isArray(d) ? d : [d] 
       map( x => ({ entites:x.data , ids: x.data.map( y => x.opt.selectId(y) ) , request:loc})  ),
-      //tap( x=> console.log(x) )
-    ); 
+    );
+    
+    
+    // this.store.select( fromSelectors.selectDataOptionsByLoc(loc)).pipe(
+    //   filter( x => !!x ),
+    //   combineLatest(  this.dataService.items$(loc) , (o,d) => ({opt:o, data:d})),
+    //   //tap( x=> console.log(x) ),
+    //   map( x => ({ entites:x.data , ids: x.data.map( y => x.opt.selectId(y) ) , request:loc})  ),
+    //   //tap( x=> console.log(x) )
+    // ); 
   }
 
-  
 
 }

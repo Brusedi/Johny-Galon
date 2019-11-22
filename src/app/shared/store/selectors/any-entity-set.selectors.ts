@@ -55,11 +55,23 @@ export const selectData = ( id: string ) =>
         dt =>  id in dt.items ?  dt.items[id] : null
 );
 
+// export const selectById2 = ( id: string, idRow: any ) => 
+//     createSelector(
+//         selectData(id),
+//         dt =>   dt && dt.state ? dt.state : undefined
+//         );
+
 export const selectById = ( id: string, idRow: any ) => 
-    createSelector(
+     createSelector(
         selectData(id),
-        dt => dt&&dt.hasOwnProperty(idRow)?dt[idRow]:undefined        
-);
+        dt => dt && dt.state && dt.state.entities &&  dt.state.entities[idRow] ?   dt.state.entities[idRow] : undefined
+ );
+
+// export const selectById = ( id: string, idRow: any ) => 
+//     createSelector(
+//         selectData(id),
+//         dt => dt && dt.hasOwnProperty(idRow)?dt[idRow]:undefined        
+// );
 
 // export const selectByIdAsName = ( id: string, idRow: any ) => 
 //     createSelector(
