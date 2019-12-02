@@ -66,7 +66,7 @@ export const fldDescsToQuestions = (flds:FieldDescribe[],rowSeed:Observable<{}>)
         }
     } 
     return flds
-            .filter( x => ( x.visible != false ))
+            .filter( x => ( x  && x.visible  )) //&& x.visible != false
             .map(x => toQuest(x, rowSeed));
 }
 

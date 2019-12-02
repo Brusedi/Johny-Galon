@@ -30,6 +30,13 @@ export const selectIsExist = ( id: string ) =>
         dt =>  (id in dt.items)
 );
 
+// Загруженны ли данные
+export const selectIsDataLoaded = ( id: string ) => 
+    createSelector(
+        selectDatas,
+        selectIsExist(id),
+        (dt, is) =>  is && dt.items[id].state.loaded
+);
 
 // Загруженны ли метаданные
 export const selectIsMetadataLoaded = ( id: string ) => 
@@ -61,11 +68,23 @@ export const selectData = ( id: string ) =>
 //         dt =>   dt && dt.state ? dt.state : undefined
 //         );
 
+
 export const selectById = ( id: string, idRow: any ) => 
      createSelector(
         selectData(id),
-        dt => dt && dt.state && dt.state.entities &&  dt.state.entities[idRow] ?   dt.state.entities[idRow] : undefined
+        dt => dt && dt.state && dt.state.entities &&  dt.state.entities[idRow] ? dt.state.entities[idRow] : undefined
  );
+
+
+ export const selectDataItems = ( id: string) => 
+     createSelector(
+        selectData(id),
+        dt => dt && dt.state && dt.state.entities ? Object.keys(dt.state.entities).map(x=> dt.state.entities[x] )   : undefined
+ );
+
+
+
+
 
 // export const selectById = ( id: string, idRow: any ) => 
 //     createSelector(
@@ -158,6 +177,70 @@ export const selectIsPrepared = (id: string) =>
         selectData(id),
         (x:AnyEntytySetItemState<any>) => (x && x.state.metaLoaded )
 );    
+
+// ---------NEW 291119 -----------
+
+export const selFieldDescribes = (id:string) =>  
+    createSelector(  selectDataMetadata(id), x => {   
+        //console.log(x.fieldsDesc)
+        return !x ? undefined : Object.keys(x.fieldsDesc)
+                                    .map(y => x.fieldsDesc[y])
+                                    .sort( (a, b) => a.order - b.order  )
+    });  
+
+export const selRowTemplate = (id:string) =>
+    createSelector( selectDatas, x => 
+        ! x.items[id] ? null : 
+            ! x.items[id].state.template ? {} :
+                x.items[id].state.template 
+    );  
+
+export const selQuestionsEx = (id:string, flds:string[] , rowSeed:{} ) =>  
+    createSelector( 
+        selFieldDescribes(id), 
+        selRowTemplate(id),
+        (x, t) => {
+            //console.log(x);
+            return !x ? undefined :  
+                fldDescsToQuestions(  flds.map( y => x.find( (e,i,a)=> (e.id == y)  )), {...t, ...rowSeed}) 
+        }            
+    );   
+
+export const selFormGroupEx = ( id:string, flds:string[] , rowSeed:{} ) => 
+    createSelector(
+        selQuestionsEx(id,flds,rowSeed),
+        selRowTemplate(id),
+        (x, t) =>  toFormGroup( x, {...t, ...rowSeed})        
+    );    
+
+export const selFormControlsEx = ( id:string, flds:string[] , rowSeed:{} ) => 
+    createSelector(
+        selQuestionsEx(id,flds,rowSeed),
+        selRowTemplate(id),
+        selectIsMetadataLoaded(id),
+        (x, t, f) => {
+            //console.log(x);
+            return  !(x&&f)
+                ? undefined 
+                : ({   
+                    questions: x , 
+                    formGroup:toFormGroup( x, {...t, ...rowSeed})  
+                }) ;     
+        }
+    );    
+
+    // export const selFormControlsEx = (id:string,  flds:string[] , rowSeed:{}) =>
+//     createSelector( 
+//         selQuestionsEx(id, flds,rowSeed),
+//         selFormGroupEx(id, flds,rowSeed),
+//         (x,y) => {
+//             console.log(x);
+//             console.log(y);
+//             return ({questions:x, formGroup:y});
+//         }        
+//     );    
+
+
 
 
 
@@ -288,12 +371,14 @@ export const selCurFormGroupEx = ( flds:string[] , rowSeed:{} ) =>
         (x, t) =>  toFormGroup( x, {...t, ...rowSeed})        
     );
 
+
 export const selCurFormControlsEx = (flds:string[] , rowSeed:{}) =>
     createSelector( 
         selCurQuestionsEx(flds,rowSeed),
         selCurFormGroupEx(flds,rowSeed),
-        (x,y) =>  ({ questions:x, formGroup:y})       
+        (x,y) =>  ({questions:x, formGroup:y})       
     );    
+
 
 
 
@@ -603,3 +688,6 @@ export const selectPartLocationIfNotExist = ( loc: string ) =>
         x => x.indexOf(loc) >= 0 ?  null : loc
     );    
 
+
+
+///////////////////////////////////////////////////////    

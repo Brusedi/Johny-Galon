@@ -51,9 +51,9 @@ export class JnRootPageComponent implements OnInit {
       //     fromSelectors.selEnvAuthHeaderBody 
       //   ).subscribe(x=>console.log(x));
 
-      this.store.select(  
-          fromSelectors.selEnvAuthHeaderPicUri 
-        ).subscribe(x=>console.log(x));
+      // this.store.select(  
+      //     fromSelectors.selEnvAuthHeaderPicUri 
+      //   ).subscribe(x=>console.log(x));
 
         
       //this.store.select(  fromSelectors.selectErrors()).subscribe(x=>console.log(x));

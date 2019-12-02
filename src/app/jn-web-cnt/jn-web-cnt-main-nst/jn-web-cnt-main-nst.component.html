@@ -1,0 +1,53 @@
+<div *ngIf = "( dataSubj$ | async) as data ;  else elseBlock"  >    
+
+    <mat-card class="example-card">
+      <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+        <!-- This is the tree node template for leaf nodes -->
+        <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
+          <!-- use a disabled button to provide padding for tree leaf -->
+
+          <button mat-icon-button disabled>
+              <mat-icon class="mat-icon-rtl-mirror">
+              
+              </mat-icon>
+          </button>   
+
+          <button mat-stroked-button [routerLink]="[ node.id ]"> {{node.Name}} </button>
+          
+
+          
+
+         <!-- <mat-divider></mat-divider>  -->
+        </cdk-nested-tree-node>
+
+        <!-- This is the tree node template for expandable nodes -->
+          <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild " class="example-tree-node">
+            
+              <button mat-icon-button [attr.aria-label]="'toggle ' + node.name" cdkTreeNodeToggle>
+                <mat-icon class="mat-icon-rtl-mirror">
+                  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                </mat-icon>
+              </button>
+
+               <button mat-stroked-button [routerLink]="[ node.id ]">{{node.Name}}</button>
+  
+
+              <!-- <mat-divider></mat-divider>   -->
+              <div [class.example-tree-invisible]="!treeControl.isExpanded(node)">
+                <ng-container cdkTreeNodeOutlet></ng-container>
+              </div>
+            
+
+          </cdk-nested-tree-node>
+      </cdk-tree>
+    </mat-card>
+
+
+</div> 
+
+
+<ng-template #elseBlock>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-template> 
+
+

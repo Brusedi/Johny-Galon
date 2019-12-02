@@ -21,7 +21,7 @@ const  LOGO_IMAGE_FIELD = 'IMAGEB64';
 
 export class JnpFlightItemComponent implements OnInit {
 
-  @Input() flightId: AnyEntityId;
+  @Input() flightId: any;
 
   private subscriptions: Subscription[] = [];
 
@@ -35,7 +35,7 @@ export class JnpFlightItemComponent implements OnInit {
   constructor(private entityProv: EntityProvService, private store: Store<fromStore.State>,private sanitizer : DomSanitizer) { }
 
   ngOnInit() {
-    const data$ = this.entityProv.itemData$( FlightFidsOption, this.flightId ).pipe( filter(x => !!x ), delay(1000) ) ;
+    const data$ = this.entityProv.itemData$( FlightFidsOption, this.flightId ).pipe( filter(x => !!x ), delay(100) ) ;
 
     this.subscriptions.push(
         data$.subscribe( x => this.dataSubj.next(x) )
@@ -48,7 +48,7 @@ export class JnpFlightItemComponent implements OnInit {
         .subscribe( (x:SafeUrl) => this.imgSubj.next( x ) )
     ); 
 
-    this.imgSubj$.subscribe(x => console.log(x));
+    //this.imgSubj$.subscribe(x => console.log(x));
     
   }
 

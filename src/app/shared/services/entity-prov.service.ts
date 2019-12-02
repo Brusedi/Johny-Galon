@@ -5,9 +5,9 @@ import * as fromSelectors from '@appStore/selectors/index';
 //import { AnyEntityId } from '@appModels/any-entity';
 
 import { anyEntityOptions, AnyEntityId, AnyEntity } from "@appModels/any-entity";
-import { tap, filter, take, map, mergeMap } from 'rxjs/operators';
+import { tap, filter, take, map, mergeMap, switchMap } from 'rxjs/operators';
 import { AddItem, Exec, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
-import { GetItemsPart } from '@appStore/actions/any-entity.actions';
+import { GetItemsPart, GetItems, GetItemsMeta } from '@appStore/actions/any-entity.actions';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 //import { AddItem } from '@appStore/actions/any-entity.actions';
@@ -22,7 +22,7 @@ export class EntityProvService {
 /*
 *  get stream with resolve data if need
 */
-public itemData$ = (  opt:anyEntityOptions<AnyEntity> ,  id:AnyEntity ) =>
+public itemData$ = (  opt:anyEntityOptions<AnyEntity> ,  id:any ) =>
     this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
         tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
         filter( x => x ),
@@ -56,30 +56,59 @@ public sanifeImageBase64$ = ( imageB64:Observable<string> ) =>
         //map( x => this.sanitizer.bypassSecurityTrustStyle("url('"+ x +"')"  ))
     );    
 
+/*
+*  get all collection data 
+*/
+public collectionData$ = (  opt:anyEntityOptions<AnyEntity>  ) =>
+    this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
+        tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
+        filter( x => x ),
+        tap(  x => 
+              this.store.select( fromSelectors.selectIsDataLoaded(opt.name)).pipe(
+                take(1)
+              ).subscribe( x => !!x ? null : this.store.dispatch(  new ExecItemAction( {itemOption:opt , itemAction: new GetItems(null) })))   
+        ),
+        mergeMap( x => this.store.select( fromSelectors.selectDataItems(opt.name)) )
+    )  
 
-      //private buildRequest  = ( opt:anyEntityOptions<AnyEntityId> ,  id:AnyEntityId ) =>   opt.location + opt.selBack(id)
+/*
+*  prepare and get metadata 
+*/
+public metaData$ = (  opt:anyEntityOptions<AnyEntity>  ) =>
+    this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
+        tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
+        filter( x => x ),
+        tap(  x => 
+              this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)).pipe(
+                take(1)
+              ).subscribe( x => !!x ? null : this.store.dispatch(  new ExecItemAction( {itemOption:opt , itemAction: new GetItemsMeta() })))   
+        ),
+        switchMap( x => this.store.select( fromSelectors.selectDataMetadata(opt.name)) ),
+        tap(x=>console.log(x) )
+    )  
+
+/*
+*  prepare and get controls
+*/
+public controls$ = (  opt:anyEntityOptions<AnyEntity> ,flds: string[], rowSeed: {} ) =>
+    this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
+        tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
+        filter( x => x ),
+        tap(  x => 
+              this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)).pipe(
+                take(1)
+              ).subscribe( x => !!x ? null : this.store.dispatch(  new ExecItemAction( {itemOption:opt , itemAction: new GetItemsMeta() })))   
+        ),
+        switchMap( x => 
+            this.store.select( fromSelectors.selFormControlsEx( opt.name, flds, rowSeed )).pipe(
+                filter(x=>!!x)
+            ) 
+        ),
+        tap(x=>console.log(x) )
+    )  
 
 
-
-          
-        //   //combineLatest( this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)), (x,y)=> y ), 
-        //   switchMap(() => this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)) ), 
-        //   tap( x => !x ?  this.store.dispatch( new Exec( {name:opt.name , itemAction: new GetItemsMeta() }) ) : null ),
-        //   filter( x => x ),
-        //   //combineLatest( this.store.select( fromSelectors.selCurName()), (x,y)=> y ), 
-        //   switchMap( () => this.store.select( fromSelectors.selCurName()) ),
-        //   tap(x => x != opt.name ? this.store.dispatch( new SetCurrent(opt.name) ) : null ),
-        //   filter( x => x == opt.name ),
-        //   //tap( x=> this.store.dispatch( new Exec( {name:'NvaSdEventType' , itemAction: new GetItemsPart('/Ax/NvaSdEventType?SERVICEDESCID=1') }) )),  // Debug
-        //   map( x => !!x ),
-        // ).pipe(
-        //   startWith(false),
-        //   take(2)
-        // );
-
-
-    //this.store.select( fromSelectors.selectById( FlightFidsOption.name ) ); 
-
+    
 
 }
 

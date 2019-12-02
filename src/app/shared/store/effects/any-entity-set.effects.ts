@@ -182,7 +182,7 @@ export class anyEntytySetEffects {
             case ( AnyEntityActionTypes.GET_ITEMS_PART) :
                 return this.foreignService.getItemsPart$( action.payload, options )  // 201119 add options
                     .pipe(
-                        tap( x=>  console.log(x) ),
+                        //tap( x=>  console.log(x) ),
                         map( x => new GetItemsPartSuccess(x) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )

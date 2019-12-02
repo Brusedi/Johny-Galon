@@ -23,7 +23,8 @@ import {
   MatDialogModule,
   MatTooltipModule,
   MatProgressBarModule,
-  MatGridListModule
+  MatGridListModule,
+  MatTreeModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -60,6 +61,11 @@ import { JnBusyBarComponent } from './jn-galon/jn-busy-bar/jn-busy-bar.component
 import { JnpFlightItemComponent } from './jn-ispolin/jn-polin-flight/jnp-flight-item/jnp-flight-item.component';
 import { EntityProvService } from './shared/services/entity-prov.service';
 import { JnpCmpBarComponent } from './jn-ispolin/jnp-cmp-bar/jnp-cmp-bar.component';
+import { JnWebCntMainComponent } from './jn-web-cnt/jn-web-cnt-main/jn-web-cnt-main.component';
+import { JnWebCntMainNstComponent } from './jn-web-cnt/jn-web-cnt-main-nst/jn-web-cnt-main-nst.component';
+import { CdkTreeModule } from '@angular/cdk/tree';
+import { JnWebCntItemComponent } from './jn-web-cnt/jn-web-cnt-item/jn-web-cnt-item.component';
+import { JnNewItemContentComponent } from './jn-galon/jn-entity/jn-new-item-content/jn-new-item-content.component';
 
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
@@ -71,6 +77,9 @@ const appRoutes: Routes = [
 
   { path: 'tutoral/values',    component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
   { path: 'forms/sd/incoming', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
+
+  { path: 'forms/wc',           component: JnWebCntMainNstComponent          },  
+  { path: 'forms/wc/:id',  component: JnWebCntItemComponent             },  
 
   { path: '**',                component: JnNotFoundComponent }
 ];
@@ -103,6 +112,14 @@ const appRoutes: Routes = [
     JnBusyBarComponent,
     JnpFlightItemComponent,
     JnpCmpBarComponent,
+
+    JnWebCntMainComponent,
+
+    JnWebCntMainNstComponent,
+
+    JnWebCntItemComponent,
+
+    JnNewItemContentComponent,
     
   ],
 
@@ -148,7 +165,10 @@ const appRoutes: Routes = [
     HttpClientModule,
     MatTooltipModule,
     MatProgressBarModule,
-    MatGridListModule
+    MatGridListModule,
+    MatTreeModule,
+    CdkTreeModule 
+
     
   ],
   providers: [

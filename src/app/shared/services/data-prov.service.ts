@@ -93,7 +93,7 @@ export class DataProvService {
 
   private getDataFromUri = (uri: string) =>  this.store.select( fromSelectors.selEnvAuthHeader ).pipe( 
     take(1),
-    tap(console.log),
+    //tap(console.log),
     map(this.buildOption),
     //tap(console.log) ,
     mergeMap( x => this.http.get(uri,x).pipe(map(rsp => rsp.text()))));        
@@ -106,7 +106,7 @@ export class DataProvService {
   private post = ( loc:string , subloc:string = undefined , data:any ) =>
     this.store.select( fromSelectors.selEnvAuthHeader ).pipe( 
         take(1),
-        tap(x=>console.log('w :'+x)) ,
+        //tap(x=>console.log('w :'+x)) ,
         map(this.buildOption),
         combineLatest( this.buildDataUri_v2(loc, subloc, RequestType.Ordinary ), (o,u) => ({opt:o, uri:u}) ),
         //tap(x=>console.log('w')) ,

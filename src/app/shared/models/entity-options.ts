@@ -47,3 +47,18 @@ export const NvaOmaCustLogo:anyEntityOptions<AnyEntityId> = {
   selectId: (x) => x.CUSTACCOUNT,
   selBack: (x:string) => ("?CUSTACCOUNT=" + x )
 };      
+
+
+export const ActionContentRoot:anyEntityOptions<AnyEntityId> = {
+  name: "ActionContentRoot", 
+  location:"/WebInstance/ActionContentRoot", 
+  selectId: (x) => x.id,
+  selBack: (x:string) => ("?id=" + x )
+};      
+
+export const ActionContent:anyEntityOptions<AnyEntityId> = {
+  name: "ActionContent", 
+  location:"/WebInstance/ActionContent", 
+  selectId: (x) => x.id,
+  selBack: (x:string) => ("?id=" + x )
+};      
