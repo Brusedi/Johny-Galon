@@ -21,8 +21,8 @@
 
         <mat-menu #menu="matMenu">
             <button mat-menu-item [routerLink]="['forms/sd/incoming']" >Добровольное сообщение </button>
-            <button mat-menu-item [routerLink]="['tutoral/values']" > === </button>
-            <button mat-menu-item [routerLink]="['forms/wc']" > Web content </button>
+            <!-- <button mat-menu-item [routerLink]="['tutoral/values']" > === </button> -->
+            <button mat-menu-item [routerLink]="['forms/wc']" >Макеты веб-страниц </button>
         </mat-menu> 
 
         <!-- <mat-menu #menu="matMenu1">
@@ -64,9 +64,6 @@
               </button>
               <mat-menu #menuLogout="matMenu">
                 <button mat-menu-item   (click) = "Login()" >
-
-                  
-
                    <mat-icon >account_balance</mat-icon> 
                   <span>Выйти</span>
                 </button>
@@ -98,8 +95,7 @@
 
         <div class="jn-content-p"> 
             <router-outlet></router-outlet>
-
-            <app-jnp-flight-item flightId=5637187138 > </app-jnp-flight-item>
+            <!-- <app-jnp-flight-item flightId=5637187138 > </app-jnp-flight-item> -->
         </div>     
 
         <div class="jg-fill-spacer"></div>

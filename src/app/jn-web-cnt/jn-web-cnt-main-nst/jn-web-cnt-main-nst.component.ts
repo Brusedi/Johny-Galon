@@ -6,10 +6,6 @@ import { EntityProvService } from 'app/shared/services/entity-prov.service';
 import { ActionContentRoot } from '@appModels/entity-options';
 import { filter, tap, map, take } from 'rxjs/operators';
 
-interface FoodNode {
-  name: string;
-  children?: FoodNode[];
-}
 
 interface WebContItem{
   Name: string;

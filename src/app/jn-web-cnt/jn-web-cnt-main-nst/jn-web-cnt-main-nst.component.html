@@ -12,6 +12,8 @@
               </mat-icon>
           </button>   
 
+          <span class="example-tree-title" >{{node.id}}</span>
+
           <button mat-stroked-button [routerLink]="[ node.id ]"> {{node.Name}} </button>
           
 
@@ -29,9 +31,8 @@
                 </mat-icon>
               </button>
 
-               <button mat-stroked-button [routerLink]="[ node.id ]">{{node.Name}}</button>
+              <button mat-stroked-button [routerLink]="[ node.id ]">{{node.Name}}</button>
   
-
               <!-- <mat-divider></mat-divider>   -->
               <div [class.example-tree-invisible]="!treeControl.isExpanded(node)">
                 <ng-container cdkTreeNodeOutlet></ng-container>

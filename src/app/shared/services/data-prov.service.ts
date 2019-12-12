@@ -75,6 +75,8 @@ export class DataProvService {
   public items$    = (loc:string , subloc:string = undefined ) => this.get(loc, subloc).pipe(map(x => ( <any[]>x === null) ? [] :<any[]>x ));
     
   public insert   = (loc:string , data:any ) => this.post(loc, undefined, data); //.subscribe(x => console.log(x) );
+  public update   = (loc:string , data:any ) => this.put(loc, undefined, data); //.subscribe(x => console.log(x) );
+
 
   
 
@@ -98,6 +100,22 @@ export class DataProvService {
     //tap(console.log) ,
     mergeMap( x => this.http.get(uri,x).pipe(map(rsp => rsp.text()))));        
 
+  /**
+  *  041219    
+  *  Send PUT any data to http-service as JSON 
+  */ 
+ private put = ( loc:string , subloc:string = undefined , data:any ) =>
+    this.store.select( fromSelectors.selEnvAuthHeader ).pipe( 
+        take(1),
+        //tap(x=>console.log('w :'+x)) ,
+        map(this.buildOption),
+        combineLatest( this.buildDataUri_v2(loc, subloc, RequestType.Ordinary ), (o,u) => ({opt:o, uri:u}) ),
+        //tap(x=>console.log('w')) ,
+        //tap(console.log) ,
+        mergeMap( x => this.http.put( x.uri, data, x.opt ) ) 
+ )        
+
+
   
    /**
   *  301018    
@@ -113,6 +131,7 @@ export class DataProvService {
         //tap(console.log) ,
         mergeMap( x => this.http.post( x.uri, data, x.opt ) ) 
     )        
+
     // this.buildDataUri_v2(loc, subloc, RequestType.Ordinary )
     //  .pipe(  mergeMap( x => this.http.post( x, data ) ) );  
 

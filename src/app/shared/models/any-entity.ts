@@ -25,3 +25,10 @@ export interface BackICommonError{
      StatusCode:number
      Data:any 
 } 
+
+// 
+export interface BackICommonErrorEx extends BackICommonError {
+     Id:string
+     Retriable:boolean
+} 
+

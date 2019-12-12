@@ -1,19 +1,19 @@
-<mat-card class="example-card">
-    <mat-card-header>
+<mat-card class="example-card-wide">
+    <mat-card-header *ngIf = "header$|async as header "  >
         <div mat-card-avatar >
-                <mat-icon class="icon-disp" color="primary" > email </mat-icon>
+                <mat-icon class="icon-disp" color="primary" > language </mat-icon>
         </div> 
-        <mat-card-title>Добровольное сообщение</mat-card-title>
-        <mat-card-subtitle>
-            Если вы зашли в этот раздел, значит, у Вас есть добровольное сообщение, касающееся непосредственно безопасности полетов. Если Вы хотите оставить сообщение о качестве оказанных услуг службами аэропорта, то перейдите, пожалуйста, в раздел
-            
-        </mat-card-subtitle>
+        <mat-card-title>{{header.id + ' ' + header.caption}}</mat-card-title>
+        <mat-card-subtitle>{{header.description}}</mat-card-subtitle>
 
     </mat-card-header> 
 
     <mat-card-content>
-        <app-jn-new-item-content [item$]="item$"  [controls$]="controls$" ></app-jn-new-item-content>
+        <app-jn-new-item-content  [controls$]="controls$" ></app-jn-new-item-content>
     </mat-card-content>
-
+    <mat-card-actions>
+        <button mat-button color="primary" (click)="Save()" [disabled]="!(isValid$|async)" > СОХРАНИТЬ </button>
+        <button mat-button color="primary" routerLink="/forms/wc"> ОТМЕНА </button>
+    </mat-card-actions>
 
 </mat-card>

@@ -7,10 +7,14 @@ import * as fromSelectors from '@appStore/selectors/index';
 import { anyEntityOptions, AnyEntityId, AnyEntity } from "@appModels/any-entity";
 import { tap, filter, take, map, mergeMap, switchMap } from 'rxjs/operators';
 import { AddItem, Exec, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
-import { GetItemsPart, GetItems, GetItemsMeta } from '@appStore/actions/any-entity.actions';
+import { GetItemsPart, GetItems, GetItemsMeta, ChangeRowSeed, SetRowSeed, UpdateItem } from '@appStore/actions/any-entity.actions';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
+import { FormGroup } from '@angular/forms';
 //import { AddItem } from '@appStore/actions/any-entity.actions';
+
+
+interface jnForm { questions:any, formGroup:FormGroup} ;
 
 @Injectable({
   providedIn: 'root'
@@ -90,7 +94,33 @@ public metaData$ = (  opt:anyEntityOptions<AnyEntity>  ) =>
 /*
 *  prepare and get controls
 */
-public controls$ = (  opt:anyEntityOptions<AnyEntity> ,flds: string[], rowSeed: {} ) =>
+// public controls$ = (  opt:anyEntityOptions<AnyEntity> ,flds: string[], rowSeed: {} ) =>
+//     this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
+//         tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
+//         filter( x => x ),
+//         tap(  x => 
+//               this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)).pipe(
+//                 take(1)
+//               ).subscribe( x => !!x ? null : this.store.dispatch(  new ExecItemAction( {itemOption:opt , itemAction: new GetItemsMeta() })))   
+//         ),
+//         switchMap( x => 
+//             this.store.select( fromSelectors.selFormControlsEx( opt.name, flds, rowSeed )).pipe(
+//                 filter(x=>!!x)
+//             ) 
+//         ),
+//         tap(x=>console.log(x) )
+//     )  
+
+
+// private getFormControls$ = (id:string, flds:string[], iVal$:Observable<{}>  ) =>
+//     this.store.select( fromSelectors.selFormControlsEx$( id , flds, iVal$) ).pipe(
+//         switchMap( x => x ) 
+//     );  
+
+/*
+*  prepare and get controls for edit
+*/
+public controlsForEdit$ = (  opt:anyEntityOptions<AnyEntity> ,id:any ,flds: string[] ) =>
     this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
         tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
         filter( x => x ),
@@ -99,17 +129,49 @@ public controls$ = (  opt:anyEntityOptions<AnyEntity> ,flds: string[], rowSeed: 
                 take(1)
               ).subscribe( x => !!x ? null : this.store.dispatch(  new ExecItemAction( {itemOption:opt , itemAction: new GetItemsMeta() })))   
         ),
+        tap( x => this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new SetRowSeed(null) }) ) ),
+        tap( x => 
+              this.itemData$( opt, id ).pipe(
+                     filter(x=>!!x)
+                 ).subscribe( x => {
+                     this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new SetRowSeed(x) }) ) ;
+                 }
+        ) ),
+
         switchMap( x => 
-            this.store.select( fromSelectors.selFormControlsEx( opt.name, flds, rowSeed )).pipe(
-                filter(x=>!!x)
-            ) 
-        ),
-        tap(x=>console.log(x) )
+            this.store.select( 
+                fromSelectors.selFormControlsEx$( 
+                    opt.name ,
+                    flds,
+                    this.store.select(fromSelectors.selRowSeed(opt.name)) 
+                )
+            )
+            .pipe(switchMap( x => x ))
+        )  
+        //switchMap( x => this.getFormControls$(opt.name, flds,this.store.select(fromSelectors.selRowSeed(opt.name) ) ) ),
     )  
 
-
-    
-
+/*
+*  prepare and get controls for edit and eject changes to rowseeed
+*/    
+public controlsForEditEx$ = (  opt:anyEntityOptions<AnyEntity> ,id:any ,flds: string[] ) => 
+    this.controlsForEdit$(opt,id,flds).pipe(
+        filter( x => x && x.formGroup  ),
+        tap( (x:jnForm) => x.formGroup.valueChanges.subscribe( x =>
+                this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new ChangeRowSeed(x) }) )
+            )
+        )
+    )  
+/**
+ *  Run update record (from rowseed) actions 
+ */
+public updateItemByRowSeed = (  opt:anyEntityOptions<AnyEntity>  ) => 
+    this.store.select(fromSelectors.selRowSeed(opt.name)).pipe(take(1))
+        .subscribe(  x => {
+                console.log(x);
+                this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new UpdateItem(x) }) )
+            }
+        );
 }
 
 

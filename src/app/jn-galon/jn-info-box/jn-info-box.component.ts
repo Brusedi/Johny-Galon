@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, of, from, ReplaySubject, Subscription } from 'rxjs';
 import * as fromSelectors from '@appStore/selectors/index';
 import * as fromStore from '@appStore/index';
-import { map, filter, tap , merge } from 'rxjs/operators';
+import { map, filter, tap , merge, mergeMap, distinct } from 'rxjs/operators';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { BackICommonError } from '@appModels/any-entity';
-import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
+import { ExecCurrent, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
 import { ErrorAnyEntityReset } from '@appStore/actions/any-entity.actions';
 import { ErrorEnvironment, ErrorEnvironmentReset } from '@appStore/actions/environment.actions';
 
@@ -23,27 +23,50 @@ import { ErrorEnvironment, ErrorEnvironmentReset } from '@appStore/actions/envir
 
 export class JnInfoBoxComponent implements OnInit {
 
-  public errorEntity$ : Observable<any>; 
+  //public errorEntity$ : Observable<any>;              /// del candidate
   public errorEnvironment$ : Observable<any>; 
-
+  public errorAllEntity$ : Observable<any>; 
+  
+  private subscriptions:Subscription[] = [];
+  
   constructor(private store: Store<fromStore.State>, public dialog: MatDialog){
   
   }
 
   ngOnInit() {
+  
+    //this.errorEntity$ = this.store.select( fromSelectors.selCurError() ).pipe(  filter( x => !!x) ) ; 
+    this.errorEnvironment$ = this.store.select( fromSelectors.selEnvError).pipe( filter( x => !!x) ) ;
+    this.errorAllEntity$ =   this.store.select( fromSelectors.selEntitiesErrors() ).pipe(
+      filter( x => x && x.length > 0 ),
+      mergeMap(x => from(x) ),
+      distinct( x => x.error.Id )        
+    ); 
 
-     
-    this.errorEntity$ = this.store.select( fromSelectors.selCurError() ) ; 
-    this.errorEntity$.pipe(
-        filter( x => !!x)
-      ).subscribe(x=>this.onErrorDialog(x, new ExecCurrent( new ErrorAnyEntityReset() ))); 
 
+    // this.subscriptions.push( 
+    //   this.errorEntity$.subscribe(x=>this.onErrorDialog(x, new ExecCurrent( new ErrorAnyEntityReset() ))) 
+    // ); 
 
-    this.errorEnvironment$ = this.store.select( fromSelectors.selEnvError)    ; 
-    this.errorEnvironment$.pipe( 
-        filter( x => !!x)
-      ).subscribe(x=>this.onErrorDialog(x, new ErrorEnvironmentReset())); 
+    this.subscriptions.push( 
+      this.errorEnvironment$.subscribe(x=>this.onErrorDialog(x, new ErrorEnvironmentReset()))
+    ); 
+    
+    this.subscriptions.push(
+      this.errorAllEntity$.subscribe(x=>
+        this.onErrorDialog(
+            x.error, 
+            new ExecItemAction( { itemOption: x.opt, itemAction: new ErrorAnyEntityReset() } )
+        )
+      )
+    );  
 
+  }
+
+  ngOnDestroy(){ 
+    while(this.subscriptions.length > 0){
+      this.subscriptions.pop().unsubscribe(); 
+    } 
   }
 
   onErrorDialog(error, resetDispatch  ){  //:BackICommonError

@@ -2,12 +2,30 @@ import { createFeatureSelector, createSelector, MemoizedSelector, select } from 
 import { AnyEntytySetItemState, State } from "@appStore/reducers/any-entity-set.reduser";
 import { of, Observable } from "rxjs";
 
-import { fldDescsToQuestions,toFormGroup } from "../../question/adapters/question-adapt.helper";
+import { fldDescsToQuestions,toFormGroup, toFormGroup$ } from "../../question/adapters/question-adapt.helper";
 //import { _Start } from "@angular/cdk/scrolling";
 import { getLocationMacros, locationToName, locationInfo, fillLocationMacros, isFullIndepended } from "app/shared/services/foregin/foreign-key.helper";
 import { getMdOptons, getMdOptonsFromDict, getRowVal } from "app/shared/services/metadata/metadata.helper";
 import { EntityAdapter } from "@ngrx/entity";
+import { map, filter, switchMap } from "rxjs/operators";
 
+///////// HELPERS /////////////////////////////////////////////////////
+
+// AnyEntytySetItemState Interface props
+const ENTITY_PROPS = ["state","option","action"];
+
+// Check props of object  
+const instOf = ( obj:any ,props:Array<string> ) =>  props.reduce( (a,i) => a && obj && obj.hasOwnProperty(i) , true )
+
+// Object is instance  AnyEntytySetItemState
+const instOfAnyEntytySet = (obj:any) => instOf(obj,ENTITY_PROPS)
+
+const extractEntities:((obj:any) => AnyEntytySetItemState<any>[])  = (obj) => 
+     obj && obj.items
+        ? Object.keys( obj.items ).map(x => obj.items[x]).filter(x => instOfAnyEntytySet(x) )
+        : []
+
+/////////////////////////////////////////////////////////////////////////
 
 export const dataStore = createFeatureSelector<State>('data');
 
@@ -108,7 +126,7 @@ export const selectDataOptions = ( id: string ) =>
 export const selectDataMetadata = ( id: string ) => 
     createSelector(
         selectData(id),
-        (items:AnyEntytySetItemState<any>) =>   items.state.metadata
+        (items:AnyEntytySetItemState<any>) => items&&items.state ? items.state.metadata : null
 );
 
 export const selectMetadataIterable = ( id: string ) => 
@@ -178,6 +196,7 @@ export const selectIsPrepared = (id: string) =>
         (x:AnyEntytySetItemState<any>) => (x && x.state.metaLoaded )
 );    
 
+
 // ---------NEW 291119 -----------
 
 export const selFieldDescribes = (id:string) =>  
@@ -195,53 +214,56 @@ export const selRowTemplate = (id:string) =>
                 x.items[id].state.template 
     );  
 
-export const selQuestionsEx = (id:string, flds:string[] , rowSeed:{} ) =>  
+export const selRowSeed = (id:string) =>
+    createSelector( selectDatas, x =>  
+        !! (x.items[id]) && !!(x.items[id].state.rowSeed) 
+            ? x.items[id].state.rowSeed 
+            : null
+    );   
+    
+export const selQuestionsEx = (id:string, flds:string[], rowSeed$:Observable<{}>) =>  
     createSelector( 
         selFieldDescribes(id), 
-        selRowTemplate(id),
-        (x, t) => {
+        (x) => {
             //console.log(x);
             return !x ? undefined :  
-                fldDescsToQuestions(  flds.map( y => x.find( (e,i,a)=> (e.id == y)  )), {...t, ...rowSeed}) 
+                fldDescsToQuestions(  flds.map( y => x.find( (e,i,a)=> (e.id == y)  )), rowSeed$) 
         }            
     );   
 
-export const selFormGroupEx = ( id:string, flds:string[] , rowSeed:{} ) => 
+/**
+ *  Return джентельменский набор контролов для редактирования в форме  
+ */     
+export const selFormControlsEx$ = ( id:string, flds:string[] , rowSeed$:Observable<{}> ) =>   //, rowSeed$:Observable<{}>
     createSelector(
-        selQuestionsEx(id,flds,rowSeed),
-        selRowTemplate(id),
-        (x, t) =>  toFormGroup( x, {...t, ...rowSeed})        
-    );    
-
-export const selFormControlsEx = ( id:string, flds:string[] , rowSeed:{} ) => 
-    createSelector(
-        selQuestionsEx(id,flds,rowSeed),
-        selRowTemplate(id),
+        selQuestionsEx(id,flds,rowSeed$),
         selectIsMetadataLoaded(id),
-        (x, t, f) => {
-            //console.log(x);
-            return  !(x&&f)
-                ? undefined 
-                : ({   
-                    questions: x , 
-                    formGroup:toFormGroup( x, {...t, ...rowSeed})  
-                }) ;     
-        }
+        (qn, isL) => qn && isL ?  toFormGroup$(qn,rowSeed$).pipe( map(fg => ({questions: qn , formGroup:fg}) ))  :  of(null)  
     );    
 
-    // export const selFormControlsEx = (id:string,  flds:string[] , rowSeed:{}) =>
-//     createSelector( 
-//         selQuestionsEx(id, flds,rowSeed),
-//         selFormGroupEx(id, flds,rowSeed),
-//         (x,y) => {
-//             console.log(x);
-//             console.log(y);
-//             return ({questions:x, formGroup:y});
-//         }        
-//     );    
 
 
+    
 
+/**
+ *  Select all Entities 
+ */    
+export const selEntities = () => createSelector( selectDatas, extractEntities )    
+
+/**
+ *  Select all Entities  Errors
+ */    
+export const selEntitiesErrors = () =>  
+    createSelector(
+        selEntities(),
+        (ents) => ents.map(x  => x && x.state &&  x.state.error ? ({error:x.state.error, opt:x.option }) :null).filter( x => !!x  )
+    )
+
+export const selectDataMetadataHeader = ( id: string ) => 
+    createSelector(
+        selectDataMetadata(id),
+        (x => ({ caption: x&&x.table ? x.table.DisplayName : undefined , description:  x&&x.table ? x.table.Description : undefined      }) )
+);    
 
 
 // ANONIMUS SELECTOR --------------------------------------------------------------------------

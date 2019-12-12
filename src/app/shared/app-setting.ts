@@ -1,7 +1,7 @@
 export class AppSettings {
-    svcFasadeUri:  string = "http://webgate.nvavia.ru:8080/api" ;
-    svcFasadeUri2: string = "http://b-portal.nvavia.ru/api" ;
-    svcFasadeUri5 : string = "http://localhost:50997/api" ;
+    svcFasadeUri1:  string = "http://webgate.nvavia.ru:8080/api" ;
+    svcFasadeUri3: string = "http://b-portal.nvavia.ru/api" ;
+    svcFasadeUri : string = "http://localhost:50997/api" ;
     svcRestMetadataSuffix: string ="/Md" ;
     svcRestRecTemplateSuffix: string ="/!Template" ;
 

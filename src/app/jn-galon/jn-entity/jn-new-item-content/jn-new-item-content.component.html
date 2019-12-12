@@ -5,14 +5,15 @@
         <app-jn-item-question [question]="question" [form]="ctrls.formGroup" ></app-jn-item-question> 
     </div>
 
-    <div class="form-row">
+    <!-- <div class="form-row">
        <button mat-raised-button type="submit" [disabled]="!ctrls.formGroup.valid">Добавить запись</button>
-    </div> 
+    </div>  -->
     
   </form>
 
 </div>
 
+
 <ng-template #loading >
-        <mat-spinner class = "spinner"> </mat-spinner>
+        <mat-spinner  diameter="60" style="margin:0 auto;" mode="indeterminate" > </mat-spinner>
 </ng-template>

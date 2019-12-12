@@ -1,21 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { JnNewItemContentComponent } from './jn-new-item-content.component';
+import { JnNameplateCardComponent } from './jn-nameplate-card.component';
 
-
-describe('JnNewItemContentComponent', () => {
-  let component: JnNewItemContentComponent;
-  let fixture: ComponentFixture<JnNewItemContentComponent>;
+describe('JnNameplateCardComponent', () => {
+  let component: JnNameplateCardComponent;
+  let fixture: ComponentFixture<JnNameplateCardComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ JnNewItemContentComponent ]
+      declarations: [ JnNameplateCardComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(JnNewItemContentComponent);
+    fixture = TestBed.createComponent(JnNameplateCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

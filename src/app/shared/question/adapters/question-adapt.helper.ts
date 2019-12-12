@@ -160,3 +160,17 @@ const toCheckbox = (x:FieldDescribe, rowSeed$:Observable<{}>) => {
     return new FormGroup(group);
 
   }  
+
+  /**
+   * Convert  question set to angular FormGroup stream 
+   * @param questions 
+   * @param initValues  - INIT VALUES STREAM
+   */
+  export const toFormGroup$ = (questions: QuestionBase<any>[], initValues$:Observable<{}>) =>  
+        initValues$.pipe(
+            filter(x=>!!x),
+            map( iVals => toFormGroup(questions,iVals) ),
+         ) ;
+
+
+

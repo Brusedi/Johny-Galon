@@ -3,8 +3,11 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { AnyEntity } from '@appModels/any-entity';
 import { FormGroup } from '@angular/forms';
 import { take } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
 
-
+import * as fromStore from '@appStore/index';
+import * as fromSelectors from '@appStore/selectors/index';
+import { ExecCurrent } from '@appStore/actions/any-entity-set.actions';
 
 interface jnForm { questions:any, formGroup:FormGroup} ;
 
@@ -16,22 +19,19 @@ interface jnForm { questions:any, formGroup:FormGroup} ;
 
 export class JnNewItemContentComponent implements OnInit {
 
-  @Input() item$:Observable<AnyEntity>;
+  //@Input() item$:Observable<AnyEntity>;
   @Input() controls$: Observable<jnForm>;
 
-  //private formDataSubj$ = new BehaviorSubject<jnForm>( undefined );
-
-  //public  formDataSubj$ = this.formDataSubj.asObservable(); 
-
-  constructor() { }
+  constructor(private store: Store<fromStore.State>) { }
 
   ngOnInit() {
 
-    //this.item$.subscribe(x=> console.log(x)  )
-    //this.controls$.pipe(take(1)).subscribe(x=> this.formDataSubj$.next(x) )
-
-    //this.formDataSubj$.subscribe(x=> console.log(x));
 
   }
 
+  onSubmit() {
+    // this.store.select(fromSelectors.selCurRowSeed()).subscribe( 
+    //   x => this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new ChangeRowSeed(x) })  new ExecCurrent( new AddItem(x) )  )
+    // ).unsubscribe();
+  }  
 }

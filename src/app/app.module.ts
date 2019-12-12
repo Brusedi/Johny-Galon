@@ -66,6 +66,7 @@ import { JnWebCntMainNstComponent } from './jn-web-cnt/jn-web-cnt-main-nst/jn-we
 import { CdkTreeModule } from '@angular/cdk/tree';
 import { JnWebCntItemComponent } from './jn-web-cnt/jn-web-cnt-item/jn-web-cnt-item.component';
 import { JnNewItemContentComponent } from './jn-galon/jn-entity/jn-new-item-content/jn-new-item-content.component';
+import { JnNameplateCardComponent } from './jn-galon/jn-nameplate-card/jn-nameplate-card.component';
 
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
@@ -78,8 +79,8 @@ const appRoutes: Routes = [
   { path: 'tutoral/values',    component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
   { path: 'forms/sd/incoming', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
 
-  { path: 'forms/wc',           component: JnWebCntMainNstComponent          },  
-  { path: 'forms/wc/:id',  component: JnWebCntItemComponent             },  
+  { path: 'forms/wc',          component: JnWebCntMainNstComponent          },  
+  { path: 'forms/wc/:id',      component: JnWebCntItemComponent             },  
 
   { path: '**',                component: JnNotFoundComponent }
 ];
@@ -120,6 +121,8 @@ const appRoutes: Routes = [
     JnWebCntItemComponent,
 
     JnNewItemContentComponent,
+
+    JnNameplateCardComponent,
     
   ],
 

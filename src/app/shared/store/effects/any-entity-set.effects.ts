@@ -14,6 +14,7 @@ import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
 import { DataProvService } from "app/shared/services/data-prov.service";
 import { ErrorEnvironment, AuthStart } from "@appStore/actions/environment.actions";
+import { BackProvService } from "app/shared/services/back-prov.service";
 
 //import { AnyEntityLazySetActionTypes, ExecItemAction,  CompleteItemAction, Exec } from "@appStore/actions/any-entity-lazy-set.actions";
 //import { AnyEntityLazyActionTypes, anyEntityLazyActions, GetItemSuccess, GetItemNotFound } from "@appStore/actions/any-entity-lazy.actions";
@@ -34,7 +35,8 @@ export class anyEntytySetEffects {
       private actions$:         Actions, 
       private dataService:      DataProvService,
       private metadataService:  MetadataProvService,
-      private foreignService:   ForeignKeyService
+      private foreignService:   ForeignKeyService,
+      private backProvService:  BackProvService
 ) {}
 
     //const PrepareByLocBranch$ = ( loc:string  )   
@@ -159,6 +161,24 @@ export class anyEntytySetEffects {
     private procSubAction$ = ( action : anyEntityActions, options: anyEntityOptions<any>  ): Observable<any> => {
         switch(action.type){
 
+            case ( AnyEntityActionTypes.UPD_ITEM) :
+                return this.dataService.update( options.location, action.payload )
+                    .pipe( 
+                        tap( x => console.log(x)  ),
+                        // map( x =>  x.hasOwnProperty('_body')?JSON.parse(x['_body']):x ),
+                        // mergeMap( x => from( 
+                        //             x.hasOwnProperty('Data')&&x['Data'].hasOwnProperty('id')
+                        //                 && Array.isArray(x['Data']['id'])&&(x['Data']['id'][0])  
+                        //                 && x['Data'].hasOwnProperty('Location')&& Array.isArray(x['Data']['Location'])&&(x['Data']['Location'][0]) 
+                        //                 ? [ new AddItemSuccess( x['Data']['id'][0] ) , new  GetItemsPart(x['Data']['Location'][0]) ]  //x['Data']['id'][0]
+                        //                 : [ new AddItemSuccess(null)] 
+                        //         )
+                        // ),
+                        //catchError(error => { console.log(error )  ; return of(new ErrorAnyEntity(prepareError(error))) } )   
+                        catchError(error => this.backProvService.actionErrorfromResponse$(error))   
+                        
+                    ); 
+
             case ( AnyEntityActionTypes.ADD_ITEM) :
                 return this.dataService.insert( options.location, action.payload )
                     .pipe(
@@ -234,7 +254,7 @@ export class anyEntytySetEffects {
                     fromSource: action.payload&&action.payload.url?action.payload.url:undefined,
                     tag:'NVAVIA'
                 }).pipe( 
-                        tap( x=>  console.log(x) ),
+                        tap( x=>  console.log(action.payload) ),
                         map(x => x.fromError && x.fromError == 401 ? { freeAction: new AuthStart(x) } : null) //new AuthStart(x) :  new AuthStart(x))   
                     )
             }    
