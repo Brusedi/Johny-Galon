@@ -1,46 +1,41 @@
 <div *ngIf = "( dataSubj$ | async) as data ;  else elseBlock"  >    
 
     <mat-card class="example-card">
-      <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
-        <!-- This is the tree node template for leaf nodes -->
-        <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
-          <!-- use a disabled button to provide padding for tree leaf -->
+      <mat-card-header class="jg-card-header-prim">
+          <div mat-card-avatar >
+              <mat-icon class="ex-mat-icon" color="primary" > flight </mat-icon>
+           </div> 
+          <mat-card-title>WWW.NVAVIA.RU</mat-card-title>
+          <mat-card-subtitle>Редактирование контента корпоративного сайта АО "Нижневартовскавиа" </mat-card-subtitle>
+      </mat-card-header>
 
-          <button mat-icon-button disabled>
-              <mat-icon class="mat-icon-rtl-mirror">
-              
-              </mat-icon>
-          </button>   
+      <mat-card-content class="example-card-content">
 
-          <span class="example-tree-title" >{{node.id}}</span>
+        <cdk-tree [dataSource]="dataSource" [treeControl]="treeControl">
+          <cdk-nested-tree-node *cdkTreeNodeDef="let node" class="example-tree-node">
+            <mat-chip-list>
+              <mat-chip [routerLink]="[ node.id ]" >{{node.id}}</mat-chip>
+              <mat-chip color="primary"  [selected] = "node.IsActive?'':null" [routerLink]="[ node.id ]" >{{node.Name}}</mat-chip>
+           </mat-chip-list>  
+          </cdk-nested-tree-node>
 
-          <button mat-stroked-button [routerLink]="[ node.id ]"> {{node.Name}} </button>
-          
-
-          
-
-         <!-- <mat-divider></mat-divider>  -->
-        </cdk-nested-tree-node>
-
-        <!-- This is the tree node template for expandable nodes -->
+          <!-- This is the tree node template for expandable nodes -->
           <cdk-nested-tree-node *cdkTreeNodeDef="let node; when: hasChild " class="example-tree-node">
-            
-              <button mat-icon-button [attr.aria-label]="'toggle ' + node.name" cdkTreeNodeToggle>
-                <mat-icon class="mat-icon-rtl-mirror">
-                  {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
-                </mat-icon>
-              </button>
-
-              <button mat-stroked-button [routerLink]="[ node.id ]">{{node.Name}}</button>
-  
-              <!-- <mat-divider></mat-divider>   -->
+            <mat-chip-list>
+                <mat-chip color="accent" selected  [attr.aria-label]="'toggle ' + node.name" cdkTreeNodeToggle  >
+                   <mat-icon class="mat-icon-rtl-mirror">
+                      {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+                   </mat-icon>
+                 </mat-chip>
+                 <mat-chip [routerLink]="[ node.id ]" >{{node.id}}</mat-chip>
+                 <mat-chip color="primary" [selected] = "node.IsActive?'':null"   [routerLink]="[ node.id ]" >{{node.Name}}</mat-chip>
+             </mat-chip-list>  
               <div [class.example-tree-invisible]="!treeControl.isExpanded(node)">
                 <ng-container cdkTreeNodeOutlet></ng-container>
-              </div>
-            
-
-          </cdk-nested-tree-node>
-      </cdk-tree>
+              </div> 
+           </cdk-nested-tree-node>
+         </cdk-tree>
+       </mat-card-content>
     </mat-card>
 
 

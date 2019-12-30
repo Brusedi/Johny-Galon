@@ -37,13 +37,17 @@ export class MetadataProvService {
 
   private loadMetadata3 = (loc:string ) => {
     const tmeta$ = this.dataService.metadata$(loc);
+
     const fdesc$ = tmeta$.pipe(
       map(this.toFieldsType),
       mergeMap( x => from(Object.keys(x)).pipe(
                     mergeMap( f => this.getFieldDescr$(loc, f, x[f] )),
-                    reduce( (a,f:FieldDescribe) => ({...a, [f.id]:f }), ({}) )
+                    //tap(x=>console.log(x)),
+                    reduce( (a,f) => ({...a, [f.id]:f}), {} as FieldDescribe ),
+                    //tap(x=>console.log(x)),
       )),
     );
+
     return tmeta$.pipe( 
       combineLatest( fdesc$ , (v1,v2) => ({table:v1 ,fieldsDesc: v2 }) )
       //, tap(x=>console.log(x)) 
@@ -55,7 +59,7 @@ export class MetadataProvService {
         .pipe( catchError( error => ([{[META_FIELDNAME_KEY_NAME]:id}])) )
         .pipe( 
             map( x => this.adapterService.toFieldDescribe(x, META_FIELDNAME_KEY_NAME, (x,t) => x[t] )),
-            map( x => ({...x, type:(x.type === undefined ? typeSeed : x.type) }))
+            map( x => ({...x, type:(x.type === undefined ? typeSeed : x.type) })  )
         );
         
 
@@ -140,7 +144,7 @@ export class MetadataProvService {
 
     return from(fieldsMetadata).pipe(
       mergeAll(),
-      reduce( (a,e:FieldDescribe) => ({...a, [e.name]:e }) ,  {}  ) ,     
+      reduce( (a,e) => ({...a, [e.name]:e }) ,  {} as FieldDescribe  ) ,     
       tap(x=>console.log(x))
     )
   }

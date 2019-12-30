@@ -59,6 +59,7 @@ export class JnWebCntMainNstComponent implements OnInit {
     const data$ = this.entityProv.collectionData$( ActionContentRoot ).pipe( filter(x => !!x ) ,
     // tap( x => console.log(x))
     ) ;
+    
     this.subscriptions.push(
        data$.subscribe( x => this.dataSubj.next(x) )
     ); 

@@ -41,5 +41,19 @@
             <mat-form-field *ngSwitchCase="'datetimepicker'" class="example-datetime-width" >
                 <input type="datetime-local"  matInput  placeholder={{question.label}} [formControlName]="question.key" [id]="question.key"   >
             </mat-form-field>   
+
+            <div *ngSwitchCase="'textarea_html'">
+                <app-jg-textarea-html  placeholder={{question.label}} [formControlName]="question.key" [id]="question.key"> </app-jg-textarea-html> 
+                
+            </div>
+
+            <!-- <mat-form-field *ngSwitchCase="'textarea_html'" > -->
+                    <!-- <form-field-custom-control-example></form-field-custom-control-example> -->
+                    <!-- <app-jg-textarea-html  [formControlName]="question.key" [id]="question.key"></app-jg-textarea-html> -->
+                    <!-- <ckeditor [formControlName]="question.key" [id]="question.key" data="<p>Hello, world!</p>"></ckeditor> -->
+            <!-- </mat-form-field>    -->
+    
+          
+
     </div> 
   </div> 

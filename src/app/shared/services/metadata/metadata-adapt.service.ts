@@ -63,7 +63,8 @@ export class MetadataAdaptService {
         type: this.existOrValFunc(data,[
             {atr:"DataType", fn: (x => x==1 ? "DateTime" : null )},
             {atr:"DataType", fn: (x => x==2 ? "Date" : null )},
-            {atr:"DataType", fn: (x => x==7 || x==6 || x==9 ? "Text" : null )},
+            {atr:"DataType", fn: (x => x==7 || x==6 || x==9  ? "Text" : null )},
+            {atr:"DataType", fn: (x => x==8 ? "Html" : null )},
             {atr:ADD_META_TYPE_KEY_NAME, fn: (x => x)} 
           ],undefined),  //string
 

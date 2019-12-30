@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Http,  RequestOptions , Headers} from '@angular/http';
-import { map, mergeMap, tap, combineLatest, last, take, takeLast } from 'rxjs/operators';
+import { map, mergeMap, tap, combineLatest, last, take, takeLast, retry, catchError } from 'rxjs/operators';
 
 import { AppSettingsService } from './app-setting.service';
 import { AppSettings } from '../app-setting';
@@ -110,10 +110,10 @@ export class DataProvService {
         //tap(x=>console.log('w :'+x)) ,
         map(this.buildOption),
         combineLatest( this.buildDataUri_v2(loc, subloc, RequestType.Ordinary ), (o,u) => ({opt:o, uri:u}) ),
-        //tap(x=>console.log('w')) ,
-        //tap(console.log) ,
-        mergeMap( x => this.http.put( x.uri, data, x.opt ) ) 
- )        
+        tap(x=>console.log('w')) ,
+        tap(console.log) ,
+        mergeMap( x => this.http.put( x.uri, data, x.opt ))
+    )        
 
 
   

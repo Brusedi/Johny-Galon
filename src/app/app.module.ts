@@ -24,7 +24,8 @@ import {
   MatTooltipModule,
   MatProgressBarModule,
   MatGridListModule,
-  MatTreeModule
+  MatTreeModule,
+  MatChipsModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -67,6 +68,12 @@ import { CdkTreeModule } from '@angular/cdk/tree';
 import { JnWebCntItemComponent } from './jn-web-cnt/jn-web-cnt-item/jn-web-cnt-item.component';
 import { JnNewItemContentComponent } from './jn-galon/jn-entity/jn-new-item-content/jn-new-item-content.component';
 import { JnNameplateCardComponent } from './jn-galon/jn-nameplate-card/jn-nameplate-card.component';
+
+import { CKEditorModule } from 'ckeditor4-angular';
+import { JgTextareaHtmlComponent } from './jn-galon/jg-controls/jg-textarea-html/jg-textarea-html.component';
+import { MyTelInput, FormFieldCustomControlExample } from './jn-galon/jg-controls/uc-example/form-field-custom-control-example';
+
+
 
 
 //const externalUrlProvider = new InjectionToken('externalUrlRedirectResolver');
@@ -113,17 +120,15 @@ const appRoutes: Routes = [
     JnBusyBarComponent,
     JnpFlightItemComponent,
     JnpCmpBarComponent,
-
     JnWebCntMainComponent,
-
     JnWebCntMainNstComponent,
-
     JnWebCntItemComponent,
-
     JnNewItemContentComponent,
-
     JnNameplateCardComponent,
-    
+    JgTextareaHtmlComponent,
+    FormFieldCustomControlExample,
+    MyTelInput
+   
   ],
 
   imports: [
@@ -170,8 +175,11 @@ const appRoutes: Routes = [
     MatProgressBarModule,
     MatGridListModule,
     MatTreeModule,
-    CdkTreeModule 
-
+    CdkTreeModule,
+    MatChipsModule,
+    CKEditorModule,
+    
+    
     
   ],
   providers: [

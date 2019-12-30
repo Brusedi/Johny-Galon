@@ -39,6 +39,8 @@ export class JnItemQuestionComponent implements OnInit{
     this.control = this.form.controls[this.question.key];
     this.prepareSecondaryData();
 
+    //console.log(this.question.controlType);
+
     if(this.question.controlType == 'dropdown'){
        //this.options$ = this.store.select( fromSelectors.selectOptionsByLoc( this.question[REF_LOC_PROP] ));             //чистый 
        this.options$ = this.store.select( fromSelectors.selectForeignOptionsByLoc( this.question[REF_LOC_PROP] ));        //референсный 
@@ -46,6 +48,7 @@ export class JnItemQuestionComponent implements OnInit{
        //this.options$.subscribe( x=>{ console.log(this.question.key);console.log(this.question[REF_LOC_PROP]) ;console.log(x); })
     }
 
+    //this.form.valueChanges.subscribe(x => console.log(x));
   }
 
   private prepareSecondaryData (){

@@ -1,3 +1,4 @@
+ 
  .example-tree-invisible {
     display: none;
   }
@@ -22,9 +23,23 @@
     margin: 10px;
     margin-left: auto;
     margin-right: auto;  
+    padding:0 !important;
+
   }  
+
+  .ex-mat-icon {
+    font-size: 50px;
+  }
 
   .example-tree-title {
     font-size: 24px;
     font-weight: 500;
+  }
+
+ .jg-card-header-prim{
+  
+  padding:16px !important;
+}
+.example-card-content{
+  padding:16px !important;
 }

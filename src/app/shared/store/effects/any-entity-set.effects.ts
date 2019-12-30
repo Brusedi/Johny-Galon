@@ -7,7 +7,7 @@ import { map, mergeMap, catchError, tap, switchMap, filter, delayWhen, last, tak
 
 
 import { AnyEntitySetActionTypes, Exec, ExecItemAction, CompleteItemAction, ExecCurrent, PrepareByLoc, PrepareByLocComplete, AddItem, PartLoadByLoc, ErrorAnyEntitySet } from "@appStore/actions/any-entity-set.actions";
-import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart, SetRowSeed, AddItemSuccess  } from "@appStore/actions/any-entity.actions";
+import { anyEntityActions, AnyEntityActionTypes, GetItemsMetaSuccess, ErrorAnyEntity, GetTemplateSuccess, GetItemsSuccess, GetItemsPartSuccess, GetItemsPart, SetRowSeed, AddItemSuccess, UpdateItemSuccess  } from "@appStore/actions/any-entity.actions";
 import { anyEntityOptions } from "@appModels/any-entity";
 
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
@@ -165,6 +165,12 @@ export class anyEntytySetEffects {
                 return this.dataService.update( options.location, action.payload )
                     .pipe( 
                         tap( x => console.log(x)  ),
+                        map( x =>  x.hasOwnProperty('status') && x.status == 204 ),
+                        map( x =>  !x ? new ErrorAnyEntity(prepareError('Жопа')) : new UpdateItemSuccess('') ) ,
+                        tap( x =>  console.log(x)),
+
+
+
                         // map( x =>  x.hasOwnProperty('_body')?JSON.parse(x['_body']):x ),
                         // mergeMap( x => from( 
                         //             x.hasOwnProperty('Data')&&x['Data'].hasOwnProperty('id')
@@ -175,8 +181,8 @@ export class anyEntytySetEffects {
                         //         )
                         // ),
                         //catchError(error => { console.log(error )  ; return of(new ErrorAnyEntity(prepareError(error))) } )   
-                        catchError(error => this.backProvService.actionErrorfromResponse$(error))   
-                        
+                        catchError(error =>  this.backProvService.actionErrorfromCatch$(error) )
+
                     ); 
 
             case ( AnyEntityActionTypes.ADD_ITEM) :

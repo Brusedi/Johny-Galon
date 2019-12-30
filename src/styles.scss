@@ -25,8 +25,6 @@ $candy-app-theme: mat-light-theme($candy-app-primary, $candy-app-accent, $candy-
 // that you are using.
 @include angular-material-theme($candy-app-theme);
 
-
-
 .jg-i-header, .jg-busy-bar{
     background-color:  mat-color($candy-app-primary ,  900);
     color:  mat-color(mat-palette($mat-grey,400));
@@ -40,10 +38,24 @@ $candy-app-theme: mat-light-theme($candy-app-primary, $candy-app-accent, $candy-
     background-color: mat-color($candy-app-accent, 50 );
 }
 
+
 .jg-layout-accent{
     background-color: mat-color($candy-app-accent);
 }
 
+.jg-card-header-prim{
+    background-color: mat-color($candy-app-primary,500);
+    color: mat-color($candy-app-accent, 50 );
+
+}
+
+.jg-card-header-accent{
+    background-color: mat-color($candy-app-accent,200);
+ 
+}
+
+
 body{
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }    
+

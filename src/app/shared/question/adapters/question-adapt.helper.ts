@@ -9,6 +9,7 @@ import { DatePickerQuestion } from "../question-datepicker";
 import { TextareaQuestion } from "../question-textarea";
 import { CheckboxQuestion } from "../question-checkbox";
 import { FormControl, FormGroup } from "@angular/forms";
+import { TextareaHtmlQuestion } from "../question-textarea-html";
 
 /**
  *  Form Question adapter 
@@ -19,6 +20,7 @@ const  BKND_DATE_DATATYPE_NAME = "Date";
 const  BKND_DATE_DATATYPE_NAME_NULABLE = "Date?";
 const  BKND_DATETIME_DATATYPE_NAME = "DateTime";
 const  BKND_TEXT_DATATYPE_NAME = "Text";
+const  BKND_HTML_DATATYPE_NAME = "Html";
 const  BKND_BOOL_DATATYPE_NAME = "boolean";
 const  BKND_BOOL_DATATYPE_NAME_NULABLE = "boolean?";
 
@@ -56,6 +58,8 @@ export const fldDescsToQuestions = (flds:FieldDescribe[],rowSeed:Observable<{}>)
                     return toDatePicker(fld, rowSeed);
                 case BKND_TEXT_DATATYPE_NAME: 
                     return toTextArea(fld, rowSeed);
+                case BKND_HTML_DATATYPE_NAME: 
+                    return toTextAreaHtml(fld, rowSeed);
                 case BKND_BOOL_DATATYPE_NAME: 
                     return toCheckbox(fld, rowSeed);
                 case BKND_BOOL_DATATYPE_NAME_NULABLE: 
@@ -118,7 +122,17 @@ const toTextArea = (x:FieldDescribe, rowSeed$:Observable<{}>) => {
     return new TextareaQuestion(
         buildQuestionBaseOption(x, rowSeed$ ) 
     ); 
+
+
 }
+const toTextAreaHtml = (x:FieldDescribe, rowSeed$:Observable<{}>) => { 
+    //console.log("TextareaQuestion")
+    return new TextareaHtmlQuestion(
+        buildQuestionBaseOption(x, rowSeed$ ) 
+    ); 
+}
+
+
 
 const toCheckbox = (x:FieldDescribe, rowSeed$:Observable<{}>) => { 
     //console.log("toDatePicker")

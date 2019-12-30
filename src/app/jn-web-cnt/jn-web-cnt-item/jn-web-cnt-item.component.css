@@ -3,8 +3,16 @@
     margin: 10px;
     margin-left: auto;
     margin-right: auto;  
+    padding:0 !important;
   }  
 
 .mat-icon {
     font-size: 50px;
+  }
+
+  .jg-card-header-accent{
+      padding:16px !important;
+  }
+  .example-card-content{
+    padding:16px !important;
   }

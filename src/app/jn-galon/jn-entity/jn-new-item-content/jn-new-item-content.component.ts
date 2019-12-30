@@ -26,7 +26,7 @@ export class JnNewItemContentComponent implements OnInit {
 
   ngOnInit() {
 
-
+    //this.controls$.subscribe(x=> console.log(x))
   }
 
   onSubmit() {

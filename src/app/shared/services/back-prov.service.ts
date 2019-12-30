@@ -6,7 +6,7 @@ import * as fromSelectors from '@appStore/selectors/index';
 import { BackICommonError, BackICommonErrorEx } from '@appModels/any-entity';
 import { of, Observable } from 'rxjs';
 import { ErrorAnyEntity } from '@appStore/actions/any-entity.actions';
-import { combineLatest, map, switchMap, mergeMap } from 'rxjs/operators';
+import { combineLatest, map, switchMap, mergeMap, tap, take } from 'rxjs/operators';
 
 
 
@@ -78,8 +78,31 @@ export class BackProvService {
      */      
     public actionErrorfromResponse$ =  (responce:Response)  => 
         this.errorPreHandler$(this.backErrorHandler(responce)).pipe(
-            map( x => new ErrorAnyEntity(x ) )    
+            map( x => new ErrorAnyEntity(x ) ) ,   
         )
+
+     /**
+     * Convert error responce to Error Entity action
+     */      
+    public actionErrorfromCatch$ = (error:any)  =>  this.actionErrorfromResponse$(error)    ;
+        // of(error).pipe(
+        //     tap( x => console.log(x) ),
+        //     map( x => new ErrorAnyEntity(x ) )
+        // )
+        
+
+
+    /**
+     * Convert error responce to Error Entity action as Value
+     */      
+    // public actionErrorfromResponse =  (responce:Response)  => {
+    //     this.actionErrorfromResponse$(responce).pipe(
+    //         take(1)
+    //     ).subscribe( )            
+
+    // }
+        
+
 
     /**
      *  Error pre handler
@@ -93,5 +116,8 @@ export class BackProvService {
      *  Check is error retryable
      */    
     private isErrorRetriable$ =   (err:BackICommonError)  => of( !!(err.StatusCode == 500 ))
+
+
+    
           
 }

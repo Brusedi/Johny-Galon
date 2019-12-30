@@ -1,32 +1,20 @@
-<div class="jn-scard">
-    <mat-card class="example-card">
-        <mat-card-header> 
-            <div mat-card-avatar class="example-header-image">
-                <button mat-mini-fab [routerLink]="['forms/sd/incoming']"  color="accent" >
-                        <mat-icon aria-label="Example icon-button with a heart icon">email</mat-icon>
-                </button>
-            </div>
-            <mat-card-title>Добровольное сообщение</mat-card-title>
-            <mat-card-subtitle>Вы можете отправить сообщение касающееся непосредственно безопасности полетов.</mat-card-subtitle> 
-        </mat-card-header>
-    </mat-card>
-</div>
-  
 
-<div class="jn-scard">
-        <mat-card class="example-card">
-            <mat-card-header> 
-                <div mat-card-avatar class="example-header-image">
-                    <button mat-mini-fab [routerLink]="['forms/wc']"  color="accent" >
-                            <mat-icon aria-label="Example icon-button with a heart icon">language</mat-icon>
-                    </button>
-                </div>
-                <mat-card-title>Макеты веб-страниц</mat-card-title>
-                <mat-card-subtitle>Макеты веб-страниц представляют основу содержимого корпоративного сайта www.nvavia.ru</mat-card-subtitle> 
-            </mat-card-header>
-        </mat-card>
-    </div>
-    
+<app-jn-nameplate-card 
+        Caption ="Добровольное сообщение"
+        Description = "Вы можете отправить сообщение касающееся непосредственно безопасности полетов." 
+        IconName="email"  
+        RouterLink = "forms/sd/incoming"
+        >
+</app-jn-nameplate-card>   
+
+<app-jn-nameplate-card 
+        Caption ="Макеты веб-страниц"
+        Description = "Макеты веб-страниц представляют основу содержимого корпоративного сайта www.nvavia.ru" 
+        IconName="language"  
+        RouterLink = "forms/wc"
+        >
+</app-jn-nameplate-card>   
 
 
+<form-field-custom-control-example></form-field-custom-control-example>
 

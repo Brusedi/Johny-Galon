@@ -68,6 +68,7 @@ export class JnWebCntItemComponent implements OnInit {
 
   Save() {
     this.entityProv.updateItemByRowSeed(ActionContent).unsubscribe();
+    
   }  
 
 }
