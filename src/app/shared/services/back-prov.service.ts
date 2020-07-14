@@ -16,10 +16,16 @@ import { combineLatest, map, switchMap, mergeMap, tap, take } from 'rxjs/operato
 
 
 const isBackICommonError = (x:any) => 
+    x &&
     x.hasOwnProperty('Name') &&
     x.hasOwnProperty('Message') &&
     x.hasOwnProperty('Code') &&
     x.hasOwnProperty('Data') ;
+
+const isJSMessageError = (x:any) => 
+    x &&
+    x.hasOwnProperty('message') &&
+    x.hasOwnProperty('stack')    
 
 const unknownError = (data:any) =>({
         Name:"Ошибка", 
@@ -43,14 +49,18 @@ interface buildErr{
 export class errBuilder {
     static of  = (x:any) => new errBuilder({val:x, error:null })
     static error = (x:BackICommonError) => new errBuilder({val:null, error:x })
+
     private constructor(public data:buildErr) { }
 
     public bind:((f:((data:any) => errBuilder)) => errBuilder ) = (f) => this.data.error ? this : f(this.data.val) ;
-    public ret = ( defError:BackICommonError ) =>   this.data.error ? this.data.error : defError ;
 
-    public ifError = (f:( (x:any)=>boolean )) => this.bind( y => f(y) ?   errBuilder.error(y) : errBuilder.of(y)  ); 
     public map = (f:((x:any)=>any )) => this.bind( y => errBuilder.of( f(y)) );  
     public tap = (f:((x:any)=>any )) => { f(this.data.error?this.data.error:this.data.val ); return this;}   
+
+    public toError = ( defError:BackICommonError ) =>   this.data.error ? this.data.error : defError ;
+    public ifError = (f:( (x:any)=>boolean )) => this.bind( y => f(y) ?   errBuilder.error(y) : errBuilder.of(y)  ); 
+    public ifMap = (fCheck:( (x:any)=>boolean ), fmap:( (x:any)=>BackICommonError  )  ) => this.bind( y => fCheck(y) ?   errBuilder.error(fmap(y)) : errBuilder.of(y)  ); 
+
     
 }  
 
@@ -69,22 +79,36 @@ export class BackProvService {
         errBuilder
           .of(responce)
           .ifError( x => isBackICommonError(x) )
-          .map( x => x.hasOwnProperty('_body') ? JSON.parse(x['_body']) : x  )
+          .map( x => x&&x.hasOwnProperty('_body') ? JSON.parse(x['_body']) : x  )
           .ifError( x => isBackICommonError(x) )
-          .ret(unknownError(responce))
+          .ifMap(isJSMessageError, x => ({ 
+                    Name: x.message, 
+                    Message: x.stack,
+                    Code:0,
+                    StatusCode:0,
+                    Data:x 
+                })
+            )
+          .toError(unknownError(responce))
 
     /**
      * Convert error responce to Error Entity action
      */      
     public actionErrorfromResponse$ =  (responce:Response)  => 
         this.errorPreHandler$(this.backErrorHandler(responce)).pipe(
-            map( x => new ErrorAnyEntity(x ) ) ,   
+            map( x => new ErrorAnyEntity(x) ) ,   
         )
+
+    /**
+     * Convert error responce to Error Entity action
+     */      
+    public actionErrorfromAny$ =  (responce:any)  => this.actionErrorfromResponse$(responce).pipe(tap(x=>console.log(x))) ;
+
 
      /**
      * Convert error responce to Error Entity action
      */      
-    public actionErrorfromCatch$ = (error:any)  =>  this.actionErrorfromResponse$(error)    ;
+    public actionErrorfromCatch$ = (error:any)  =>  this.actionErrorfromResponse$(error).pipe(tap(x=>console.log(x)))    ;
         // of(error).pipe(
         //     tap( x => console.log(x) ),
         //     map( x => new ErrorAnyEntity(x ) )

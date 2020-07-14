@@ -62,3 +62,10 @@ export const ActionContent:anyEntityOptions<AnyEntityId> = {
   selectId: (x) => x.id,
   selBack: (x:string) => ("?id=" + x )
 };      
+
+export const RiskExamItemsOption:anyEntityOptions<AnyEntityId> = {
+  name: "ExamItems", 
+  location:"/NvaRisks/ExamItems", 
+  selectId: (x) => x.ID,
+  selBack: (x:string) => ("/" + x )
+};      

@@ -1,6 +1,7 @@
 import { EntityState, createEntityAdapter, EntityAdapter, Dictionary } from "@ngrx/entity";
 import { anyEntityActions, AnyEntityActionTypes } from "@appStore/actions/any-entity.actions";
 import { FieldDescribes } from "@appModels/metadata";
+import { monad, tMonad } from "@appModels/monad";
 
 //import { anyEntityLazyActions, AnyEntityLazyActionTypes } from "@appStore/actions/any-entity-lazy.actions";
 
@@ -92,23 +93,30 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             case AnyEntityActionTypes.ADD_ITEM_SUCCESS:
                 return { ...state, uploading: false, uploaded:true, insertedId:action.payload};    
 
-            case AnyEntityActionTypes.UPD_ITEM:
+            case AnyEntityActionTypes.UPD_ITEM:{
+                console.log('UPD_ITEM_SUCCESS');
                 return { ...state, uploading: true , insertedId:null  };    
-   
-            case AnyEntityActionTypes.UPD_ITEM_SUCCESS:
+            }    
+            case AnyEntityActionTypes.UPD_ITEM_SUCCESS:{
+                console.log('UPD_ITEM_SUCCESS');
                 return { ...state, uploading: false, uploaded:true, insertedId:action.payload};    
-   
+            }    
             case AnyEntityActionTypes.GET_ITEMS_PART:
                 return { ...state, loading: true };    
 
-            case AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS:{
-                //console.log('GET_ITEMS_PART_SUCCESS');
-                var r = adapt.addMany( 
-                        action.payload.entites,
-                        { ...state , loading: false , partLoaded:  { ...state.partLoaded , [action.payload.request]:action.payload.ids  }  }
-                    );  
-                return r;                    
-            }
+            case AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS: 
+                // Возможна несогласованность ид и ентитесов, без опшинов ее не разрешить  
+                //
+                return tMonad.of(({
+                        a:action,
+                        p2:{ ...state , loading: false , partLoaded:  { ...state.partLoaded , [action.payload.request]:action.payload.ids  }  }   
+                    }))
+                    .map( x => x.a.isReload 
+                            ? adapt.updateMany( x.a.payload.entites.map( (y,i) => ({id: x.a.payload.ids[i]  , changes:y } )), x.p2 ) 
+                            : adapt.addMany( x.a.payload.entites, x.p2 )  )
+                    .run();
+
+            
 
             case AnyEntityActionTypes.GET_ITEMS:
                 return { ...state, loading: true };    
@@ -150,7 +158,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
 
             /// uploaded
             case AnyEntityActionTypes.EROR_ANY_ENTITY:{
-              //  console.log(action);
+                //console.log(action);
                 return { ...state, loading: false, uploading:false, metaLoading:false ,error: action.payload};        //loaded: false     
             }
                 

@@ -72,6 +72,7 @@ import { JnNameplateCardComponent } from './jn-galon/jn-nameplate-card/jn-namepl
 import { CKEditorModule } from 'ckeditor4-angular';
 import { JgTextareaHtmlComponent } from './jn-galon/jg-controls/jg-textarea-html/jg-textarea-html.component';
 import { MyTelInput, FormFieldCustomControlExample } from './jn-galon/jg-controls/uc-example/form-field-custom-control-example';
+import { JnRiskExamComponent } from './jn-risks/jn-risk-exam/jn-risk-exam.component';
 
 
 
@@ -88,6 +89,8 @@ const appRoutes: Routes = [
 
   { path: 'forms/wc',          component: JnWebCntMainNstComponent          },  
   { path: 'forms/wc/:id',      component: JnWebCntItemComponent             },  
+
+  { path: 'forms/risks',       component: JnRiskExamComponent               },  
 
   { path: '**',                component: JnNotFoundComponent }
 ];
@@ -127,7 +130,8 @@ const appRoutes: Routes = [
     JnNameplateCardComponent,
     JgTextareaHtmlComponent,
     FormFieldCustomControlExample,
-    MyTelInput
+    MyTelInput,
+    JnRiskExamComponent
    
   ],
 

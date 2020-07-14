@@ -24,6 +24,17 @@ const  BKND_HTML_DATATYPE_NAME = "Html";
 const  BKND_BOOL_DATATYPE_NAME = "boolean";
 const  BKND_BOOL_DATATYPE_NAME_NULABLE = "boolean?";
 
+//
+const DEFAULT_VALUES_FOR_TYPES : {[key: string]: any} =  {
+    [BKND_DATE_DATATYPE_NAME]              : new Date(), 
+    [BKND_DATE_DATATYPE_NAME_NULABLE]      : null,
+    [BKND_DATETIME_DATATYPE_NAME]          : new Date(),
+    [BKND_TEXT_DATATYPE_NAME]              : "",
+    [BKND_HTML_DATATYPE_NAME]              : "",
+    [BKND_BOOL_DATATYPE_NAME]              : false, 
+    [BKND_BOOL_DATATYPE_NAME_NULABLE]      : null
+};
+
 interface cdata { descr:FieldDescribe ; ctrl?:QuestionBase<any>; rowSeed$:Observable<{}> } ;    // контейнер для конвеера
 type cfactory =  (descr:FieldDescribe,  rowSeed$:Observable<{}> ) => QuestionBase<any> ;      
 const ifEmptyAnd = ( c:( (x:cdata) => boolean ) , f:cfactory)  =>  ( (x:cdata) =>  x.ctrl || ! c(x) ? x : { descr:x.descr, ctrl:f(x.descr, x.rowSeed$), rowSeed$:x.rowSeed$ } );
@@ -35,6 +46,18 @@ const ifEmptyAnd = ( c:( (x:cdata) => boolean ) , f:cfactory)  =>  ( (x:cdata) =
 //      this.dbItemQuestions$(dataSourse,rowSeed)
 //      .combineLatest( this.getDependedOwnerFields$( dataSourse), (q,f) => ({ questions:q , fields:f }) )
 
+/**
+* Return new rowTemplate (RowSeed) for FieldDescribe[] by FieldDescribe def value 
+*/
+export const getDefValByType = (type:string) => DEFAULT_VALUES_FOR_TYPES.hasOwnProperty(type) ?  DEFAULT_VALUES_FOR_TYPES[type] : undefined ; 
+/**
+* Return new rowTemplate (RowSeed) for FieldDescribe[] by FieldDescribe def value 
+*/
+export const genRowTemplateByFldsDesc = (flds:FieldDescribe[]) => flds.reduce( (a,x) => ({ ...a , [x.id]:x.defaultValue }) ,{} )
+/**
+* Return new rowTemplate (RowSeed) for FieldDescribe[] by Type def value 
+*/
+export const getRowTemplateByFldsDesc = (flds:FieldDescribe[]) => flds.reduce( (a,x) => ({ ...a , [x.id]:getDefValByType(x.type) }) ,{} )
 
 /**
 * Build Item Question set for dbsource

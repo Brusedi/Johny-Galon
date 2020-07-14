@@ -11,6 +11,7 @@ import { GetItemsPart, GetItems, GetItemsMeta, ChangeRowSeed, SetRowSeed, Update
 import { DomSanitizer } from '@angular/platform-browser';
 import { Observable } from 'rxjs';
 import { FormGroup } from '@angular/forms';
+import { genRowTemplateByFldsDesc, getRowTemplateByFldsDesc } from '../question/adapters/question-adapt.helper';
 //import { AddItem } from '@appStore/actions/any-entity.actions';
 
 
@@ -88,7 +89,7 @@ public metaData$ = (  opt:anyEntityOptions<AnyEntity>  ) =>
               ).subscribe( x => !!x ? null : this.store.dispatch(  new ExecItemAction( {itemOption:opt , itemAction: new GetItemsMeta() })))   
         ),
         switchMap( x => this.store.select( fromSelectors.selectDataMetadata(opt.name)) ),
-        tap(x=>console.log(x) )
+        //tap(x=>console.log(x) )
     )  
 
 /*
@@ -151,6 +152,8 @@ public controlsForEdit$ = (  opt:anyEntityOptions<AnyEntity> ,id:any ,flds: stri
         //switchMap( x => this.getFormControls$(opt.name, flds,this.store.select(fromSelectors.selRowSeed(opt.name) ) ) ),
     )  
 
+
+
 /*
 *  prepare and get controls for edit and eject changes to rowseeed
 */    
@@ -168,10 +171,44 @@ public controlsForEditEx$ = (  opt:anyEntityOptions<AnyEntity> ,id:any ,flds: st
 public updateItemByRowSeed = (  opt:anyEntityOptions<AnyEntity>  ) => 
     this.store.select(fromSelectors.selRowSeed(opt.name)).pipe(take(1))
         .subscribe(  x => {
-                console.log(x);
+                //console.log(x);
                 this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new UpdateItem(x) }) )
             }
         );
-}
 
+
+
+/*
+*  prepare and get controls 2020 wo id (insert or edit?)
+*  Не реализована поддержка подгрузки темплэйта новой записи TODO !!!
+*
+*/
+public controlsForEntityDefTempl$ = (   opt:anyEntityOptions<AnyEntity> ,excludeFlds: string[] ) =>
+    this.metaData$(opt).pipe(
+        filter(x => x && Object.keys(x.fieldsDesc).length > 0 ),
+        map( x => ({ 
+            meta:x, 
+            templ: getRowTemplateByFldsDesc( Object.keys(x.fieldsDesc).map( y => x.fieldsDesc[y])) ,
+            flds:Object.keys(x.fieldsDesc).filter(y => !excludeFlds.includes(y) )        
+        })), 
+        tap( x => this.store.dispatch( new ExecItemAction( {itemOption:opt , itemAction: new ChangeRowSeed(x.templ) }))), 
+        switchMap( x => 
+            this.store.select( 
+                fromSelectors.selFormControlsEx$( 
+                    opt.name ,
+                    x.flds,
+                    this.store.select(fromSelectors.selRowSeed(opt.name)) 
+                )
+            )
+            .pipe(switchMap( x => x ))
+        ));
+        
+        //map( x => Object.keys(x.fieldsDesc).map( y => x.fieldsDesc[y] ) )
+        //map( x => genRowTemplateByFldsDesc( Object.keys(x.fieldsDesc).map( y => x.fieldsDesc[y] ) ) )
+        //map( x => getRowTemplateByFldsDesc( Object.keys(x.fieldsDesc).map( y => x.fieldsDesc[y] ) ) )
+        //map( x => Object.keys(x.fieldsDesc).filter(y => !excludeFlds.includes(y) ) ), 
+        //switchMap( x =>  this.store.select( fromSelectors.selFormControlsEx$( opt.name , x, this.store.select(fromSelectors.selRowSeed(opt.name) ) ))),
+        //fromSelectors.selFormControlsEx$( 
+
+}
 

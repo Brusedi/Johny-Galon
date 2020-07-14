@@ -1,0 +1,31 @@
+<mat-card class="example-card">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon class="icon-disp" color="primary"> email </mat-icon>
+    </div>
+    <mat-card-title>Оценка рисков</mat-card-title>
+    <mat-card-subtitle>
+      Оценка и определение возможности вылета (принятия решения на вылет) предстоящего полета, по критериям СУБП 
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    
+    <app-jn-new-item-content  [controls$]="controls$" ></app-jn-new-item-content>
+
+    <mat-card-subtitle>
+      Так же Вы можете передать добровольное сообщение письменно или устно по следующим каналам:
+      <ul>
+        <li>По почте: ул.Авиаторов 2, г. Нижневартовск, ХМАО-Югра, 628613, Аэропорт; </li>
+        <li>На адрес электронной почты: vashenko@nvavia.ru;</li>
+        <li>В специальный почтовый ящик: здание СПЗ авиапредприятия, КТОиР, Терминал №1 и наземный комплекс;</li>
+        <li>По телефону: 8(3466)49-20-62 ; 8(982)535-97-07; </li>
+        <li>При личном обращении в инспекции по безопасности полетов Ващенко Сергею Александровичу</li>
+      </ul>
+    </mat-card-subtitle>
+  </mat-card-content>
+
+  <!-- <ng-template #loading>
+    <mat-spinner class="spinner"> </mat-spinner>
+  </ng-template> -->
+</mat-card>

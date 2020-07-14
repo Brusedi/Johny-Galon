@@ -40,7 +40,7 @@ export class JgTextareaHtmlComponent implements ControlValueAccessor, OnInit {
   }
 
   registerOnTouched(fn: any): void {
-    console.log(fn);
+  //   console.log(fn);
   }
 
   setDisabledState?(isDisabled: boolean): void {

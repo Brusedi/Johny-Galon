@@ -63,6 +63,8 @@ export class JnWebCntItemComponent implements OnInit {
     )  
 
     this.isValid$ =  this.controls$.pipe( map( x => x.formGroup.valid) )
+
+    
         
   }
 

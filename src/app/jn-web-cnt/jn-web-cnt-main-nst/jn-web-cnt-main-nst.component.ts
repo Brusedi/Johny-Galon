@@ -65,6 +65,15 @@ export class JnWebCntMainNstComponent implements OnInit {
     ); 
   }
 
+
+  NewPage() {
+    // this.entityProv.updateItemByRowSeed(ActionContent).unsubscribe();
+      
+
+    
+  }
+
+
   ngOnDestroy(){ 
     while(this.subscriptions.length > 0){
       this.subscriptions.pop().unsubscribe(); 

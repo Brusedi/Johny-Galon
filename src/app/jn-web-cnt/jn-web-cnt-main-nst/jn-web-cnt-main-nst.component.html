@@ -30,16 +30,23 @@
                  <mat-chip [routerLink]="[ node.id ]" >{{node.id}}</mat-chip>
                  <mat-chip color="primary" [selected] = "node.IsActive?'':null"   [routerLink]="[ node.id ]" >{{node.Name}}</mat-chip>
              </mat-chip-list>  
+
               <div [class.example-tree-invisible]="!treeControl.isExpanded(node)">
                 <ng-container cdkTreeNodeOutlet></ng-container>
               </div> 
            </cdk-nested-tree-node>
          </cdk-tree>
+
+         <mat-card-actions>
+          <p></p>
+          <button mat-button color="primary" (click)="NewPage()" > НОВАЯ СТРАНИЦА </button>
+         </mat-card-actions>
        </mat-card-content>
+
+
     </mat-card>
-
-
 </div> 
+
 
 
 <ng-template #elseBlock>

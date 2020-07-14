@@ -1,11 +1,12 @@
 import { Action } from "@ngrx/store";
 //import { FieldDescribes } from "@appModels/metadata";
 
-// Для GET_ITEMS_PART не совсем верная семантика надо повошкатся потом может быть скоректировать
+// Для GET_ITEMS_PART не совсем верная синтаксика надо повошкатся потом может быть скоректировать
 //
 
 
 export enum AnyEntityActionTypes {
+    
     GET_ITEMS               = '[Entity] Load all items',
     GET_ITEMS_SUCCESS       = '[Entity] All items loaded success ',
 
@@ -15,11 +16,11 @@ export enum AnyEntityActionTypes {
     GET_ITEMS_META          = '[Entity] Load items medadata',
     GET_ITEMS_META_SUCCESS  = '[Entity] Item medadata loaded success',
 
-    ADD_ITEM                =  '[Entity] Add item',
-    ADD_ITEM_SUCCESS        =  '[Entity] Item added success',
+    ADD_ITEM                = '[Entity] Add item',
+    ADD_ITEM_SUCCESS        = '[Entity] Item added success',
 
-    UPD_ITEM                =  '[Entity] Update item',
-    UPD_ITEM_SUCCESS        =  '[Entity] Item uppdated success',
+    UPD_ITEM                = '[Entity] Update item',
+    UPD_ITEM_SUCCESS        = '[Entity] Item uppdated success',
 
     GET_TEMPLATE            = '[Entity] Load template',
     GET_TEMPLATE_ROWSEED    = '[Entity] Load template and set in rowSeed',
@@ -41,12 +42,12 @@ export class Jab implements Action {
 
 export class GetItemsPart implements Action {
     readonly type = AnyEntityActionTypes.GET_ITEMS_PART;
-    constructor(public payload: string ) {}
+    constructor(public payload: string , public isReload : boolean = false ) {}
 }
 
 export class GetItemsPartSuccess<T> implements Action {
     readonly type = AnyEntityActionTypes.GET_ITEMS_PART_SUCCESS;
-    constructor(public payload: ({ entites: T[] , ids:any[], request:string })  ) {}
+    constructor(public payload: ({ entites: T[] , ids:any[], request:string }) , public isReload : boolean = false ) {}
 }
 
 export class GetItems implements Action {
@@ -72,9 +73,9 @@ export class UpdateItem<T> implements Action {
     constructor(public payload: T ) {}
 }
 
-export class UpdateItemSuccess<T> implements Action {
+export class UpdateItemSuccess implements Action {
     readonly type = AnyEntityActionTypes.UPD_ITEM_SUCCESS;
-    constructor(public payload: T ) {}
+    constructor(public payload: any ) {}
 }
 
 export class GetItemsMeta implements Action {
@@ -133,7 +134,7 @@ export type anyEntityActions =
   | AddItem<any>
   | AddItemSuccess<any>
   | UpdateItem<any>
-  | UpdateItemSuccess<any>
+  | UpdateItemSuccess
   | GetTemplate
   | GetTemplateRowSeed
   | GetTemplateSuccess<any>

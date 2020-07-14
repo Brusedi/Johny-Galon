@@ -19,7 +19,7 @@ export class AppSettings {
 
     auth2AuthEndPoint_Google: string    = "https://accounts.google.com/o/oauth2/v2/auth";
     auth2ClientId_Google:string         = "919554785719-dj2snd740luu6hr698acfs9b5lsvl3he.apps.googleusercontent.com";
-    auth2Scope_Google:string            = "profile";
+    auth2Scope_Google:string            = "email" ; //"profile";
     auth2LogoutEndPoint_Google:string   = "https://mail.google.com/mail/u/0/?logout&hl=ru";
 
                                             //"https://www.googleapis.com/auth/drive.metadata.readonly";

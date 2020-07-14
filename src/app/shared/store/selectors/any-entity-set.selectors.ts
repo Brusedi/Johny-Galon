@@ -149,6 +149,14 @@ export const selectEntityError = ( id: string ) =>
         (items:AnyEntytySetItemState<any>) => items.state.error
 );
 
+// 
+// export const selectEntity = ( id: string ) => 
+//     createSelector(
+//         selectData(id),
+//         (items:AnyEntytySetItemState<any>) => items.state.error
+// );
+
+
 
 // Questions seet
 // export const selectQuestions = ( id: string, rowSeed:Observable<{}> ) => 
@@ -563,7 +571,7 @@ export const selectDataIfExist = ( id: string ) =>
     );
 
 /**
-*   Select entytes & metadata if exist & loading
+*   Select entytes & metadata if exist & loading 
 */
 export const selectDataAndMetaIfExist = ( id: string ) =>
     createSelector(
@@ -710,6 +718,13 @@ export const selectPartLocationIfNotExist = ( loc: string ) =>
         x => x.indexOf(loc) >= 0 ?  null : loc
     );    
 
+    
+//260620 --- Не знаю с чего начать ... воще нужны контролы на форму для новой записи.... 
+// Начать отработку вероятно надо не с виртуальных сущностей, а потом уже переходить к виртуальным...
+// 
+
+
+//selectDataMetadata
 
 
 ///////////////////////////////////////////////////////    

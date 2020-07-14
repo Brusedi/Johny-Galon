@@ -159,30 +159,25 @@ export class anyEntytySetEffects {
 
     // proceccing child items effects            
     private procSubAction$ = ( action : anyEntityActions, options: anyEntityOptions<any>  ): Observable<any> => {
+        console.log(action);
         switch(action.type){
-
+            case ( AnyEntityActionTypes.UPD_ITEM_SUCCESS) :{
+                console.log('eeeeeeee');
+                return of( {opt:options,  id: action.payload} ).pipe(
+                    tap(x => console.log(x) ),
+                    map(x => new GetItemsPart( x.opt.location + x.opt.selBack(x.id), true ) )
+                )
+            }        
             case ( AnyEntityActionTypes.UPD_ITEM) :
                 return this.dataService.update( options.location, action.payload )
                     .pipe( 
                         tap( x => console.log(x)  ),
-                        map( x =>  x.hasOwnProperty('status') && x.status == 204 ),
-                        map( x =>  !x ? new ErrorAnyEntity(prepareError('Жопа')) : new UpdateItemSuccess('') ) ,
-                        tap( x =>  console.log(x)),
-
-
-
-                        // map( x =>  x.hasOwnProperty('_body')?JSON.parse(x['_body']):x ),
-                        // mergeMap( x => from( 
-                        //             x.hasOwnProperty('Data')&&x['Data'].hasOwnProperty('id')
-                        //                 && Array.isArray(x['Data']['id'])&&(x['Data']['id'][0])  
-                        //                 && x['Data'].hasOwnProperty('Location')&& Array.isArray(x['Data']['Location'])&&(x['Data']['Location'][0]) 
-                        //                 ? [ new AddItemSuccess( x['Data']['id'][0] ) , new  GetItemsPart(x['Data']['Location'][0]) ]  //x['Data']['id'][0]
-                        //                 : [ new AddItemSuccess(null)] 
-                        //         )
-                        // ),
-                        //catchError(error => { console.log(error )  ; return of(new ErrorAnyEntity(prepareError(error))) } )   
-                        catchError(error =>  this.backProvService.actionErrorfromCatch$(error) )
-
+                        map( x =>  ({   isOk: x.hasOwnProperty('status') && x.status == 204,
+                                        resp: x 
+                                    })),
+                        tap( x => { if(!x.isOk) { throw new Error('Запрос выполнен успешно, но ожидался другой код !')}} ),                                    
+                        map( x =>  new UpdateItemSuccess(options.selectId(action.payload))) ,
+                        catchError(error => this.backProvService.actionErrorfromCatch$(error) )
                     ); 
 
             case ( AnyEntityActionTypes.ADD_ITEM) :
@@ -209,7 +204,7 @@ export class anyEntytySetEffects {
                 return this.foreignService.getItemsPart$( action.payload, options )  // 201119 add options
                     .pipe(
                         //tap( x=>  console.log(x) ),
-                        map( x => new GetItemsPartSuccess(x) ),
+                        map( x => new GetItemsPartSuccess(x, action.isReload) ),
                         catchError(error => of(new ErrorAnyEntity(error)))    
                         //map( x => x.length > 0 ? new GetItemSuccess(x[0]) : new GetItemNotFound( action.payload ) )
                     ); 

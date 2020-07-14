@@ -84,8 +84,8 @@ export class JnInfoBoxComponent implements OnInit {
       width: '600px',
       data: prepErr(error)
     });
-    console.log(error );
-    console.log( prepErr(error) );
+    //console.log(error );
+    //console.log( prepErr(error) );
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       resetDispatch ? this.store.dispatch( resetDispatch ) : null ;

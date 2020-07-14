@@ -1,11 +1,12 @@
 <mat-card class="example-card-wide">
     <mat-card-header *ngIf = "header$|async as header " class="jg-card-header-accent" >
+
         <div mat-card-avatar >
                 <mat-icon class="icon-disp" color="primary" > language </mat-icon>
         </div> 
         <mat-card-title>{{header.id + ' ' + header.caption}}</mat-card-title>
         <mat-card-subtitle>{{header.description}}</mat-card-subtitle>
-
+        
     </mat-card-header> 
 
     <mat-card-content class="example-card-content">
@@ -14,7 +15,7 @@
         <mat-card-actions>
                 <button mat-button color="primary" (click)="Save()" [disabled]="!(isValid$|async)" > СОХРАНИТЬ </button>
                 <button mat-button color="primary" routerLink="/forms/wc"> ОТМЕНА </button>
-            </mat-card-actions>
+        </mat-card-actions>
         
     </mat-card-content>
 

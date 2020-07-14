@@ -110,8 +110,8 @@ export class DataProvService {
         //tap(x=>console.log('w :'+x)) ,
         map(this.buildOption),
         combineLatest( this.buildDataUri_v2(loc, subloc, RequestType.Ordinary ), (o,u) => ({opt:o, uri:u}) ),
-        tap(x=>console.log('w')) ,
-        tap(console.log) ,
+        //tap(x=>console.log('w')) ,
+        //tap(console.log) ,
         mergeMap( x => this.http.put( x.uri, data, x.opt ))
     )        
 
