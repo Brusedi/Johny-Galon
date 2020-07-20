@@ -73,6 +73,8 @@ import { CKEditorModule } from 'ckeditor4-angular';
 import { JgTextareaHtmlComponent } from './jn-galon/jg-controls/jg-textarea-html/jg-textarea-html.component';
 import { MyTelInput, FormFieldCustomControlExample } from './jn-galon/jg-controls/uc-example/form-field-custom-control-example';
 import { JnRiskExamComponent } from './jn-risks/jn-risk-exam/jn-risk-exam.component';
+import { JnErrorBarComponent } from './jn-galon/jn-error-bar/jn-error-bar.component';
+
 
 
 
@@ -131,7 +133,9 @@ const appRoutes: Routes = [
     JgTextareaHtmlComponent,
     FormFieldCustomControlExample,
     MyTelInput,
-    JnRiskExamComponent
+    JnRiskExamComponent,
+    JnErrorBarComponent
+    
    
   ],
 

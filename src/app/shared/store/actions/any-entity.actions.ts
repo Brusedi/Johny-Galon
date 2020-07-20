@@ -116,7 +116,7 @@ export class ChangeRowSeed<T> implements Action {
 
 export class ErrorAnyEntity implements Action {
     readonly type = AnyEntityActionTypes.EROR_ANY_ENTITY;
-    constructor(public payload: any) {}
+    constructor(public payload: any  ) {}
 }  
 
 export class ErrorAnyEntityReset implements Action {

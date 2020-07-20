@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Http,  RequestOptions , Headers} from '@angular/http';
+import { Http,  RequestOptions , Headers, Response} from '@angular/http';
 import { map, mergeMap, tap, combineLatest, last, take, takeLast, retry, catchError } from 'rxjs/operators';
 
 import { AppSettingsService } from './app-setting.service';
@@ -10,6 +10,8 @@ import { of } from 'rxjs';
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 import { Store } from '@ngrx/store';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+
 
 /**
  *  Low level data provider (Very oldest)
@@ -31,6 +33,7 @@ enum RequestType { Ordinary, Metadata, Template } ;
 export class DataProvService {
   constructor(
     private http: Http,
+    private httpCli: HttpClient,
     private settings: AppSettingsService,
     private store: Store<fromStore.State>,    // Add interseption auth header
 
@@ -69,6 +72,7 @@ export class DataProvService {
   /**
   *  New Fasade.   Above Legasy.
   */ 
+  //public metadata$ = (loc:string , subloc:string = undefined ) => this.getCli(loc, subloc, RequestType.Metadata ); 
   public metadata$ = (loc:string , subloc:string = undefined ) => this.get(loc, subloc, RequestType.Metadata );
   public template$ = (loc:string , subloc:string = undefined ) => this.get(loc, subloc, RequestType.Template );
   public item$     = (loc:string , subloc:string = undefined ) => this.get(loc, subloc);
@@ -84,10 +88,10 @@ export class DataProvService {
   //FASADE END
 
   // Build Auth Options                                          //ToDO:
-  private buildOption = (authKey:string ) =>  new RequestOptions({headers:new Headers( authKey?{'Authorization':authKey }:{}  ) })
+  private buildOption = (authKey:string ) =>  new RequestOptions({ headers:new Headers( authKey?{'Authorization':authKey }:{}  ), responseType:0   })
 
   /// Rebuild 211019 with Auth
-   /**
+  /**
   *  301018    
   *  Get  data from http-service as JSON (new release data method)
   */ 
@@ -98,7 +102,34 @@ export class DataProvService {
     //tap(console.log),
     map(this.buildOption),
     //tap(console.log) ,
-    mergeMap( x => this.http.get(uri,x).pipe(map(rsp => rsp.text()))));        
+    mergeMap(x => this.http.get(uri,x).pipe(
+        tap( x => console.log(x)),
+        map(rsp => rsp.text())
+        // ,catchError(error => 
+        //     of(error).pipe(
+        //         tap( x => console.log(x)),
+        //         tap( x => console.log(x.headers.get('content-length'))),
+        //     ))
+        )));        
+
+  // Rebuild HttpCilent               
+  private getDataFromUriCli = (uri: string) =>  this.store.select( fromSelectors.selEnvAuthHeader ).pipe( 
+            take(1),
+            //tap(console.log),
+            map(this.buildOption),
+            //tap(console.log) ,
+            mergeMap(x => this.httpCli.get<HttpResponse<Object>>(uri, {observe: 'response'}   ).pipe(
+                tap( x => console.log( x ) ),
+                tap( x => console.log( x.headers.get('prayer') )),
+                map(rsp => rsp.body),
+                tap( x => console.log(x)),
+                catchError(error => 
+                    of(error).pipe(
+                        tap( x => console.log(x)),
+                        tap( x => console.log(x.headers.get('content-length'))),
+                    ))
+        )));        
+                
 
   /**
   *  041219    
@@ -148,12 +179,23 @@ export class DataProvService {
   private get = ( loc:string , subloc:string = undefined , type:RequestType = RequestType.Ordinary  ) =>
     this.buildDataUri_v2(loc, subloc,type )
         .pipe(
-            //tap(x=>console.log(x)), 
-            mergeMap( x => this.getDataFromUri( x )),
+            mergeMap( x => this.getDataFromUri( x )), 
+            tap(x=>console.log(x) ),        
             map(x  => x.trim()===""? {}: JSON.parse(x) ),
-            //tap(x=>console.log(x)) 
+            tap(x=>console.log(x) ) 
         ) ;           
-  
+
+  //140720
+  private getCli = ( loc:string , subloc:string = undefined , type:RequestType = RequestType.Ordinary  ) =>
+        this.buildDataUri_v2(loc, subloc, type )
+            .pipe(
+                //mergeMap( x => this.getDataFromUri( x )), 
+                mergeMap( x => this.getDataFromUriCli(x)),
+                tap(x=>console.log(x) ),
+                map(x  => !x ? {}: x ),
+                tap(x=>console.log(x) )
+            ) ;           
+      
 
 
   // Uri prepare tools -----------------------------------------------

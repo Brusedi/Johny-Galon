@@ -1,0 +1,9 @@
+<div #erbar class="jg-busy-bar-cnt  mat-elevation-z6"  >
+  <mat-toolbar  class="jg-busy-bar" color ='warn' >
+      <div class="flex-spacer" ></div>
+      <div >
+        <p>{{ (errorMessage$ | async) }}  </p>
+      </div>
+      <!-- <mat-spinner *ngIf="!!(spiner$ |async)"  color="accent" diameter="16"> </mat-spinner>     -->
+  </mat-toolbar> 
+</div>

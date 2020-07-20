@@ -9,6 +9,7 @@ import { BackICommonError } from '@appModels/any-entity';
 import { ExecCurrent, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
 import { ErrorAnyEntityReset } from '@appStore/actions/any-entity.actions';
 import { ErrorEnvironment, ErrorEnvironmentReset } from '@appStore/actions/environment.actions';
+import { ErrorParsed } from 'app/shared/error-parsed';
 
 // export interface DialogData {
 //   animal: string;
@@ -37,11 +38,11 @@ export class JnInfoBoxComponent implements OnInit {
   
     //this.errorEntity$ = this.store.select( fromSelectors.selCurError() ).pipe(  filter( x => !!x) ) ; 
     this.errorEnvironment$ = this.store.select( fromSelectors.selEnvError).pipe( filter( x => !!x) ) ;
-    this.errorAllEntity$ =   this.store.select( fromSelectors.selEntitiesErrors() ).pipe(
-      filter( x => x && x.length > 0 ),
-      mergeMap(x => from(x) ),
-      distinct( x => x.error.Id )        
-    ); 
+    // this.errorAllEntity$ =   this.store.select( fromSelectors.selEntitiesErrors() ).pipe(
+    //   filter( x => x && x.length > 0 ),
+    //   mergeMap(x => from(x) ),
+    //   distinct( x => x.error.Id )        
+    // ); 
 
 
     // this.subscriptions.push( 
@@ -49,17 +50,17 @@ export class JnInfoBoxComponent implements OnInit {
     // ); 
 
     this.subscriptions.push( 
-      this.errorEnvironment$.subscribe(x=>this.onErrorDialog(x, new ErrorEnvironmentReset()))
+      this.errorEnvironment$.subscribe (x=>this.onErrorDialog( x , new ErrorEnvironmentReset()))
     ); 
     
-    this.subscriptions.push(
-      this.errorAllEntity$.subscribe(x=>
-        this.onErrorDialog(
-            x.error, 
-            new ExecItemAction( { itemOption: x.opt, itemAction: new ErrorAnyEntityReset() } )
-        )
-      )
-    );  
+    // this.subscriptions.push(
+    //   this.errorAllEntity$.subscribe(x=>
+    //     this.onErrorDialog(
+    //         x.error, 
+    //         new ExecItemAction( { itemOption: x.opt, itemAction: new ErrorAnyEntityReset() } )
+    //     )
+    //   )
+    // );  
 
   }
 
@@ -79,12 +80,15 @@ export class JnInfoBoxComponent implements OnInit {
                                     ? ({ Message: e, Name: 'Ошибка'  })   
                                     : prepErrM( prepErrN(e) );
 
+
+
     const dialogRef = this.dialog.open(JnInfoBoxDialogComponent, {
       //height: '400px',
       width: '600px',
-      data: prepErr(error)
+      //data: prepErr(error)
+      data:  new ErrorParsed(error).toDialogData()
     });
-    //console.log(error );
+    console.log(error );
     //console.log( prepErr(error) );
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');

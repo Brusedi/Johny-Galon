@@ -15,6 +15,7 @@ import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.servi
 import { DataProvService } from "app/shared/services/data-prov.service";
 import { ErrorEnvironment, AuthStart } from "@appStore/actions/environment.actions";
 import { BackProvService } from "app/shared/services/back-prov.service";
+import { ErrorHandlerService } from "app/shared/services/error-handler.service";
 
 //import { AnyEntityLazySetActionTypes, ExecItemAction,  CompleteItemAction, Exec } from "@appStore/actions/any-entity-lazy-set.actions";
 //import { AnyEntityLazyActionTypes, anyEntityLazyActions, GetItemSuccess, GetItemNotFound } from "@appStore/actions/any-entity-lazy.actions";
@@ -32,11 +33,12 @@ const prepareError = (er) =>   er.hasOwnProperty(IERROR_OBJ_PROP_NAME) && isJSON
 @Injectable()
 export class anyEntytySetEffects {
   constructor(
-      private actions$:         Actions, 
-      private dataService:      DataProvService,
-      private metadataService:  MetadataProvService,
-      private foreignService:   ForeignKeyService,
-      private backProvService:  BackProvService
+      private actions$:             Actions, 
+      private dataService:          DataProvService,
+      private metadataService:      MetadataProvService,
+      private foreignService:       ForeignKeyService,
+      private backProvService:      BackProvService,
+      private errorHandlerService:  ErrorHandlerService
 ) {}
 
     //const PrepareByLocBranch$ = ( loc:string  )   
@@ -154,7 +156,9 @@ export class anyEntytySetEffects {
                 x.payload.itemOption,  
                 this.procSubAction$( x.payload.itemAction, x.payload.itemOption )
             )   
-        )
+        ),
+        tap(x=>console.log(x))
+
     )            
 
     // proceccing child items effects            
@@ -217,7 +221,7 @@ export class anyEntytySetEffects {
                         switchMap(()=>this.metadataService.metadata$( options.location ) )
                     ).pipe(
                         map(x => new GetItemsMetaSuccess(x) ),
-                        catchError(error => of(new ErrorAnyEntity(error)))
+                        catchError(error => of(new ErrorAnyEntity(error)).pipe(tap( x=>  console.log(x) )))
                     ); 
 
                 // return this.metadataService.metadata$( options.location ) // options.selBack(action.payload)
@@ -250,14 +254,19 @@ export class anyEntytySetEffects {
                     ); 
 
             case ( AnyEntityActionTypes.EROR_ANY_ENTITY ) :{
-                return of({
-                    fromError: action.payload&&action.payload.status?action.payload.status:undefined,
-                    fromSource: action.payload&&action.payload.url?action.payload.url:undefined,
-                    tag:'NVAVIA'
-                }).pipe( 
-                        tap( x=>  console.log(action.payload) ),
-                        map(x => x.fromError && x.fromError == 401 ? { freeAction: new AuthStart(x) } : null) //new AuthStart(x) :  new AuthStart(x))   
-                    )
+
+                return this.errorHandlerService.AnyEntityLevelHandling( action , options ).pipe( 
+                    map( x => ({ freeAction:x }))
+                ) ;
+
+                // return of({
+                //     fromError: action.payload&&action.payload.status?action.payload.status:undefined,
+                //     fromSource: action.payload&&action.payload.url?action.payload.url:undefined,
+                //     tag:'NVAVIA'
+                // }).pipe( 
+                //         tap( x=>  console.log(action.payload) ),
+                //         map( x => x.fromError && x.fromError == 401 ? { freeAction: new AuthStart(x) } : null) //new AuthStart(x) :  new AuthStart(x))   
+                //     )
             }    
                     
             default:
@@ -267,7 +276,7 @@ export class anyEntytySetEffects {
     
     private procNextSubAction$ = ( options: anyEntityOptions<any>,  act$: Observable<any> ): Observable<any> => 
         act$.pipe( 
-            //tap( x=>  console.log(x) ),
+            tap( x=>  console.log(x) ),
             map(x  =>  x != null 
                         ? x.freeAction 
                               ? x.freeAction 
