@@ -32,3 +32,60 @@ export interface BackICommonErrorEx extends BackICommonError {
      Retriable:boolean
 } 
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*
+*  210720  Попытка идентифицировать загрузку с бэка
+*/
+export enum BackCommonContextMode { Data, Metadata }
+
+export enum BackContextMode { Data, Metadata, MetadataField, Record }
+
+export interface IBackFieldMeta<T> {
+     options : anyEntityOptions<T>
+     field: string
+}
+
+export interface IBackCommonContext<T> {
+     options : anyEntityOptions<T>
+     optionsMode : BackCommonContextMode
+}
+
+export interface IBackRecord<T> {
+     options : anyEntityOptions<T>
+     id : T
+}
+
+export type IBackContext<T> =  IBackCommonContext<T> |  IBackFieldMeta<T> | IBackRecord<T> ;
+
+export interface IBackContextDescriptor<T>{
+     context : IBackContext<T>
+     contextMode: BackContextMode
+}
+
+/*
+*  Loadeble Back-end context descriptor
+*/
+export class BackContextDescriptor<T> {
+
+     public static Data<U>( opt: anyEntityOptions<U> ) { return  new BackContextDescriptor<U>(  { options: opt, optionsMode:BackCommonContextMode.Data }  ) ;}
+     public static Meta<U>( opt: anyEntityOptions<U> ) { return  new BackContextDescriptor<U>(  { options: opt, optionsMode:BackCommonContextMode.Metadata}  ) ;}
+     public static MetaField<U>( opt: anyEntityOptions<U>, fld: string ) { return  new BackContextDescriptor<U>(  { options: opt, field:fld}  ) ;}
+     public static Record<U>( opt: anyEntityOptions<U>, recId: U ) { return  new BackContextDescriptor<U>( {options: opt, id:recId }  ) ;}
+
+     constructor( public context : IBackContext<T> ){}
+
+     contextMode = 
+          this.context.hasOwnProperty("field") 
+          ? BackContextMode.MetadataField
+          : this.context.hasOwnProperty("id")
+               ? BackContextMode.Record
+               : this.context.hasOwnProperty("optionsMode") && this.context["optionsMode"] == BackCommonContextMode.Data 
+                    ? BackContextMode.Data
+                    : BackContextMode.Metadata
+
+}          
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+

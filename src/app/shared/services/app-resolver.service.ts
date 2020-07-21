@@ -9,6 +9,7 @@ import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 import { ForeignKeyService } from './foregin/foreign-key.service';
 import { ErrorEnvironment } from '@appStore/actions/environment.actions';
+import { of } from 'rxjs';
 
 const OPTION_PARAM_DATA_KEY = 'option';
 
@@ -34,22 +35,30 @@ export class AppResolverService implements Resolve<any> {
     //this.store.dispatch( new ErrorEnvironment('3'))
 
 
-    return this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
-        tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
-        filter( x => x ),
-        //combineLatest( this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)), (x,y)=> y ), 
-        switchMap(() => this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)) ), 
-        tap( x => !x ?  this.store.dispatch( new Exec( {name:opt.name , itemAction: new GetItemsMeta() }) ) : null ),
-        filter( x => x ),
-        //combineLatest( this.store.select( fromSelectors.selCurName()), (x,y)=> y ), 
-        switchMap( () => this.store.select( fromSelectors.selCurName()) ),
-        tap(x => x != opt.name ? this.store.dispatch( new SetCurrent(opt.name) ) : null ),
-        filter( x => x == opt.name ),
-        //tap( x=> this.store.dispatch( new Exec( {name:'NvaSdEventType' , itemAction: new GetItemsPart('/Ax/NvaSdEventType?SERVICEDESCID=1') }) )),  // Debug
-        map( x => !!x ),
-      ).pipe(
-        startWith(false),
-        take(2)
-      );
+    // console.log(route);
+    // console.log(state);
+
+    return state.url == "/forms/risks"
+      ? of(true) 
+      : this.store.select( fromSelectors.selectIsExist(opt.name)).pipe(
+            tap( x => !x ?  this.store.dispatch( new AddItem(opt)) : null ),
+            filter( x => x ),
+            //combineLatest( this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)), (x,y)=> y ), 
+            switchMap(() => this.store.select( fromSelectors.selectIsMetadataLoaded(opt.name)) ), 
+            tap( x => !x ?  this.store.dispatch( new Exec( {name:opt.name , itemAction: new GetItemsMeta() }) ) : null ),
+            filter( x => x ),
+            //combineLatest( this.store.select( fromSelectors.selCurName()), (x,y)=> y ), 
+            switchMap( () => this.store.select( fromSelectors.selCurName()) ),
+            tap(x => x != opt.name ? this.store.dispatch( new SetCurrent(opt.name) ) : null ),
+            filter( x => x == opt.name ),
+            //tap( x=> this.store.dispatch( new Exec( {name:'NvaSdEventType' , itemAction: new GetItemsPart('/Ax/NvaSdEventType?SERVICEDESCID=1') }) )),  // Debug
+            map( x => !!x ),
+          ).pipe(
+            startWith(false),
+            take(2)
+          );
   }
+
+
+
 }

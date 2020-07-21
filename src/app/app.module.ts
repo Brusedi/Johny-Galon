@@ -47,7 +47,7 @@ import { JnNewItemComponent } from './jn-galon/jn-entity/jn-new-item/jn-new-item
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { JnItemQuestionComponent } from './jn-galon/jn-entity/jn-item-question/jn-item-question.component';
 import { ReactiveFormsModule ,FormsModule } from '@angular/forms';
-import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine, AuthTestDataOption } from '@appModels/entity-options';
+import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine, AuthTestDataOption, RiskExamItemsOption } from '@appModels/entity-options';
 import { AppResolverService } from './shared/services/app-resolver.service';
 import { SdNewUserMessageComponent } from './serv-desc/sd-new-user-message/sd-new-user-message.component';
 import { JnInfoBoxComponent, JnInfoBoxDialogComponent} from './jn-galon/jn-info-box/jn-info-box.component';
@@ -74,6 +74,7 @@ import { JgTextareaHtmlComponent } from './jn-galon/jg-controls/jg-textarea-html
 import { MyTelInput, FormFieldCustomControlExample } from './jn-galon/jg-controls/uc-example/form-field-custom-control-example';
 import { JnRiskExamComponent } from './jn-risks/jn-risk-exam/jn-risk-exam.component';
 import { JnErrorBarComponent } from './jn-galon/jn-error-bar/jn-error-bar.component';
+import { BackContextDescriptor } from '@appModels/any-entity';
 
 
 
@@ -92,7 +93,17 @@ const appRoutes: Routes = [
   { path: 'forms/wc',          component: JnWebCntMainNstComponent          },  
   { path: 'forms/wc/:id',      component: JnWebCntItemComponent             },  
 
-  { path: 'forms/risks',       component: JnRiskExamComponent               },  
+  { 
+      path: 'forms/risks',
+      component: JnRiskExamComponent,  
+      data:{  
+        load:[  
+          BackContextDescriptor.Meta(RiskExamItemsOption),
+          BackContextDescriptor.Data(RiskExamItemsOption) 
+        ]   
+      },
+      resolve: { isLoad:AppResolverService  } 
+  },  
 
   { path: '**',                component: JnNotFoundComponent }
 ];
