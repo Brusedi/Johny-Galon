@@ -1,0 +1,35 @@
+  .example-button{
+    margin: 8px 20px 8px 5px;
+    height: 46px;
+    
+  }  
+
+  .icon-title {
+    /* margin-top: -3px;   */
+    height: 46px;
+    width: 46px;
+    font-size: 46px;
+
+}
+
+.icon-title2 {
+    margin-top: 2px;   
+    height: 46px;
+    width: 46px;
+
+}
+
+
+.my-det
+{
+    display: inline-flex;
+    vertical-align: middle;
+}
+
+.my-ico
+{
+    padding-right: 20px;
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+}

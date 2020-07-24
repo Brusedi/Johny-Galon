@@ -6,6 +6,7 @@ export const AUTH_HEADER_TOKEN_PREFIX = "Bearer";
 
 export const environmentStore = createFeatureSelector<State>('environment');
 
+
 export const selectEnvironment = createSelector(
     environmentStore,
     (x:State) => x 
@@ -95,5 +96,22 @@ export const authIsTag = ( tag: string ) => createSelector(
     selEnvAuthTag,
     (x) => !!(x && x == tag) 
 );
+
+/**
+*  Authentificate without tag ...
+*/
+export const authIsNoTag = ( ) => createSelector(
+    environmentStore,
+    (x:State) => x && x.authgData && x.authgData.request && ( !x.authgData.request.tag )
+);    
+                    
+/**
+*  Authentificate without tag ...
+*/
+ export const authRequest = ( ) => createSelector(
+     environmentStore,
+     (x:State) => x && x.authgData && x.authgData.request ? x.authgData.request : undefined
+ );    
+
 
 

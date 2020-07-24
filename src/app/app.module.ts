@@ -75,6 +75,8 @@ import { MyTelInput, FormFieldCustomControlExample } from './jn-galon/jg-control
 import { JnRiskExamComponent } from './jn-risks/jn-risk-exam/jn-risk-exam.component';
 import { JnErrorBarComponent } from './jn-galon/jn-error-bar/jn-error-bar.component';
 import { BackContextDescriptor } from '@appModels/any-entity';
+import { AppAuthResolverService } from './shared/services/app-auth-resolver.service';
+import { JnAuthSelectorComponent, JnAuthSelectorDialogComponent } from './jn-galon/jn-auth-selector/jn-auth-selector.component';
 
 
 
@@ -102,7 +104,7 @@ const appRoutes: Routes = [
           BackContextDescriptor.Data(RiskExamItemsOption) 
         ]   
       },
-      resolve: { isLoad:AppResolverService  } 
+      resolve: { isLoad:AppAuthResolverService  } 
   },  
 
   { path: '**',                component: JnNotFoundComponent }
@@ -145,7 +147,9 @@ const appRoutes: Routes = [
     FormFieldCustomControlExample,
     MyTelInput,
     JnRiskExamComponent,
-    JnErrorBarComponent
+    JnErrorBarComponent,
+    JnAuthSelectorComponent,
+    JnAuthSelectorDialogComponent
     
    
   ],
@@ -220,7 +224,7 @@ const appRoutes: Routes = [
   ],
   bootstrap: [AppComponent],
 
-  entryComponents: [JnInfoBoxDialogComponent,JgBusyDialog]
+  entryComponents: [JnInfoBoxDialogComponent,JgBusyDialog,JnAuthSelectorDialogComponent]
 })
 
 export class AppModule { }

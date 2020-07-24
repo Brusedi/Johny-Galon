@@ -4,7 +4,8 @@ import { Store } from '@ngrx/store';
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 import { map, tap, mergeMap, delay } from 'rxjs/operators';
-import { ErrorParsed } from 'app/shared/error-parsed';
+import { ErrorParsed } from 'app/shared/services/error-handler.service';
+
 
 @Component({
   selector: 'app-jn-error-bar',

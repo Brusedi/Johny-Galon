@@ -1,9 +1,17 @@
 
 <h1 mat-dialog-title class="mat-error" > {{data.StatusCode}} {{data.Name}}</h1>
-<div mat-dialog-content > {{data.Message}}  </div>
+
+<div class= my-det >
+  <mat-icon color="warn" class = my-ico >error</mat-icon> 
+  <div  mat-dialog-content>
+    <p>
+       {{data.Message}} 
+    </p>
+  </div>
+</div>
 
 <div mat-dialog-actions align="end" >
-  <button mat-button color="warn" (click)="onNoClick()">Закрыть</button>
+  <button mat-raised-button   (click)="onNoClick()">Закрыть</button>
   <!-- <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button> -->
 </div>  
 

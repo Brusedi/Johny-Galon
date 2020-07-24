@@ -9,7 +9,8 @@ import { BackICommonError } from '@appModels/any-entity';
 import { ExecCurrent, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
 import { ErrorAnyEntityReset } from '@appStore/actions/any-entity.actions';
 import { ErrorEnvironment, ErrorEnvironmentReset } from '@appStore/actions/environment.actions';
-import { ErrorParsed } from 'app/shared/error-parsed';
+import { ErrorParsed } from 'app/shared/services/error-handler.service';
+
 
 // export interface DialogData {
 //   animal: string;
@@ -104,6 +105,7 @@ export class JnInfoBoxComponent implements OnInit {
 @Component({
   selector:    'app-jn-info-box-dialog',
   templateUrl: './jn-info-box-dialog.component.html',
+  styleUrls: ['./jn-info-box-dialog.component.css']
 })
 export class JnInfoBoxDialogComponent {
 

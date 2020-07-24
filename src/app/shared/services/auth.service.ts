@@ -16,14 +16,15 @@ import { Injectable, Inject } from '@angular/core';
 import * as fromStore from '@appStore/index';
 import { Http,  RequestOptions , Headers} from '@angular/http';
 import { AppSettingsService } from './app-setting.service';
-import { map, mergeMap, tap, take, combineLatest, takeLast, filter  } from 'rxjs/operators';
+import { map, mergeMap, tap, take, combineLatest, takeLast, filter, mapTo  } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { of, timer, Observable } from 'rxjs';
+import { of, timer, Observable, merge } from 'rxjs';
 import * as fromSelectors from '@appStore/selectors/index';
 import { AuthSuccess, ErrorEnvironment, AuthTokenReceived, AuthLogoutSucess } from '@appStore/actions/environment.actions';
 
 export const TAG_NVA                   = "ADFS"
 export const TAG_GOOGLE                = "GOOGLE"
+
 
 
 const A_PAR_RESPONSE_TYPE       =  "code" ;   
@@ -74,13 +75,22 @@ export class AuthService {
     * Login to ..
     * return action for dispatching  
     */ 
-    public  Login = (timeOutSec:number) =>
-        this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe(
+    public  Login = (timeOutSec:number) => merge(
+            this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe( filter( x => x ) , mapTo(this.LoginGoogle$(timeOutSec))) ,
+            this.store.select( fromSelectors.authIsTag(TAG_NVA)).pipe(filter( x => x ), mapTo(this.LoginFS3$(timeOutSec)))    
+        ).pipe(
             take(1),
-            mergeMap( x => x ? this.LoginGoogle$(timeOutSec) : this.LoginFS3$(timeOutSec)  )
+            mergeMap( x => x )
         );    
 
+        // public  Login = (timeOutSec:number) => merge(
+        //     this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe(
+        //         merge( fromSelectors.authIsTag(TAG_NVA) ),
+        //         take(1),
+        //         mergeMap( x => x ? this.LoginGoogle$(timeOutSec) : this.LoginFS3$(timeOutSec)  )
+        //     );    
     
+        
     /*
     * Request Auth token after auth-code request from back (ADFS AND GOOGLE) 
     * return action for dispatching  

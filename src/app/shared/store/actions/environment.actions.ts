@@ -12,6 +12,10 @@ export enum EnvironmentActionTypes {
     ERROR_ENVIRONMENT_RESET = '[Environment] Error reset'
 }
 
+// export class AuthTryingLogin implements Action {
+//     readonly type = EnvironmentActionTypes.AUTH_TRYING_LOGIN
+//     constructor(public payload: any) {}
+// }  
 
 export class ErrorEnvironment implements Action {
     readonly type = EnvironmentActionTypes.ERROR_ENVIRONMENT
