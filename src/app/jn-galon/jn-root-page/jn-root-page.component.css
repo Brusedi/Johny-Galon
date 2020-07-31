@@ -73,3 +73,15 @@ footer{
     height: 24px;
     width: 24px;
   }
+
+
+.icon-title-auth1 {
+    height:42px;
+    width: 42px;
+}
+.icon-title-auth2 {
+    padding-left: 3px;
+    margin-top: -15px;
+    padding-right: 15px;
+}
+

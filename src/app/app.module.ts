@@ -25,7 +25,8 @@ import {
   MatProgressBarModule,
   MatGridListModule,
   MatTreeModule,
-  MatChipsModule
+  MatChipsModule,
+  MatExpansionModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -201,6 +202,7 @@ const appRoutes: Routes = [
     CdkTreeModule,
     MatChipsModule,
     CKEditorModule,
+    MatExpansionModule,
     
     
     

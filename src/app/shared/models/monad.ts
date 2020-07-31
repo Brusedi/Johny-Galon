@@ -66,12 +66,19 @@ export class Either<E,T> {
     public map = <U>(f:((x:T)=> U)) => <Either<E,U>>MonadExtention.map<U,E,T>(this,f) ; 
     public tap = (f:((x:T)=> any)) =>  <Either<E,T>>MonadExtention.tap<E,T>(this,f);
     public applicative = <U>( mf:Either<E, (x:T)=> U>) =>  <Either<E,U>>MonadExtention.applicative<U,E,T>(this,mf) ;      
+
     public static join = MonadExtention.join;      
+    //public join = <U>(f:((x:T)=> Either<E,U>))  MonadExtention.join;      
+
+    //Invent 
+    /*
+    * Ну пиздец блядь!!! Зеркалит монаду  
+    */
+    public reverse: () => Either<T,E> = () =>  this.isLeft ? Either.Right<T,E>(this.err) : Either.Left<T,E>(this.val) 
 
     //tools 
     public LeftIs : (f:((y:T)=> boolean), fc?:( (y:T) => E ) ) => Either<E,T> = (f,fc?)  => 
                 this.bind( x => f(x) ? Either.Left( (fc == undefined) ? id(x) : fc(x) ) :  Either.Right(x)  )  
-
 
     public LeftOrMap = <U>( isF :((y:T)=> boolean) , f:((x:T)=> U), fc?:( (y:T) => E ) ) => this.LeftIs(isF, fc ).map(f)
     public LeftIsNotEmptyOrMap = <U>(f:((x:T)=> U), fc?:( (y:T) => E ) ) => this.LeftOrMap(isNotEmpty, f, fc)

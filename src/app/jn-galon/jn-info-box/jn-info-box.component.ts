@@ -9,7 +9,8 @@ import { BackICommonError } from '@appModels/any-entity';
 import { ExecCurrent, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
 import { ErrorAnyEntityReset } from '@appStore/actions/any-entity.actions';
 import { ErrorEnvironment, ErrorEnvironmentReset } from '@appStore/actions/environment.actions';
-import { ErrorParsed } from 'app/shared/services/error-handler.service';
+import { buildParsedError, appErrorToDialogData } from 'app/shared/services/error-handler.service';
+import { IDialogBoxData } from 'app/shared/app-common';
 
 
 // export interface DialogData {
@@ -81,18 +82,20 @@ export class JnInfoBoxComponent implements OnInit {
                                     ? ({ Message: e, Name: 'Ошибка'  })   
                                     : prepErrM( prepErrN(e) );
 
-
+    const dialogDataDeteailsToArray: (x:IDialogBoxData) => IDialogBoxData = (x) => x.Details && Array.isArray(x.Details) ? x : ({ ...x , Details: ( x.Details ? <string[]>[x.Details] : [] )  }) ;
+ 
 
     const dialogRef = this.dialog.open(JnInfoBoxDialogComponent, {
       //height: '400px',
       width: '600px',
       //data: prepErr(error)
-      data:  new ErrorParsed(error).toDialogData()
+      //data:  new ErrorParsed(error).toDialogData()
+      data: dialogDataDeteailsToArray( appErrorToDialogData( buildParsedError(error))) 
     });
-    console.log(error );
+    console.log(appErrorToDialogData( buildParsedError(error) ) );
     //console.log( prepErr(error) );
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+      //console.log('The dialog was closed');
       resetDispatch ? this.store.dispatch( resetDispatch ) : null ;
       //this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );
 

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { Actions, Effect, ofType } from "@ngrx/effects";
-import { EnvironmentActionTypes, ErrorEnvironment, AuthTokenReceived } from "@appStore/actions/environment.actions";
-import { map, tap, catchError, mergeMap } from "rxjs/operators";
+import { EnvironmentActionTypes, ErrorEnvironment, AuthTokenReceived, AuthStart } from "@appStore/actions/environment.actions";
+import { map, tap, catchError, mergeMap, filter } from "rxjs/operators";
 import { AuthService } from "app/shared/services/auth.service";
 import { of } from "rxjs";
 
@@ -18,8 +18,10 @@ export class EnvironmentEffects {
      @Effect()  
     AuthHandler$ = this.actions$.pipe( 
          ofType(EnvironmentActionTypes.AUTH_START),
+         filter( (x:AuthStart ) => x.payload && !!x.payload.tag ),
          //mergeMap( x => this.authService.LoginFS3$(300)),
-         mergeMap( x => this.authService.Login(300)),
+         //mergeMap( x => this.authService.Login(300)),
+         mergeMap( x => this.authService.LoginByReq(x.payload,300)),
          catchError(error => of(new ErrorEnvironment(error)))
          
      );

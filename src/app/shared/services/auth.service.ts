@@ -21,6 +21,8 @@ import { Router } from '@angular/router';
 import { of, timer, Observable, merge } from 'rxjs';
 import * as fromSelectors from '@appStore/selectors/index';
 import { AuthSuccess, ErrorEnvironment, AuthTokenReceived, AuthLogoutSucess } from '@appStore/actions/environment.actions';
+import { authingReqData } from '@appStore/reducers/environment.reduser';
+import { fart, puk } from '../app-helper';
 
 export const TAG_NVA                   = "ADFS"
 export const TAG_GOOGLE                = "GOOGLE"
@@ -74,11 +76,13 @@ export class AuthService {
     /*
     * Login to ..
     * return action for dispatching  
+    * Recomended  LoginByReq 240720
     */ 
     public  Login = (timeOutSec:number) => merge(
             this.store.select( fromSelectors.authIsTag(TAG_GOOGLE)).pipe( filter( x => x ) , mapTo(this.LoginGoogle$(timeOutSec))) ,
             this.store.select( fromSelectors.authIsTag(TAG_NVA)).pipe(filter( x => x ), mapTo(this.LoginFS3$(timeOutSec)))    
         ).pipe(
+            tap(x => console.log(x)),    
             take(1),
             mergeMap( x => x )
         );    
@@ -89,6 +93,25 @@ export class AuthService {
         //         take(1),
         //         mergeMap( x => x ? this.LoginGoogle$(timeOutSec) : this.LoginFS3$(timeOutSec)  )
         //     );    
+
+    /*
+    * Login by request to ..
+    * return action for dispatching  
+    */ 
+   public  LoginByReq = ( logRequest:authingReqData ,timeOutSec:number ) => 
+        of(logRequest).pipe(
+            tap(x => console.log(x)),
+            mapTo( logRequest.tag ),               
+            mergeMap( x => 
+                (x == TAG_GOOGLE)
+                    ? this.LoginGoogle$(timeOutSec)
+                    : x == TAG_NVA 
+                        ? this.LoginFS3$(timeOutSec)
+                        : of( new ErrorEnvironment( "Неподдерживаемый тип аутентификации : [" + x + "]" ))
+            ) 
+        );
+   
+
     
         
     /*
@@ -213,7 +236,7 @@ export class AuthService {
     private LoginGoogle$(timeOutSec:number){
         //const uriAndParams$ =  of(this.myLocation).pipe(
         const uriAndParams$ =  of(this.window.location.origin+'/').pipe(
-            //tap(console.log),
+            //tap(x=>console.log(this.window.location)),
             combineLatest( this.settings.getSettings() , (l,s) => ({ myLoc:l , setting :s }) ),
             map( x =>  new  URLSearchParams([
                         ["response_type",A_PAR_RESPONSE_TYPE    ],
@@ -237,6 +260,7 @@ export class AuthService {
         const parseLoginResult = (w:Window, herf:string ) =>{
             const rPar = ( url:string, par:string ) =>   new URL(url).searchParams.get(par) ;   
             const closeIf =  ( x:Window) => { try { x.close() ; return true } catch (e) { return false ; } }
+            console.log(w);
             var retAct = isHerfReadingAndstartsWith(w,herf) 
                 ?  rPar( w.location.href ,'code') 
                     ? new AuthSuccess( rPar( w.location.href ,'code') )  
@@ -247,16 +271,17 @@ export class AuthService {
         }       
         //console.log('call!');
         return of(this.window).pipe(
-            //tap(x=>console.log("lg"+x)),    
+           //tap(x=>console.log("lg"+x)),    
             combineLatest( uri$ , (w,u)=> ({ 
                 popup: w.open( u, POPUP_WIN_NAME , POPUP_WIN_PARS ), 
-                myLoc: w.location.href
+                myLoc: w.location.origin                                // 280720  манки дебаг  было  w.location.href 
             })),
             combineLatest( timer (1000, 1000) , (x,y) => x ), 
             take(timeOutSec) ,                                              // timeout sec
             //tap(console.log),
             filter(  x => ! x.popup || isHerfReadingAndClosed(x.popup) || isHerfReadingAndstartsWith(x.popup, x.myLoc) ), 
-            take(1),
+            take(1), 
+            //tap(x => console.log(x)),
             map( x => parseLoginResult(x.popup, x.myLoc)  )
         );    
     }     

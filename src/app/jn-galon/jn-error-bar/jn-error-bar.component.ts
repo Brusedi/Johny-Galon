@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
 import { map, tap, mergeMap, delay } from 'rxjs/operators';
-import { ErrorParsed } from 'app/shared/services/error-handler.service';
+import { buildParsedError, appErrorToShortSys } from 'app/shared/services/error-handler.service';
 
 
 @Component({
@@ -27,12 +27,14 @@ export class JnErrorBarComponent implements OnInit {
     this.errorAllEntity$ =   this.store.select( fromSelectors.selEntitiesErrors() ).pipe( ) ;
 
     this.errorWithDelay$ = this.errorAllEntity$.pipe( 
-      mergeMap( x =>  x&&x.length ? of(x) : of(x).pipe(delay(3000)) )
+      mergeMap( x =>  x&&x.length ? of(x) : of(x).pipe(delay(5000)) )
     )
 
     this.errorMessage$ =   this.errorWithDelay$.pipe(
-      map( x => x.map( j => new ErrorParsed(j))),
-      map( x =>  x.length > 0 ?  "[" + x.length.toString() +"] " + x[x.length-1].caption +"   "+x[x.length-1].description : "" ) 
+      //tap( x => console.log(x) ),
+      map( x => x.map( j =>   buildParsedError(j)  )),      //new ErrorParsed(j))),
+      //tap( x => console.log(x) ),
+      map( x =>  x.length > 0 ?  "[" + x.length.toString() +"] "+ appErrorToShortSys( x[x.length-1])     :"" )///  + x[x.length-1].parsedError.caption +"   "+x[x.length-1].parsedError.description : "" ) 
    )
 
    this.errorWithDelay$.pipe( 

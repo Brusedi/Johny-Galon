@@ -1,17 +1,30 @@
 
-<h1 mat-dialog-title class="mat-error" > {{data.StatusCode}} {{data.Name}}</h1>
+<h1 mat-dialog-title class="mat-error" > {{data.Name}}</h1>
 
 <div class= my-det >
-  <mat-icon color="warn" class = my-ico >error</mat-icon> 
+  <mat-icon color="warn" class = my-ico >{{data.IconName}} </mat-icon> 
   <div  mat-dialog-content>
     <p>
        {{data.Message}} 
     </p>
   </div>
 </div>
+<p></p>
+<mat-expansion-panel color = "primary">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      Подробнее...
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+  <div *ngFor="let item of data.Details">
+     {{ item }}
+  </div>
+  <!-- <p> {{data.Details}} </p> -->
+</mat-expansion-panel>
+
 
 <div mat-dialog-actions align="end" >
-  <button mat-raised-button   (click)="onNoClick()">Закрыть</button>
+  <button mat-raised-button  color="warn"   (click)="onNoClick()">Закрыть</button>
   <!-- <button mat-button [mat-dialog-close]="data.animal" cdkFocusInitial>Ok</button> -->
 </div>  
 
