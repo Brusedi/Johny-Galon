@@ -103,7 +103,7 @@ export class DataProvService {
     map(this.buildOption),
     //tap(console.log) ,
     mergeMap(x => this.http.get(uri,x).pipe(
-        tap( x => console.log(x)),
+        //tap( x => console.log(x)),
         map(rsp => rsp.text())
         // ,catchError(error => 
         //     of(error).pipe(
@@ -180,9 +180,9 @@ export class DataProvService {
     this.buildDataUri_v2(loc, subloc,type )
         .pipe(
             mergeMap( x => this.getDataFromUri( x )), 
-            tap(x=>console.log(x) ),        
+            //tap(x=>console.log(x) ),        
             map(x  => x.trim()===""? {}: JSON.parse(x) ),
-            tap(x=>console.log(x) ) 
+            //tap(x=>console.log(x) ) 
         ) ;           
 
   //140720

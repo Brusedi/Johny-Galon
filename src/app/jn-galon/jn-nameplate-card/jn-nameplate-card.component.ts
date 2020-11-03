@@ -15,7 +15,7 @@ export class JnNameplateCardComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-     console.log(this.Caption);
+     //console.log(this.Caption);
   }
 
 }

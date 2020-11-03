@@ -7,6 +7,7 @@ export class DropdownQuestion extends QuestionBase<string> {
   options: {key: string, value: string}[] = [];
   options$: Observable<{key: string, value: string}[]> = null;
   optionsRefLoc: string = null;
+  rowSeed$: string = null;
 
   constructor(options: {} = {} ) {
     super(options);
@@ -14,7 +15,7 @@ export class DropdownQuestion extends QuestionBase<string> {
     this.options = options['options'] || [];
     this.options$ = options['options$'] || null;
     this.optionsRefLoc = options['optionsRefLoc'] || null;
-
+    this.rowSeed$ = options['rowSeed$'] || null;
     //
     //const a = this.optionsRefLoc ? locationToEntityOption(this.optionsRefLoc) : null ;
     //if(this.optionsRefLoc){console.log(locationInfo(this.optionsRefLoc )) }

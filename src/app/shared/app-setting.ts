@@ -1,7 +1,9 @@
 export class AppSettings {
     svcFasadeUri1:  string = "http://webgate.nvavia.ru:8080/api" ;
-    svcFasadeUri3: string = "http://b-portal.nvavia.ru/api" ;
-    svcFasadeUri : string = "http://localhost:50997/api" ;
+    svcFasadeUri2: string = "httpp://b-ortal.nvavia.ru/api" ;
+    svcFasadeUri3 : string = "http://localhost:50997/api" ;
+    svcFasadeUri : string = "http://dock.nvavia.ru/api" ;
+    
     svcRestMetadataSuffix: string ="/Md" ;
     svcRestRecTemplateSuffix: string ="/!Template" ;
 
@@ -19,7 +21,7 @@ export class AppSettings {
 
     auth2AuthEndPoint_Google: string    = "https://accounts.google.com/o/oauth2/v2/auth";
     auth2ClientId_Google:string         = "919554785719-dj2snd740luu6hr698acfs9b5lsvl3he.apps.googleusercontent.com";
-    auth2Scope_Google:string            = "profile";//"email" ;
+    auth2Scope_Google:string            = "email"; //"profile";//"email" ;
     auth2LogoutEndPoint_Google:string   = "https://mail.google.com/mail/u/0/?logout&hl=ru";
 
                                             //"https://www.googleapis.com/auth/drive.metadata.readonly";

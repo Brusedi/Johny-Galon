@@ -4,9 +4,9 @@ import * as fromStore from '@appStore/index';
 import { Store } from '@ngrx/store';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { Observable, Subscription } from 'rxjs';
-import { filter } from 'rxjs/operators';
+import { filter, distinct, tap, distinctUntilChanged } from 'rxjs/operators';
 import { authingReqData } from '@appStore/reducers/environment.reduser';
-import { AuthStart } from '@appStore/actions/environment.actions';
+import { AuthStart, AuthLogoutSucess } from '@appStore/actions/environment.actions';
 import { TAG_NVA, TAG_GOOGLE } from 'app/shared/services/auth.service';
 
 @Component({
@@ -26,22 +26,13 @@ export class JnAuthSelectorComponent implements OnInit {
   constructor(private store: Store<fromStore.State>, public dialog: MatDialog) { }
 
   ngOnInit() {
-    // this.authRequest$ = this.store.select( fromSelectors.authRequest()).pipe(
-    //   filter( x => x &&  (!x.tag || x.tag == "") )       
-    // ); 
-
     this.subscriptions.push( 
       this.store.select( fromSelectors.authRequest()).pipe(
-           filter( x => x &&  (!x.tag || x.tag == "") )       
+           distinctUntilChanged( (x,y) =>  (x && y) &&  x.fromError == y.fromError),      
+           filter( x => x &&  (!x.tag || x.tag == "") ),
+           //tap(x=>console.log( x )),
         ).subscribe (x => this.onDialog(x))
     )    
-
-    // this.showDialog$ = this.store.select( fromSelectors.authIsNoTag()).pipe() ; 
-    // this.subscriptions.push( 
-    //   this.showDialog$.pipe(filter(x=>x)).subscribe (x => this.onDialog())
-    // )  
-
-
   }
 
 
@@ -53,17 +44,17 @@ export class JnAuthSelectorComponent implements OnInit {
 
   onDialog( authReq:authingReqData ){
     this.request = authReq;
-    console.log(authReq)
+    //console.log(authReq)
     ;
     const dialogRef = this.dialog.open(JnAuthSelectorDialogComponent, {
       width: '600px',
-      //data: authReq 
+      data: authReq 
     });
 
   
     dialogRef.afterClosed().subscribe(result => {
-       console.log(result);
-       result ? this.store.dispatch( new AuthStart( {...this.request, tag:result} )  ) : null ;
+       //console.log(result);
+       result ? this.store.dispatch( new AuthStart( {...this.request, tag:result , fromSource:"eeee"} )  ) : this.store.dispatch( new AuthLogoutSucess()  )  ;
       //  this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );
     });
   }

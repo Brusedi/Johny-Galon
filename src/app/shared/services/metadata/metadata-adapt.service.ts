@@ -81,7 +81,9 @@ export class MetadataAdaptService {
         validators: this.buildValidators(data, defVal),
         validationMessages: this.buildvalidationMessages(data, defVal),
         order: this.existOrVal(data, ["Display.Order"] , undefined ),
-        editable: this.buildIsEditable(data, defVal) 
+        editable: this.buildIsEditable(data, defVal),
+        group:  this.existOrVal(data, ["Display.GroupName"] , undefined ), 
+
 
   }) as FieldDescribe;
 

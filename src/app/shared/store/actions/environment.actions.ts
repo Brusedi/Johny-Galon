@@ -8,6 +8,7 @@ export enum EnvironmentActionTypes {
     AUTH_LOGOUT             = '[Environment] Authentication Log out begin',
     AUTH_LOGOUT_SUCCESS     = '[Environment] Authentication Log out success',
     AUTH_TOKEN_RECIVED      = '[Environment] Authentication token received',
+    
     ERROR_ENVIRONMENT       = '[Environment] Error',
     ERROR_ENVIRONMENT_RESET = '[Environment] Error reset'
 }

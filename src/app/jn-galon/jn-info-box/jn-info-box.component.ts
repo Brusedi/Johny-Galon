@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable, of, from, ReplaySubject, Subscription } from 'rxjs';
 import * as fromSelectors from '@appStore/selectors/index';
 import * as fromStore from '@appStore/index';
-import { map, filter, tap , merge, mergeMap, distinct } from 'rxjs/operators';
+import { map, filter, tap , merge, mergeMap, distinct, delay } from 'rxjs/operators';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 import { BackICommonError } from '@appModels/any-entity';
 import { ExecCurrent, ExecItemAction } from '@appStore/actions/any-entity-set.actions';
@@ -39,7 +39,12 @@ export class JnInfoBoxComponent implements OnInit {
   ngOnInit() {
   
     //this.errorEntity$ = this.store.select( fromSelectors.selCurError() ).pipe(  filter( x => !!x) ) ; 
-    this.errorEnvironment$ = this.store.select( fromSelectors.selEnvError).pipe( filter( x => !!x) ) ;
+    this.errorEnvironment$ = this.store.select( fromSelectors.selEnvError).pipe( 
+      filter( x => !!x),
+      delay(100),
+      // tap(x=>console.log(x))
+      ) ;
+
     // this.errorAllEntity$ =   this.store.select( fromSelectors.selEntitiesErrors() ).pipe(
     //   filter( x => x && x.length > 0 ),
     //   mergeMap(x => from(x) ),
@@ -50,9 +55,8 @@ export class JnInfoBoxComponent implements OnInit {
     // this.subscriptions.push( 
     //   this.errorEntity$.subscribe(x=>this.onErrorDialog(x, new ExecCurrent( new ErrorAnyEntityReset() ))) 
     // ); 
-
     this.subscriptions.push( 
-      this.errorEnvironment$.subscribe (x=>this.onErrorDialog( x , new ErrorEnvironmentReset()))
+      this.errorEnvironment$.subscribe ( x =>  this.onErrorDialog( x , new ErrorEnvironmentReset()))
     ); 
     
     // this.subscriptions.push(
@@ -92,11 +96,11 @@ export class JnInfoBoxComponent implements OnInit {
       //data:  new ErrorParsed(error).toDialogData()
       data: dialogDataDeteailsToArray( appErrorToDialogData( buildParsedError(error))) 
     });
-    console.log(appErrorToDialogData( buildParsedError(error) ) );
+    //console.log(appErrorToDialogData( buildParsedError(error) ) );
     //console.log( prepErr(error) );
     dialogRef.afterClosed().subscribe(result => {
-      //console.log('The dialog was closed');
-      resetDispatch ? this.store.dispatch( resetDispatch ) : null ;
+      console.log(result);
+      resetDispatch && !!result  ? this.store.dispatch( resetDispatch ) : null ;
       //this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );
 
     });
@@ -120,7 +124,7 @@ export class JnInfoBoxDialogComponent {
   onNoClick(): void {
     //console.log('dddddddddddddddd');
     //this.store.dispatch( new ExecCurrent( new ErrorAnyEntityReset() ) );
-    this.dialogRef.close();
+    this.dialogRef.close( true );
   }
 
 }

@@ -6,14 +6,16 @@ import { Store } from '@ngrx/store';
 
 import * as fromStore from '@appStore/index';
 import * as fromSelectors from '@appStore/selectors/index';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { PrepareByLoc, Exec } from '@appStore/actions/any-entity-set.actions';
-import { filter } from 'rxjs/operators';
+import { filter, mergeMap, map, tap, switchMap, take, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { GetItemsPart } from '@appStore/actions/any-entity.actions';
+import { fillLocationMacros } from 'app/shared/services/foregin/foreign-key.helper';
 
 
 const DEF_VALID_ERROR = "Неверное значение";
 const REF_LOC_PROP    = "optionsRefLoc";
+const ROW_SEED_PROP   = "rowSeed$";
 
 @Component({
   selector: 'app-jn-item-question',
@@ -43,17 +45,52 @@ export class JnItemQuestionComponent implements OnInit{
 
     if(this.question.controlType == 'dropdown'){
        //this.options$ = this.store.select( fromSelectors.selectOptionsByLoc( this.question[REF_LOC_PROP] ));             //чистый 
-       this.options$ = this.store.select( fromSelectors.selectForeignOptionsByLoc( this.question[REF_LOC_PROP] ));        //референсный 
 
-       //this.options$.subscribe( x=>{ console.log(this.question.key);console.log(this.question[REF_LOC_PROP]) ;console.log(x); })
+      //  this.options$ = this.question.hasOwnProperty(ROW_SEED_PROP) ? this.question[ROW_SEED_PROP] : of(null).pipe(
+      //     tap( x => console.log( this.question)),
+      //     map( x => x && this.question.hasOwnProperty(REF_LOC_PROP) ?  fillLocationMacros(this.question[REF_LOC_PROP],x )  : ""   ),
+      //     tap( (x:string) => x ? this.store.dispatch( new PrepareByLoc( x )) : null ),
+      //     switchMap( x => this.store.select( fromSelectors.selectForeignOptionsByLoc$( this.question[REF_LOC_PROP], this.question[ROW_SEED_PROP]  )).pipe(    mergeMap( x=>x ) ) )
+      //  )
+
+      this.options$ = this.store.select( 
+         fromSelectors.selectForeignOptionsByLoc$( this.question[REF_LOC_PROP], this.question[ROW_SEED_PROP]  )).pipe(    
+           mergeMap( x=>x ) ,
+           filter( x => !!x ),
+           //distinctUntilChanged(),
+           //take(1), //151020
+           //tap(x=>console.log(x))
+          ) ;
+          
+      //   );       //референсный 
+
+
     }
 
     //this.form.valueChanges.subscribe(x => console.log(x));
   }
 
   private prepareSecondaryData (){
-    !this.question.hasOwnProperty(REF_LOC_PROP) ? null:
-        this.store.dispatch( new PrepareByLoc( this.question[REF_LOC_PROP] ));
+    //console.log(this.question) ;
+
+    ( this.question.hasOwnProperty(ROW_SEED_PROP) && this.question[ROW_SEED_PROP] ? this.question[ROW_SEED_PROP] : of(null)).pipe(
+       //tap( x => console.log( this.question )),
+    //   tap( x => console.log( x )),
+      map( x => x && this.question.hasOwnProperty(REF_LOC_PROP) ?  fillLocationMacros(this.question[REF_LOC_PROP], x )  : ""   ),
+   //   tap( x => console.log(x) ),
+      take(1)
+    ).subscribe( x =>  !!x ? this.store.dispatch( new PrepareByLoc(x) ) : null  );
+
+      
+      
+    //fillLocationMacros(loc,x)
+    //isFullIndepended
+      
+
+    // if( this.question.hasOwnProperty(ROW_SEED_PROP)  )  
+
+    // !this.question.hasOwnProperty(REF_LOC_PROP) ? null:
+    //     this.store.dispatch( new PrepareByLoc( this.question[REF_LOC_PROP] ));
 
     //!this.question.hasOwnProperty(REF_LOC_PROP) ? null: console.log(this.question[REF_LOC_PROP]);
     

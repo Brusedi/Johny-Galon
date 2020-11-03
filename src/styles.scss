@@ -59,3 +59,23 @@ body{
     font-family: Roboto, "Helvetica Neue", sans-serif;
 }    
 
+//Snackbar
+.jg-snack-bar-basic{
+    background-color:mat-color(mat-palette($mat-grey,400));
+}
+.jg-snack-bar-primary{
+    background-color:mat-color($candy-app-primary);
+    
+}
+.jg-snack-bar-accent{
+    background-color:mat-color($candy-app-accent);
+    color:black;
+}
+
+.jg-snack-bar-accent .mat-simple-snackbar-action {
+    color: black;
+}
+
+.jg-snack-bar-warn{
+    background-color:mat-color($candy-app-warn);
+}

@@ -63,9 +63,36 @@ export const ActionContent:anyEntityOptions<AnyEntityId> = {
   selBack: (x:string) => ("?id=" + x )
 };      
 
+
+/// Risk Entitys
+
 export const RiskExamItemsOption:anyEntityOptions<AnyEntityId> = {
   name: "ExamItems", 
   location:"/NvaRisks/ExamItems", 
-  selectId: (x) => x.ID,
+  selectId: (x) => x.ExamID,
   selBack: (x:string) => ("/" + x )
 };      
+
+
+export const RiskFactorsGroupOption:anyEntityOptions<AnyEntityId> = {
+  name: "RiskFactorsGroup", 
+  location:"/NvaAx/NVA_OMA_RISKSFACTORSGROUP", 
+  selectId: (x) => x.RECID,
+  selBack: (x:string) => ("/" + x )
+};      
+
+
+export const RiskAssessmentOption:anyEntityOptions<AnyEntityId> = {
+  name: "RiskAssessment", 
+  location:"/NvaAx/NVA_OMA_RISKSASSESSMENT", 
+  selectId: (x) => x.RECID,
+  selBack: (x:string) => ("/" + x )
+}; 
+
+export const RiskFactorsOption:anyEntityOptions<AnyEntityId> = {
+  name: "RiskFactors", 
+  location:"/NvaAx/NVA_OMA_RISKSFACTORS", 
+  selectId: (x) => x.RECID,
+  selBack: (x:string) => ("/" + x )
+}; 
+

@@ -100,7 +100,7 @@ export class AuthService {
     */ 
    public  LoginByReq = ( logRequest:authingReqData ,timeOutSec:number ) => 
         of(logRequest).pipe(
-            tap(x => console.log(x)),
+            //tap(x => console.log(x)),
             mapTo( logRequest.tag ),               
             mergeMap( x => 
                 (x == TAG_GOOGLE)
@@ -260,7 +260,7 @@ export class AuthService {
         const parseLoginResult = (w:Window, herf:string ) =>{
             const rPar = ( url:string, par:string ) =>   new URL(url).searchParams.get(par) ;   
             const closeIf =  ( x:Window) => { try { x.close() ; return true } catch (e) { return false ; } }
-            console.log(w);
+            //console.log(w);
             var retAct = isHerfReadingAndstartsWith(w,herf) 
                 ?  rPar( w.location.href ,'code') 
                     ? new AuthSuccess( rPar( w.location.href ,'code') )  

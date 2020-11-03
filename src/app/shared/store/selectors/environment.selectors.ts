@@ -22,6 +22,36 @@ export const selEnvIsAuthed = createSelector(
     (x:State) => x&&x.authenticated ?  x.authenticated : false
 ); 
 
+export const selEnvIsAuthenticating = createSelector(
+    environmentStore,
+    (x:State) => x&&x.authenticating ?  x.authenticating : false
+); 
+
+
+/*
+*  Authed + request token resived 
+*/
+export const selEnvIsAuthedFull = createSelector(
+    environmentStore,
+    selEnvIsAuthed,
+    (x:State, auth ) => auth && x.authgData && x.authgData.hasOwnProperty("authTokenRequesting")   &&  !x.authgData.authTokenRequesting  && !!x.authgData.idToken 
+); 
+
+/*
+*  Authing + request token continue.... 
+*/
+export const selEnvIsAuthenticatingFull = createSelector(
+    environmentStore,
+    selEnvIsAuthenticating, //auth  || 
+    (x:State,auth) =>  auth  ||  (  !!x  && x.hasOwnProperty("authgData") &&  !!x.authgData  && x.authgData.hasOwnProperty("authTokenRequesting")  &&  x.authgData.authTokenRequesting )
+); 
+
+// Стоит ли ждать аутентификации True - Стоит  False - не стоит
+// Не стоит ждать если уже аутентифицирован, 
+// Стоит если   
+
+
+
 export const selEnvAuthCode = createSelector(
     environmentStore,
     (x:State) => x&&x.authenticated ?  ( x.authgData && x.authgData.authCode ? x.authgData.authCode : undefined ) : undefined 

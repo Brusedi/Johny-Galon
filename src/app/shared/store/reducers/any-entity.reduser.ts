@@ -159,7 +159,7 @@ export function reducerFromAdapter( adapt: EntityAdapter<any>){
             /// uploaded
             case AnyEntityActionTypes.EROR_ANY_ENTITY:{
                 //console.log(action);
-                return { ...state, loading: false, uploading:false, metaLoading:false , error: action.payload };        //loaded: false     
+                return { ...state, loading: false, uploading:false, metaLoading:false, error: action.payload };        //loaded: false     
             }
                 
             case AnyEntityActionTypes.EROR_ANY_ENTITY_RESET:

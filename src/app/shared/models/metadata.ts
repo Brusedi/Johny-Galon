@@ -22,6 +22,7 @@ export interface FieldDescribe {
     validators?: ValidatorFn[]
     validationMessages? : { [key: string]: string }  
     order?:number
+    group?:string
   }
 
 export type FieldDescribes = ({

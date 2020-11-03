@@ -7,7 +7,12 @@ import { fldDescsToQuestions,toFormGroup, toFormGroup$ } from "../../question/ad
 import { getLocationMacros, locationToName, locationInfo, fillLocationMacros, isFullIndepended } from "app/shared/services/foregin/foreign-key.helper";
 import { getMdOptons, getMdOptonsFromDict, getRowVal } from "app/shared/services/metadata/metadata.helper";
 import { EntityAdapter } from "@ngrx/entity";
-import { map, filter, switchMap } from "rxjs/operators";
+import { map, filter, switchMap, tap } from "rxjs/operators";
+import { and } from "@angular/router/src/utils/collection";
+import { BackContextMode } from "@appModels/any-entity";
+import { QuestionBase } from "app/shared/question/question-base";
+import { FormGroup } from "@angular/forms";
+import { FieldDescribe } from "@appModels/metadata";
 
 ///////// HELPERS /////////////////////////////////////////////////////
 
@@ -64,6 +69,14 @@ export const selectIsMetadataLoaded = ( id: string ) =>
         (dt, is) =>  is && dt.items[id].state.metaLoaded
 );
 
+// Загруженна ли запись данных
+export const selectIsRowLoaded = ( id: string, idRow:any ) => 
+    createSelector(
+        selectData(id),
+        dt => dt && dt.state && dt.state.entities &&  dt.state.entities[idRow] 
+);
+
+
 
 // пукалка
 export const selectJab = () => 
@@ -93,7 +106,7 @@ export const selectById = ( id: string, idRow: any ) =>
         dt => dt && dt.state && dt.state.entities &&  dt.state.entities[idRow] ? dt.state.entities[idRow] : undefined
  );
 
-
+ 
  export const selectDataItems = ( id: string) => 
      createSelector(
         selectData(id),
@@ -149,6 +162,50 @@ export const selectEntityError = ( id: string ) =>
         (items:AnyEntytySetItemState<any>) => items.state.error
 );
 
+//Is Error of entity
+export const selectEntityIsError = ( id: string ) => 
+    createSelector(
+        selectData(id),
+        (items:AnyEntytySetItemState<any>) => !!items.state.error
+);
+
+//Is Error is can fixeble
+// export const selectEntityIsFixebleError = ( id: string ) => 
+//     createSelector(
+//         selectData(id),
+//         (items:AnyEntytySetItemState<any>) => 
+//         { 
+//             // console.log(items.state.error );
+//             // console.log(  (!!items.state.error ) 
+//             //                     ? items.state.error.hasOwnProperty("status") && items.state.error["status"] == 401 
+//             //                         ? true
+//             //                         : false
+//             //                     : undefined    );
+
+//             return  (!!items.state.error ) 
+//                         ? items.state.error.hasOwnProperty("status") && items.state.error["status"] == 401 
+//                             ? true
+//                             : false
+//                         : undefined   
+            
+//         }
+// );
+
+// Комплексный селектор состояния Entity
+// 
+// export const selectEntityStateResume = ( id: string, mode:BackContextMode ) => 
+//     selectData(id),
+//     (items:AnyEntytySetItemState<any>) =>({
+//         isLoaded:      mode == BackContextMode.Data 
+//                             ? items.state.loaded 
+//                             : mode == BackContextMode.Metadata 
+//                                 ? items.state.metaLoaded
+//                                 : items.state.metaLoaded,
+//         isLoading:     
+//     })    
+
+
+
 // 
 // export const selectEntity = ( id: string ) => 
 //     createSelector(
@@ -186,6 +243,20 @@ export const selectTemplate = (id: string) =>
 );    
 
 
+//
+export const selectIsDataLoading = (id: string) =>
+    createSelector( 
+        selectData(id),
+        (x:AnyEntytySetItemState<any>) => x.state.loading 
+);    
+
+export const selectIsMetaLoading = (id: string) =>
+    createSelector( 
+        selectData(id),
+        (x:AnyEntytySetItemState<any>) => x.state.metaLoading
+);    
+
+
 /**
  *  item is Loading (buzy)
  */
@@ -215,6 +286,15 @@ export const selFieldDescribes = (id:string) =>
                                     .sort( (a, b) => a.order - b.order  )
     });  
 
+export const selFieldDescribe = (id:string, fldName:string ) =>  
+    createSelector(   
+        selFieldDescribes(id),   
+            xs =>  {
+                return xs.reduce(  (a:FieldDescribe,i:FieldDescribe) => !a && i.id == fldName  ? i : a  , null ) ;
+            }                
+        );     
+
+
 export const selRowTemplate = (id:string) =>
     createSelector( selectDatas, x => 
         ! x.items[id] ? null : 
@@ -240,9 +320,11 @@ export const selQuestionsEx = (id:string, flds:string[], rowSeed$:Observable<{}>
     );   
 
 /**
- *  Return джентельменский набор контролов для редактирования в форме  
+ *  Return джентельменский набор контролов для редактирования в форме   !!!!!
  */     
-export const selFormControlsEx$ = ( id:string, flds:string[] , rowSeed$:Observable<{}> ) =>   //, rowSeed$:Observable<{}>
+export const selFormControlsEx$: ( id:string, flds:string[] , rowSeed$:Observable<{}> ) => MemoizedSelector<object,Observable< {questions:QuestionBase<any>[] ,formGroup:FormGroup }>> =  // 180820 []
+
+    ( id:string, flds:string[] , rowSeed$:Observable<{}> ) =>   //, rowSeed$:Observable<{}>
     createSelector(
         selQuestionsEx(id,flds,rowSeed$),
         selectIsMetadataLoaded(id),
@@ -391,7 +473,7 @@ export const selCurQuestionsEx = (flds:string[] , rowSeed:{} ) =>
         selCurFieldDescribes(), 
         selCurRowTemplate(),
         (x, t) => !x ? undefined :  
-            fldDescsToQuestions(  flds.map( y => x.find( (e,i,a)=> (e.id == y)  )), {...t, ...rowSeed}) 
+            fldDescsToQuestions(  flds.map( y => x.find( (e,i,a)=> (e.id == y)  )), of({...t, ...rowSeed}))   // of()  201020
     );    
 
 export const selCurFormGroupEx = ( flds:string[] , rowSeed:{} ) => 
@@ -409,6 +491,33 @@ export const selCurFormControlsEx = (flds:string[] , rowSeed:{}) =>
         (x,y) =>  ({questions:x, formGroup:y})       
     );    
 
+
+// Rebuild 201020 for rowseed stream ////////////////////////////////////////////////////////////////////////////
+export const selCurTemplRowSeed$ = ( rowSeed$:Observable<{}> ) => 
+    createSelector(
+        selCurRowTemplate(),
+        (t) =>   rowSeed$.pipe(  map( x=>  ({...t, ...x})))     
+    );
+
+export const selCurQuestionsExS = (flds:string[] , rowSeed$:Observable<{}> ) =>  
+    createSelector( 
+        selCurTemplRowSeed$( rowSeed$ ),
+        selCurFieldDescribes(), 
+        (rst, x) => ({  
+            questions    : !x ? undefined :  fldDescsToQuestions(  flds.map( y => x.find( (e,i,a) => (e.id == y) )), rst )  ,
+            rowSeedTmp$  :  rst
+        }) 
+    );    
+
+export const selCurFormControlsExS = (flds:string[] , rowSeed$:Observable<{}>) =>
+    createSelector( 
+        selCurQuestionsExS(flds,rowSeed$),
+        (x) =>  ({
+                questions:x.questions, 
+                formGroup: toFormGroup$(x.questions, x.rowSeedTmp$ ) 
+        })       
+    );    
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -569,6 +678,16 @@ export const selectDataIfExist = ( id: string ) =>
         selectStateIfExist(id),
         (x) => x ? ( x.state.loaded ? x.state.entities : null ) : null
     );
+/**
+*   Select entyty row  by location and key if exist & loading
+*/
+export const selectDataRowIfExist = ( id: string, key:any ) =>
+    createSelector(
+        selectStateIfExist(id),
+        (x) => x ? (  x.state.entities ? x.state.entities[key] : null ) : null
+    );
+
+
 
 /**
 *   Select entytes & metadata if exist & loading 
@@ -596,7 +715,12 @@ export const selectIsExistByLoc = ( loc: string ) => selectIsExist( locationToNa
 export const selectIsPreparedByLoc = ( loc: string ) => selectIsMetadataLoaded( locationToName(loc) ) ;
 
 export const selectDataOptionsByLoc = ( loc: string ) => selectDataOptions( locationToName(loc) ) ;
-    
+
+export const selInsertedId = (id: string) => 
+    createSelector(
+        selectStateIfExist(id),
+        x => x ?  x.state.insertedId : null 
+    ); 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 /**
@@ -631,6 +755,8 @@ export const selectResolvedLoc =  ( loc: string ) =>
         x => fillLocationMacros(loc,x)
     );  
 
+
+
 /**
 *  Select resolved location by location
 *  TODO Chek if empty...
@@ -646,11 +772,43 @@ export const selectResolvedLocFromTemplate =  ( loc: string ) =>
 *   Возможен только относительно лукашина, начну сразу с депенденса    
 *   Сделать через два готовых селектора передав результат одного в качестве параметра другого не вышло - пока не парюся....    
 */
+export const selectForeignOptionsByLoc$ = ( loc: string , rowSeed$:Observable<{}> ) => 
+    createSelector(
+        selectStateIfExist(locationToName(loc)),
+        (dt) => (rowSeed$? rowSeed$:of({}) ).pipe(  
+            map( x => dt 
+                    ? ({
+                        data: (dt.state.entities), 
+                        parts: ( Object.keys(dt.state.partLoaded).length > 0) ? (dt.state.partLoaded):null, 
+                        meta: dt.state.metadata,
+                        rowSeed:x,
+                        resLoc: fillLocationMacros(loc,x)
+                    })
+                    :null
+            ), 
+            map( x => x 
+                    ? ({
+                        meta: x.meta,
+                        data: isFullIndepended(loc)  
+                            ? x.data
+                            : x.data && x.parts && (x.resLoc in x.parts) 
+                                ? x.parts[x.resLoc].reduce( (a,i) => ({...a, [i]:x.data[i]}) , {} ) 
+                                : null
+                    })                        
+                    :null 
+            ),
+            //tap(  x => console.log(x)  ),
+            map( x => x && x.data && x.meta && x.meta.table ? getMdOptonsFromDict(x.data, x.meta.table ):null    )
+        )
+    );    
+
+            
 export const selectForeignOptionsByLoc = ( loc: string ) => 
     createSelector(
         selectStateIfExist(locationToName(loc)),
         selectResolvedLoc(loc),
         (x,l) => {
+            console.log(l);
             const dap = x ? ({ data: (x.state.entities), parts: ( Object.keys(x.state.partLoaded).length > 0) ? (x.state.partLoaded):null, meta:x.state.metadata }) : null ;
             const selData = !x ? null:(
                 isFullIndepended(loc) ? dap.data :(
@@ -662,6 +820,7 @@ export const selectForeignOptionsByLoc = ( loc: string ) =>
             return ret;
         }
     );
+    
 
 export const selectForeignDataByLoc = ( loc: string ) => 
     createSelector(

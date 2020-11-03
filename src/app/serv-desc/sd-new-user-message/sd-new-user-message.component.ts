@@ -1,8 +1,8 @@
 import { FormGroup }          from '@angular/forms';
 import { Component, OnInit }  from '@angular/core';
-import { Store }              from '@ngrx/store';
+import { select, Store }              from '@ngrx/store';
 import { Observable, from, Subscription, of  }         from 'rxjs';
-import { skipUntil, skip, tap, filter, map, mergeMap, distinctUntilChanged, combineLatest, skipWhile, takeLast, take }          from 'rxjs/operators';
+import { skipUntil, skip, tap, filter, map, mergeMap, distinctUntilChanged, combineLatest, skipWhile, takeLast, take, switchMap }          from 'rxjs/operators';
 
 import * as fromStore         from '@appStore/index';
 import * as fromSelectors     from '@appStore/selectors/index';
@@ -22,10 +22,13 @@ const rowSeedExtFoo = () => ({ EventTypeID:"VoluntaryReportsInfo", CreatedDateTi
 export class SdNewUserMessageComponent implements OnInit {
 
   public controls$: Observable<{ questions:any, formGroup:FormGroup} >;
+  //public controls$: Observable<{ questions:any, formGroup:Observable<FormGroup>} >;
+
   private buzy$:Observable<boolean>;
   private complete$ :Observable<boolean>;
   //private completeRec$ :Observable<any>;
   public controls: { questions:any, formGroup:FormGroup}; 
+  
   
   //private fGroup:FormGroup; 
   //private fQuestions:FormGroup; 
@@ -47,11 +50,45 @@ export class SdNewUserMessageComponent implements OnInit {
 
   buildStreams(){
 
+
+  //231020
+  this.controls$ = this.store.pipe(
+    select( fromSelectors.selCurFormControlsEx( 
+        flds,
+        this.store.pipe(
+          select( fromSelectors.selCurRowTemplate() ),
+          filter( x => !!x && Object.keys(x).length > 0  ), 
+        )
+     ))
+  ) ;
+
+  // this.controls$ =  this.store.pipe(
+  //     select( fromSelectors.selCurRowTemplate() ),
+  //     filter( x => !!x && Object.keys(x).length > 0  ), 
+  //     mergeMap(  x =>  this.store.pipe(
+  //         select( fromSelectors.selCurFormControlsEx( flds ,x) )
+  //     ))
+  //  )
+
+
+    // 201020
+    //  this.controls$ =  this.store.pipe(
+    //    select( fromSelectors.selCurRowTemplate() ),
+    //    filter( x => !!x && Object.keys(x).length > 0  ), 
+    //    mergeMap(  x =>  this.store.pipe(
+    //        select( fromSelectors.selCurFormControlsEx( flds ,x) )
+    //    ))
+    // )
+
+
     // Build controls set after getting row template
-    this.controls$ = 
-      this.store.select( fromSelectors.selCurFormControlsEx( flds ,{})).pipe(
-         skipUntil( this.store.select( fromSelectors.selCurRowTemplate() ).pipe( skip(1) ) )   //горбатенько немного...
-      );  
+    // this.controls$ = 
+    //   this.store.select( fromSelectors.selCurFormControlsEx( flds ,{})).pipe(
+    //      skipUntil( this.store.select( fromSelectors.selCurRowTemplate() ).pipe( skip(1) ) ) ,  //горбатенько немного...
+    //      tap(x=>console.log(x))
+    //   );  
+
+
 
    
     this.buzy$ = this.store.select( fromSelectors.selCurItem( )).pipe(
@@ -76,8 +113,11 @@ export class SdNewUserMessageComponent implements OnInit {
 
     // push control changes to store
     this.subscriptions.push(
-      this.controls$
-        .pipe( mergeMap(x => x.formGroup.valueChanges))
+      this.controls$.pipe( 
+          //tap(x => console.log(x) ),
+          mergeMap(x => x.formGroup.valueChanges),
+          //tap(x => console.log(x) ),
+        )
         .subscribe( x=> this.store.dispatch(new ExecCurrent( new ChangeRowSeed({...x, ...rowSeedExtFoo()})  ) ))   ///new SetRowSeed(x)
     );
 

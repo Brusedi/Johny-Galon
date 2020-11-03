@@ -26,7 +26,8 @@ import {
   MatGridListModule,
   MatTreeModule,
   MatChipsModule,
-  MatExpansionModule
+  MatExpansionModule,
+  MatSnackBarModule
 } from '@angular/material';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -48,7 +49,7 @@ import { JnNewItemComponent } from './jn-galon/jn-entity/jn-new-item/jn-new-item
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { JnItemQuestionComponent } from './jn-galon/jn-entity/jn-item-question/jn-item-question.component';
 import { ReactiveFormsModule ,FormsModule } from '@angular/forms';
-import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine, AuthTestDataOption, RiskExamItemsOption } from '@appModels/entity-options';
+import { JgMockTableOption, SdIncomingOption, NvaPlanPurchaseLine, AuthTestDataOption, RiskExamItemsOption, RiskFactorsGroupOption, RiskAssessmentOption, RiskFactorsOption } from '@appModels/entity-options';
 import { AppResolverService } from './shared/services/app-resolver.service';
 import { SdNewUserMessageComponent } from './serv-desc/sd-new-user-message/sd-new-user-message.component';
 import { JnInfoBoxComponent, JnInfoBoxDialogComponent} from './jn-galon/jn-info-box/jn-info-box.component';
@@ -93,16 +94,18 @@ const appRoutes: Routes = [
   { path: 'tutoral/values',    component: JnRootComponent,                    data: {  option: AuthTestDataOption } , resolve: { isLoad:AppResolverService  } },  
   { path: 'forms/sd/incoming', component: SdNewUserMessageComponent,          data: {  option: SdIncomingOption }   , resolve: { isLoad:AppResolverService  } },  
 
-  { path: 'forms/wc',          component: JnWebCntMainNstComponent          },  
-  { path: 'forms/wc/:id',      component: JnWebCntItemComponent             },  
+  // { path: 'forms/wc',          component: JnWebCntMainNstComponent          },  
+  // { path: 'forms/wc/:id',      component: JnWebCntItemComponent             },  
 
   { 
       path: 'forms/risks',
       component: JnRiskExamComponent,  
       data:{  
         load:[  
-          BackContextDescriptor.Meta(RiskExamItemsOption),
-          BackContextDescriptor.Data(RiskExamItemsOption) 
+          BackContextDescriptor.Meta(RiskExamItemsOption) ,
+          BackContextDescriptor.Data(RiskFactorsGroupOption),
+          BackContextDescriptor.Data(RiskAssessmentOption),
+          BackContextDescriptor.Data(RiskFactorsOption),
         ]   
       },
       resolve: { isLoad:AppAuthResolverService  } 
@@ -150,7 +153,8 @@ const appRoutes: Routes = [
     JnRiskExamComponent,
     JnErrorBarComponent,
     JnAuthSelectorComponent,
-    JnAuthSelectorDialogComponent
+    JnAuthSelectorDialogComponent,
+    
     
    
   ],
@@ -203,6 +207,7 @@ const appRoutes: Routes = [
     MatChipsModule,
     CKEditorModule,
     MatExpansionModule,
+    MatSnackBarModule
     
     
     

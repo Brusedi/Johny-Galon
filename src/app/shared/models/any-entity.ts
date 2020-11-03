@@ -41,6 +41,16 @@ export enum BackCommonContextMode { Data, Metadata }
 
 export enum BackContextMode { Data, Metadata, MetadataField, Record }
 
+
+export const BackContextModeToStr = ( mode:BackContextMode ) =>  (  <[BackContextMode,string][]> [
+          [BackContextMode.Data, "Data"],
+          [BackContextMode.Metadata, "Metadata"],
+          [BackContextMode.MetadataField, "MetadataField"],
+          [BackContextMode.Record, "Record"]
+     ]).reduce( (a,x) =>  !a && mode == x[0] ? x[1] :a , undefined)
+
+
+
 export interface IBackFieldMeta<T> {
      options : anyEntityOptions<T>
      field: string

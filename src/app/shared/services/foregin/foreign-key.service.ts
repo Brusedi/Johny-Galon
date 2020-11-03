@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { locationToName,  getBaseLocation, getIdFromMeta, locToEntityOption, isFullIndepended } from './foreign-key.helper';
 import { tap, filter, take, map, mergeMap, switchMap, combineLatest, last, distinctUntilChanged} from 'rxjs/operators';
 import { Exec, AddItem } from '@appStore/actions/any-entity-set.actions';
-import { GetItemsMeta, GetItems } from '@appStore/actions/any-entity.actions';
+import { GetItemsMeta, GetItems, GetItemsPart } from '@appStore/actions/any-entity.actions';
 
 import { DataProvService } from '../data-prov.service';
 
@@ -71,24 +71,19 @@ export class ForeignKeyService {
 
     return this.isExist$(loc)
       .pipe(
-        //tap(x=>console.log('isExist'+loc)),
         map( x => ({lc:loc, isExst:x})),
         mergeMap( x => getLocOption$( x.lc, x.isExst )),
-       // tap(x=>console.log('getLocOption')),
         tap( x => !x.isExst ? this.store.dispatch( new AddItem(x.opt)) : null ),
-        filter( x => x.isExst)
+        filter( x => x.isExst )
       ).pipe(          
         map( x => x.opt),
-        //tap(x=>console.log('prepareForeignData$')),
         mergeMap( o =>  this.store.select(fromSelectors.selectIsMetadataLoaded(o.name)).pipe(map(x=>({isMdLoaded:x, opt:o })))),
-        //tap(x=>console.log(x)),
         tap( x => x.isMdLoaded ? null:  this.store.dispatch( new Exec( {name:x.opt.name , itemAction: new GetItemsMeta()}))),
-        //tap(x=>console.log('disp GetItemsMeta$')),
         filter( x => x.isMdLoaded ),
       ).pipe(
-        tap( x => isFullIndepended(loc)?
-            this.store.dispatch( new Exec( {name:x.opt.name , itemAction: new GetItems(undefined)})):
-            null  
+        tap( x => isFullIndepended(loc)
+            ? this.store.dispatch( new Exec( {name:x.opt.name , itemAction: new GetItems(undefined)}))
+            : this.store.dispatch( new Exec( {name:x.opt.name , itemAction: new GetItemsPart(loc)}))  // null   210820
         ),
         //tap( x => isFullIndepended(loc)?this.store.dispatch( new Exec( {name:x.opt.name , itemAction: new GetItems(undefined)})):null  ),
         map( x => x.isMdLoaded ),

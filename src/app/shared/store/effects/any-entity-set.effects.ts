@@ -13,7 +13,7 @@ import { anyEntityOptions } from "@appModels/any-entity";
 import { MetadataProvService } from "app/shared/services/metadata/metadata-prov.service";
 import { ForeignKeyService } from "app/shared/services/foregin/foreign-key.service";
 import { DataProvService } from "app/shared/services/data-prov.service";
-import { ErrorEnvironment, AuthStart } from "@appStore/actions/environment.actions";
+//import { ErrorEnvironment, AuthStart } from "@appStore/actions/environment.actions";
 import { BackProvService } from "app/shared/services/back-prov.service";
 import { ErrorHandlerService } from "app/shared/services/error-handler.service";
 
@@ -157,13 +157,13 @@ export class anyEntytySetEffects {
                 this.procSubAction$( x.payload.itemAction, x.payload.itemOption )
             )   
         ),
-        tap(x=>console.log(x))
+        //tap(x=>console.log(x))
 
     )            
 
     // proceccing child items effects            
     private procSubAction$ = ( action : anyEntityActions, options: anyEntityOptions<any>  ): Observable<any> => {
-        console.log(action);
+        //console.log(action);
         switch(action.type){
             case ( AnyEntityActionTypes.UPD_ITEM_SUCCESS) :{
                 console.log('eeeeeeee');
@@ -221,7 +221,9 @@ export class anyEntytySetEffects {
                         switchMap(()=>this.metadataService.metadata$( options.location ) )
                     ).pipe(
                         map(x => new GetItemsMetaSuccess(x) ),
-                        catchError(error => of(new ErrorAnyEntity(error)).pipe(tap( x=>  console.log(x) )))
+                        catchError(error => of(new ErrorAnyEntity(error))
+                        //.pipe(tap( x=>  console.log(x) ))
+                        )
                     ); 
 
                 // return this.metadataService.metadata$( options.location ) // options.selBack(action.payload)
@@ -255,7 +257,7 @@ export class anyEntytySetEffects {
 
             case ( AnyEntityActionTypes.EROR_ANY_ENTITY ) :{
 
-                return this.errorHandlerService.AnyEntityLevelHandling( action , options ).pipe( 
+                return this.errorHandlerService.AnyEntityLevelHandling$( action , options ).pipe( 
                     map( x => ({ freeAction:x }))
                 ) ;
 
@@ -276,7 +278,7 @@ export class anyEntytySetEffects {
     
     private procNextSubAction$ = ( options: anyEntityOptions<any>,  act$: Observable<any> ): Observable<any> => 
         act$.pipe( 
-            tap( x=>  console.log(x) ),
+            //tap( x=>  console.log(x) ),
             map(x  =>  x != null 
                         ? x.freeAction 
                               ? x.freeAction 

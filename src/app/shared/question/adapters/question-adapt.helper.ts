@@ -54,6 +54,7 @@ export const getDefValByType = (type:string) => DEFAULT_VALUES_FOR_TYPES.hasOwnP
 * Return new rowTemplate (RowSeed) for FieldDescribe[] by FieldDescribe def value 
 */
 export const genRowTemplateByFldsDesc = (flds:FieldDescribe[]) => flds.reduce( (a,x) => ({ ...a , [x.id]:x.defaultValue }) ,{} )
+
 /**
 * Return new rowTemplate (RowSeed) for FieldDescribe[] by Type def value 
 */
@@ -94,7 +95,9 @@ export const fldDescsToQuestions = (flds:FieldDescribe[],rowSeed:Observable<{}>)
     } 
     return flds
             .filter( x => ( x  && x.visible  )) //&& x.visible != false
+            .sort( (a,b) => a.order - b.order )
             .map(x => toQuest(x, rowSeed));
+            
 }
 
 /******************************************************************************************************* */
@@ -120,7 +123,9 @@ const toDropDown = (x:FieldDescribe, rowSeed$:Observable<{}>) => {
     const buildBaseOption = (x:FieldDescribe, rowSeed$:Observable<{}>) => {
         var ret = buildQuestionBaseOption(x, rowSeed$ );
         //ret['options$'] = buildOptions(x.foreignKey, rowSeed$);      
-        ret['optionsRefLoc'] = x.foreignKey;      
+        ret['optionsRefLoc'] = x.foreignKey;   
+        ret['rowSeed$'] = rowSeed$;   
+        
         return ret;
     }
   return new DropdownQuestion(buildBaseOption(x,rowSeed$)) ; 
@@ -191,9 +196,13 @@ const toCheckbox = (x:FieldDescribe, rowSeed$:Observable<{}>) => {
         if( question.disabled ){
           cntrl.disable();    
         }  
-
+        //console.log(initVal);
+        //console.log(question.key);
         group[question.key] = cntrl;    
     });
+
+    //console.log('wwwwwwwwwwwwwwwwwwwwwwwwwwwwwww');
+
     return new FormGroup(group);
 
   }  

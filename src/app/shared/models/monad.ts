@@ -55,8 +55,12 @@ export class MonadExtention{
 * Either As Haskell lexic
 */
 export class Either<E,T> {
+    switchMap(arg0: (x: any) => import("rxjs").OperatorFunction<unknown, unknown[]>) {
+      throw new Error("Method not implemented.");
+    }
     public static Left =  <E,U>( e:E )   => new Either<E,U>(true, e, null ) ;
     public static Right = <E,U>( v:U ) => new Either<E,U>(false, null,v) ;
+    //public static Of = <E,T>( v:T ) => Either.Right<ER,T>(v) ;
     private constructor( private readonly isLeft:boolean, private readonly err?:E, private readonly val?:T ){ }                             // лигитимные типы могут быть нулэйблы, нужен флаг :( ...
     public bind :  <U>( f:((x:T) => Either<E,U>)) => Either<E,U> = (f)  => this.isLeft ? Either.Left(this.err) : f(this.val) ;
     public ret  = <U>( v:U ) => Either.Right<E,U>(v) ;
