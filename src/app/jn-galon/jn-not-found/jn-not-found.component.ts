@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-jn-not-found',
@@ -7,7 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class JnNotFoundComponent implements OnInit {
 
-  constructor() { }
+  constructor(private location: Location) { }
+
+  
+  back() {
+      this.location.back();
+  }
 
   ngOnInit() {
   }

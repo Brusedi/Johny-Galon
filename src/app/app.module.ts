@@ -79,6 +79,7 @@ import { JnErrorBarComponent } from './jn-galon/jn-error-bar/jn-error-bar.compon
 import { BackContextDescriptor } from '@appModels/any-entity';
 import { AppAuthResolverService } from './shared/services/app-auth-resolver.service';
 import { JnAuthSelectorComponent, JnAuthSelectorDialogComponent } from './jn-galon/jn-auth-selector/jn-auth-selector.component';
+import { JnAgreeComponent } from './jn-galon/jn-agree/jn-agree.component';
 
 
 
@@ -110,6 +111,8 @@ const appRoutes: Routes = [
       },
       resolve: { isLoad:AppAuthResolverService  } 
   },  
+
+  { path: 'agreements', component: JnAgreeComponent  },   
 
   { path: '**',                component: JnNotFoundComponent }
 ];
@@ -154,6 +157,7 @@ const appRoutes: Routes = [
     JnErrorBarComponent,
     JnAuthSelectorComponent,
     JnAuthSelectorDialogComponent,
+    JnAgreeComponent,
     
     
    

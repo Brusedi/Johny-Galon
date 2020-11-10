@@ -55,9 +55,9 @@ export class MonadExtention{
 * Either As Haskell lexic
 */
 export class Either<E,T> {
-    switchMap(arg0: (x: any) => import("rxjs").OperatorFunction<unknown, unknown[]>) {
-      throw new Error("Method not implemented.");
-    }
+    // switchMap(arg0: (x: any) => import("rxjs").OperatorFunction<unknown, unknown[]>) {
+    //   throw new Error("Method not implemented.");
+    // }
     public static Left =  <E,U>( e:E )   => new Either<E,U>(true, e, null ) ;
     public static Right = <E,U>( v:U ) => new Either<E,U>(false, null,v) ;
     //public static Of = <E,T>( v:T ) => Either.Right<ER,T>(v) ;
